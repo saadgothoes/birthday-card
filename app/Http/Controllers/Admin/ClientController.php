@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class ClientController extends Controller
 {
@@ -49,12 +50,21 @@ class ClientController extends Controller
             'role'           => 'client',
         ]);
 
-        // Email bhejo
-        Mail::to($client->email)->send(
-            new ClientWelcomeMail($client->name, $client->email, $plainPassword)
-        );
+        $flashType = 'success';
+        $flashMessage = "Client created! Credentials sent to {$client->email}";
+
+        try {
+            Mail::to($client->email)->send(
+                new ClientWelcomeMail($client->name, $client->email, $plainPassword)
+            );
+        } catch (TransportExceptionInterface $exception) {
+            report($exception);
+
+            $flashType = 'warning';
+            $flashMessage = "Client created, but the welcome email could not be sent. Check your mail configuration and try again.";
+        }
 
         return redirect()->route('admin.clients.index')
-            ->with('success', "Client created! Credentials sent to {$client->email}");
+            ->with($flashType, $flashMessage);
     }
 }

@@ -52,6 +52,14 @@
         margin-bottom: 1rem;
     }
 
+    .warning {
+        background: #fef3c7;
+        color: #92400e;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -97,6 +105,10 @@
     <div class="container">
         @if(session('success'))
         <div class="success">{{ session('success') }}</div>
+        @endif
+
+        @if(session('warning'))
+        <div class="warning">{{ session('warning') }}</div>
         @endif
 
         <table>

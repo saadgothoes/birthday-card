@@ -18,7 +18,7 @@ class SuperAdminSeeder extends Seeder
                 'password' => Hash::make('Admin@12345'),
                 'role'     => 'super_admin',
             ]
-        );
+        );zz
 
         $this->command->info('✅ Super Admin created: superadmin@example.com / Admin@12345');
     }
