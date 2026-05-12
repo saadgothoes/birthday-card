@@ -20,6 +20,6 @@ class SuperAdminSeeder extends Seeder
             ]
         );zz
 
-        $this->command->info('✅ Super Admin created: superadmin@example.com / Admin@12345');
+        $this->command->info('Super Admin created: superadmin@example.com / Admin@12345');
     }
 }

@@ -31,9 +31,26 @@ Route::prefix('client')->name('client.')->group(function () {
 
     Route::get('/login', [ClientAuthController::class, 'loginPage'])->name('login');
     Route::post('/login', [ClientAuthController::class, 'login'])->name('login.post');
-
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [ClientAuthController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [ClientAuthController::class, 'logout'])->name('logout');
     });
 });
+
+// ─── Birthday Card Screens ─────────────────────────────────────
+Route::get('/boy/page/{page}', function ($page) {
+    return view('birthday.boy-page-' . $page);
+})->name('boy.page');
+
+Route::get('/girl/page/{page}', function ($page) {
+    return view('birthday.girl-page-' . $page);
+})->name('girl.page');
+
+// ─── Gift Pages ───────────────────────────────────────────────
+Route::get('/boy/gift-1/{page}', function ($page) {
+    return view('birthday.boy-gift-1-' . $page);
+})->name('boy.gift-1');
+
+Route::get('/girl/gift-1/{page}', function ($page) {
+    return view('birthday.girl-gift-1-' . $page);
+})->name('girl.gift-1');
