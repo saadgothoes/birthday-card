@@ -38,13 +38,21 @@ Route::prefix('client')->name('client.')->group(function () {
 });
 
 // ─── Birthday Card Screens ─────────────────────────────────────
-Route::get('/boy/page/{page}', function ($page) {
-    return view('birthday.boy-page-' . $page);
-})->name('boy.page');
+Route::get('/boy/page/{page}/{variant}', function ($page, $variant) {
+    $viewName = 'birthday.boy-page-' . $page;
+    if ($variant != '1') {
+        $viewName .= '-' . $variant;
+    }
+    return view($viewName);
+})->name('boy.page.variant');
 
-Route::get('/girl/page/{page}', function ($page) {
-    return view('birthday.girl-page-' . $page);
-})->name('girl.page');
+Route::get('/girl/page/{page}/{variant}', function ($page, $variant) {
+    $viewName = 'birthday.girl-page-' . $page;
+    if ($variant != '1') {
+        $viewName .= '-' . $variant;
+    }
+    return view($viewName);
+})->name('girl.page.variant');
 
 // ─── Gift Pages ───────────────────────────────────────────────
 Route::get('/boy/gift-1/{page}', function ($page) {
