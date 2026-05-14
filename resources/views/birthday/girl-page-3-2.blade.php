@@ -36,7 +36,7 @@
 </head>
 
 <body>
-    <img src="/images/giftbox/3.png" alt="Birthday Gift" class="gift-image">
+    <img src="/images/giftbox/2.png" alt="Birthday Gift" class="gift-image">
 </body>
 
 </html>
