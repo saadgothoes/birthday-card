@@ -10,6 +10,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
+    ->withSchedule(function ($schedule) {
+        $schedule->command('app:disable-expired-clients')->daily();
+    })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'super_admin' => \App\Http\Middleware\SuperAdminMiddleware::class,

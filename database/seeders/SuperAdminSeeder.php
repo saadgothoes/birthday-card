@@ -17,6 +17,7 @@ class SuperAdminSeeder extends Seeder
                 'email'    => 'superadmin@example.com',
                 'password' => Hash::make('Admin@12345'),
                 'role'     => 'super_admin',
+                'default_subscription_fee' => 300.00,
             ]
         );
 

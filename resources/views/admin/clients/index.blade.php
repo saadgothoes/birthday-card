@@ -554,6 +554,58 @@
             text-transform: uppercase;
         }
 
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.25rem 0.7rem;
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: var(--green-s);
+            border: 1.5px solid rgba(16, 185, 129, 0.2);
+            color: var(--green);
+        }
+
+        .status-badge.disabled {
+            background: var(--red-s);
+            border: 1.5px solid rgba(239, 68, 68, 0.2);
+            color: var(--red);
+        }
+
+        .btn-toggle {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-toggle.disable {
+            background: var(--red);
+            color: white;
+        }
+
+        .btn-toggle.disable:hover {
+            background: #dc2626;
+        }
+
+        .btn-toggle.enable {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-toggle.enable:hover {
+            background: #059669;
+        }
+
         .badge-dot {
             width: 5px;
             height: 5px;
@@ -628,6 +680,9 @@
             </a>
             <a href="{{ route('admin.clients.create') }}" class="nav-item">
                 <div class="nav-icon">➕</div> Add Client
+            </a>
+            <a href="{{ route('admin.payments.index') }}" class="nav-item">
+                <div class="nav-icon">💰</div> Payments
             </a>
         </nav>
         <div class="sidebar-user">
@@ -705,7 +760,8 @@
                         <th>Phone</th>
                         <th>City</th>
                         <th>Age</th>
-                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -723,11 +779,20 @@
                         <td>@if($client->city)<span class="city-pill">📍 {{ $client->city }}</span>@else<span
                                 style="color:var(--text-dim)">—</span>@endif</td>
                         <td><span class="age-cell">{{ $client->age ?? '—' }}</span></td>
-                        <td><span class="role-badge"><span class="badge-dot"></span>{{ $client->role }}</span></td>
+                        <td><span class="status-badge {{ $client->status == 'active' ? 'active' : 'disabled' }}">{{ $client->status }}</span></td>
+                        <td>
+                            <form action="{{ route('admin.clients.toggle-status', $client->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn-toggle {{ $client->status == 'active' ? 'disable' : 'enable' }}">
+                                    {{ $client->status == 'active' ? 'Disable' : 'Enable' }}
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="empty-state">
                                 <div class="ei">👤</div>
                                 <h3>No clients yet</h3>

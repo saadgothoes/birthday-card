@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Client\ClientAuthController;
 
 Route::get('/', function () {
@@ -18,11 +19,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth', 'super_admin'])->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [SuperAdminController::class, 'logout'])->name('logout');
+        Route::post('/settings', [SuperAdminController::class, 'updateSettings'])->name('settings.update');
 
         // ─── Client CRUD ──────────────────────────────────────
         Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
         Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
         Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+        Route::patch('/clients/{id}/toggle-status', [ClientController::class, 'toggleStatus'])->name('clients.toggle-status');
+
+        // ─── Payments ─────────────────────────────────────────
+        Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     });
 });
 

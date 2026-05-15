@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\ClientWelcomeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -48,6 +49,9 @@ class ClientController extends Controller
             'password'       => $plainPassword, // auto hashed via cast
             'plain_password' => $plainPassword, // store for reference
             'role'           => 'client',
+            'status'         => 'active',
+            'subscription_start_date' => now(),
+            'subscription_fee' => auth()->user()->default_subscription_fee ?? 0,
         ]);
 
         $flashType = 'success';
@@ -66,5 +70,16 @@ class ClientController extends Controller
 
         return redirect()->route('admin.clients.index')
             ->with($flashType, $flashMessage);
+    }
+
+    // Toggle client status
+    public function toggleStatus($id)
+    {
+        $client = User::where('role', 'client')->findOrFail($id);
+        $client->status = $client->status === 'active' ? 'disabled' : 'active';
+        $client->save();
+
+        return redirect()->route('admin.clients.index')
+            ->with('success', 'Client status updated successfully.');
     }
 }

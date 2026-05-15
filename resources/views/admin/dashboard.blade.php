@@ -341,7 +341,7 @@
         /* ─── STATS ─── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.25rem;
             margin-bottom: 2rem;
         }
@@ -563,6 +563,9 @@
             <a href="{{ route('admin.clients.create') }}" class="nav-item">
                 <div class="nav-icon">➕</div> Add Client
             </a>
+            <a href="{{ route('admin.payments.index') }}" class="nav-item">
+                <div class="nav-icon">💰</div> Payments
+            </a>
         </nav>
 
         <div class="sidebar-user">
@@ -630,6 +633,38 @@
                     {{ \App\Models\User::where('role', 'client')->whereMonth('created_at', now()->month)->count() }}
                 </div>
                 <div class="stat-label">Monthly Signups</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon blue">💰</div>
+                    <div class="stat-trend up">Total</div>
+                </div>
+                <div class="stat-num">
+                    {{ number_format(\App\Models\User::where('role', 'client')->sum('subscription_fee'), 2) }} PKR
+                </div>
+                <div class="stat-label">Total Payments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon green">📈</div>
+                    <div class="stat-trend up">Today</div>
+                </div>
+                <div class="stat-num">
+                    {{ number_format(\App\Models\User::where('role', 'client')->whereDate('created_at', today())->sum('subscription_fee'), 2) }}
+                    PKR
+                </div>
+                <div class="stat-label">Daily Income</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon gold">📊</div>
+                    <div class="stat-trend up">This Week</div>
+                </div>
+                <div class="stat-num">
+                    {{ number_format(\App\Models\User::where('role', 'client')->where('created_at', '>=', now()->startOfWeek())->sum('subscription_fee'), 2) }}
+                    PKR
+                </div>
+                <div class="stat-label">Weekly Income</div>
             </div>
         </div>
 

@@ -51,4 +51,18 @@ class SuperAdminController extends Controller
         $request->session()->regenerateToken();
         return redirect()->route('admin.login');
     }
+
+    // Update settings
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'default_subscription_fee' => 'required|numeric|min:0',
+        ]);
+
+        Auth::user()->update([
+            'default_subscription_fee' => $request->default_subscription_fee,
+        ]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Settings updated successfully.');
+    }
 }

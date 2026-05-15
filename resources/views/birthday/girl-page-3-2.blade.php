@@ -6,32 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Birthday Card - Girl Theme - Page 3 Variant 2</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
 
-        body {
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    body {
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-        .gift-image {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            display: block;
-        }
+    .gift-image {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        display: block;
+    }
     </style>
 </head>
 

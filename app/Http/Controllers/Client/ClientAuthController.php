@@ -10,7 +10,7 @@ class ClientAuthController extends Controller
 {
     public function loginPage()
     {
-        if (Auth::check() && Auth::user()->isClient()) {
+        if (Auth::check() && Auth::user()->isClient() && Auth::user()->status === 'active') {
             return redirect()->route('client.dashboard');
         }
         return view('client.login');
@@ -24,12 +24,12 @@ class ClientAuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            if (Auth::user()->isClient()) {
+            if (Auth::user()->isClient() && Auth::user()->status === 'active') {
                 $request->session()->regenerate();
                 return redirect()->route('client.dashboard');
             }
             Auth::logout();
-            return back()->withErrors(['email' => 'Access not allowed.']);
+            return back()->withErrors(['email' => 'Your account is disabled or access not allowed.']);
         }
 
         return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
