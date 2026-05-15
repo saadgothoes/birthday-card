@@ -232,62 +232,6 @@
             color: var(--text-muted);
         }
 
-        /* Sidebar bottom user */
-        .sidebar-user {
-            padding: 1rem 1.2rem;
-            border-top: 1.5px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-girl), var(--gold));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .user-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .user-info strong {
-            display: block;
-            font-size: 0.83rem;
-            color: var(--text);
-        }
-
-        .user-info span {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-        }
-
-        .logout-btn {
-            background: none;
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
-            padding: 0.35rem 0.55rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: #fee2e2;
-            color: #ef4444;
-            border-color: #fca5a5;
-        }
-
         /* ─── MAIN ─── */
         .main {
             margin-left: var(--sidebar-w);
@@ -317,6 +261,12 @@
             color: var(--text-muted);
             font-size: 0.87rem;
             margin-top: 0.2rem;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .progress-pill {
@@ -352,6 +302,139 @@
                 opacity: 0.6;
                 transform: scale(1.3)
             }
+        }
+
+        /* User Dropdown */
+        .user-dropdown {
+            position: relative;
+            margin-left: 1rem;
+        }
+
+        .user-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text);
+            transition: all 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .user-dropdown-btn:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-girl), var(--gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-name {
+            font-weight: 500;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dropdown-arrow {
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .user-dropdown.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+            z-index: 1000;
+            margin-top: 0.5rem;
+        }
+
+        .user-dropdown.open .user-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .dropdown-item:hover {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .dropdown-item svg {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .dropdown-item:hover svg {
+            color: var(--accent);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.25rem 0;
+        }
+
+        .logout-item {
+            color: #ef4444;
+        }
+
+        .logout-item:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .logout-item svg {
+            color: #ef4444;
+        }
+
+        .logout-item:hover svg {
+            color: #dc2626;
         }
 
         /* ─── STEP PANELS ─── */
@@ -1058,6 +1141,11 @@
                 align-items: flex-start;
             }
 
+            .topbar-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
             .progress-pill {
                 align-self: flex-start;
             }
@@ -1637,6 +1725,81 @@
         .popup-close:hover {
             background: #b45309;
         }
+
+        /* Password Alert */
+        .password-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 400px;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-content {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid #f59e0b;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .alert-text h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-text p {
+            font-size: 0.85rem;
+            color: #a16207;
+            margin: 0;
+        }
+
+        .alert-actions {
+            margin-top: 0.5rem;
+        }
+
+        .alert-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .alert-btn-primary {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .alert-btn-primary:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 
@@ -1696,17 +1859,6 @@
             </div>
         </nav>
 
-        <div class="sidebar-user">
-            <div class="user-avatar">A</div>
-            <div class="user-info">
-                <strong>{{ Auth::user()->name }}</strong>
-                <span>{{ Auth::user()->email }}</span>
-            </div>
-            <form method="POST" action="{{ route('client.logout') }}" style="margin:0">
-                @csrf
-                <button class="logout-btn" type="submit">↩</button>
-            </form>
-        </div>
     </aside>
 
     <!-- ─── MAIN ─── -->
@@ -1716,21 +1868,76 @@
                 <h2>Client Dashboard</h2>
                 <p>Create & share a beautiful birthday card experience</p>
             </div>
-            <div style="display: flex; gap: 1rem; align-items: center; width: 100%; justify-content: flex-end;">
+            <div class="topbar-right">
                 <div class="progress-pill">
                     <div class="dot"></div>
                     <span id="progressText">Step 1 of 5</span>
                 </div>
                 <button id="menuToggle" onclick="toggleSidebar()">☰</button>
+
+                <!-- User Dropdown -->
+                <div class="user-dropdown">
+                    <button class="user-dropdown-btn" onclick="toggleUserDropdown()">
+                        <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                        <span class="user-name">{{ Auth::user()->name }}</span>
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    <div class="user-dropdown-menu" id="userDropdown">
+                        <a href="{{ route('client.profile') }}" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            My Profile
+                        </a>
+                        <a href="{{ route('client.settings') }}" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <form method="POST" action="{{ route('client.logout') }}" style="margin:0">
+                            @csrf
+                            <button class="dropdown-item logout-item" type="submit">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                    <polyline points="16,17 21,12 16,7"></polyline>
+                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                </svg>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
         @php
         $daysLeft = Auth::user()->subscription_start_date ? now()->diffInDays(Auth::user()->subscription_start_date->addDays(30)) : null;
-        $showPopup = $daysLeft !== null && $daysLeft <= 6 && Auth::user()->status === 'active';
+        $showPaymentPopup = $daysLeft !== null && $daysLeft <= 6 && Auth::user()->status === 'active';
+            $showPasswordAlert = !Auth::user()->hasChangedPassword();
             @endphp
 
-            @if($showPopup)
+            @if($showPasswordAlert)
+            <div class="password-alert" id="passwordAlert">
+                <div class="alert-content">
+                    <div class="alert-icon">🔒</div>
+                    <div class="alert-text">
+                        <h3>Update Your Password</h3>
+                        <p>For security reasons, please update your password before continuing.</p>
+                    </div>
+                    <div class="alert-actions">
+                        <a href="{{ route('client.settings') }}" class="alert-btn alert-btn-primary">Update Password</a>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @if($showPaymentPopup)
             <div class="payment-popup" id="paymentPopup">
                 <div class="popup-content">
                     <div class="popup-icon">⚠️</div>
@@ -2122,6 +2329,23 @@ It all started the day I first saw your smile. I knew right then that something 
 
         window.addEventListener('resize', updateMenuButton);
         updateMenuButton();
+
+        // User dropdown toggle
+        function toggleUserDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.user-dropdown');
+            const dropdownBtn = document.querySelector('.user-dropdown-btn');
+            if (dropdown && dropdown.classList.contains('open') &&
+                !dropdown.contains(e.target) &&
+                !dropdownBtn.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
 
         function goToStep(n) {
             document.getElementById('panel' + currentStep).classList.remove('active');

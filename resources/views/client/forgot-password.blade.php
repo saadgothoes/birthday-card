@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Login — BirthdayCard</title>
+    <title>Forgot Password — BirthdayCard</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -16,7 +16,6 @@
             --text: #1e293b;
             --text-muted: #64748b;
             --accent: #6366f1;
-            /* Indigo - Neutral/Uni */
             --accent-soft: #eff6ff;
             --radius: 16px;
             --shadow: 0 4px 32px rgba(99, 102, 241, 0.08);
@@ -48,19 +47,18 @@
             inset: 0;
             background-image:
                 radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(14, 165, 233, 0.06) 0%, transparent 40%);
+                radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.04) 0%, transparent 35%);
             pointer-events: none;
-            z-index: 0;
         }
 
-        /* Floaties */
+        /* ─── FLOATING ELEMENTS ─── */
         .floater {
             position: absolute;
-            font-size: 1.5rem;
-            opacity: 0.2;
-            pointer-events: none;
-            z-index: 0;
+            font-size: 2rem;
             animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+            opacity: 0.6;
         }
 
         @keyframes float {
@@ -169,26 +167,38 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            text-align: left;
+        }
+
+        .success-msg {
+            background: #f0fdf4;
+            color: #166534;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            border: 1px solid #dcfce7;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         button {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--accent), #818cf8);
+            padding: 0.9rem 1.5rem;
+            background: var(--accent);
             color: white;
             border: none;
-            border-radius: 14px;
-            font-size: 1rem;
-            cursor: pointer;
-            font-weight: 700;
-            margin-top: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
             font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 1.5rem;
         }
 
         button:hover {
+            background: #5855eb;
             transform: translateY(-2px);
             box-shadow: 0 12px 32px rgba(99, 102, 241, 0.3);
         }
@@ -215,16 +225,6 @@
             color: var(--accent);
         }
 
-        .admin-btn {
-            display: inline-block;
-            margin-top: 1rem;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-        }
-
         /* Mobile Adjustments */
         @media (max-width: 480px) {
             .login-card {
@@ -239,58 +239,48 @@
 </head>
 
 <body>
-    <!-- Unicode-based Floating elements (Modern & Neutral) -->
-    <span class="floater" style="top: 10%; left: 8%;">🎈</span>
-    <span class="floater" style="bottom: 15%; right: 10%; animation-delay: 2s;">🎂</span>
+    <!-- Unicode-based Floating elements -->
+    <span class="floater" style="top: 10%; left: 8%;">🔐</span>
+    <span class="floater" style="bottom: 15%; right: 10%; animation-delay: 2s;">📧</span>
     <span class="floater" style="top: 15%; right: 12%; animation-delay: 1s;">✨</span>
-    <span class="floater" style="bottom: 12%; left: 14%; animation-delay: 3s;">🎁</span>
-    <span class="floater" style="top: 50%; left: 5%; animation-delay: 4s;">🎉</span>
+    <span class="floater" style="bottom: 12%; left: 14%; animation-delay: 3s;">🔑</span>
+    <span class="floater" style="top: 50%; left: 5%; animation-delay: 4s;">🎂</span>
 
     <div class="login-card">
+        <div class="logo-area">
+            <div class="logo-icon">🔐</div>
+            <div class="logo-text"><span>🎂</span> BirthdayCard</div>
+        </div>
 
+        <h2>Reset Password</h2>
+        <p class="sub">Enter your email to receive a password reset link</p>
 
-        <h2>Welcome Back!</h2>
-        <p class="sub">Log in to create your magic</p>
-
-        @if($errors->any())
-        <div class="error-msg">
-            <span>⚠️</span> {{ $errors->first() }}
+        @if(session('status'))
+        <div class="success-msg">
+            ✅ {{ session('status') }}
         </div>
         @endif
 
-        <form method="POST" action="{{ route('client.login.post') }}">
+        @if($errors->any())
+        <div class="error-msg">
+            ❌ {{ $errors->first() }}
+        </div>
+        @endif
+
+        <form method="POST" action="{{ route('client.forgot-password.send') }}">
             @csrf
             <div class="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" value="{{ old('email') }}" placeholder="your@email.com" required
-                    autofocus>
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="your@email.com" required autofocus>
             </div>
 
-            <div class="form-group" style="margin-bottom: 0.5rem;">
-                <label>Password</label>
-                <input type="password" name="password" placeholder="••••••••" required>
-            </div>
-
-            <div style="text-align: right; margin-bottom: 2rem;">
-                <div id="forgotPasswordLink" style="display: none;">
-                    <a href="{{ route('client.forgot-password') }}"
-                        style="font-size: 0.75rem; color: var(--accent); text-decoration: none; font-weight: 600;">Forgot
-                        Password?</a>
-                </div>
-            </div>
-
-            <button type="submit">Sign In to Dashboard →</button>
+            <button type="submit">Send Reset Link 📧</button>
         </form>
 
-
+        <div class="footer-links">
+            <a href="{{ route('client.login') }}">← Back to Login</a>
+        </div>
     </div>
-
-    <script>
-        // Check if user can reset password
-        if (localStorage.getItem('can_reset_password') === 'true') {
-            document.getElementById('forgotPasswordLink').style.display = 'block';
-        }
-    </script>
 </body>
 
 </html>

@@ -48,6 +48,7 @@ class ClientController extends Controller
             'age'            => $request->age,
             'password'       => $plainPassword, // auto hashed via cast
             'plain_password' => $plainPassword, // store for reference
+            'password_changed' => false, // new clients haven't changed password yet
             'role'           => 'client',
             'status'         => 'active',
             'subscription_start_date' => now(),
