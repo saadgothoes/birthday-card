@@ -32,6 +32,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // ─── Payments ─────────────────────────────────────────
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+
+        // ─── BG Owner ─────────────────────────────────────────
+        Route::get('/bg-owner', [SuperAdminController::class, 'bgOwner'])->name('bg-owner');
+        Route::post('/bg-owner/verify-pin', [SuperAdminController::class, 'verifyBgOwnerPin'])->name('bg-owner.verify-pin');
     });
 });
 

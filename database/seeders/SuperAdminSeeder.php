@@ -19,6 +19,7 @@ class SuperAdminSeeder extends Seeder
                 'role'     => 'super_admin',
                 'password_changed' => true, // Super admin has a proper password
                 'default_subscription_fee' => 300.00,
+                'bg_owner_pin' => '954895', // 6-digit PIN for BG Owner access
             ]
         );
 

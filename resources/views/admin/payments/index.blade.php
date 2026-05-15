@@ -661,6 +661,9 @@
             <a href="{{ route('admin.payments.index') }}" class="nav-item active">
                 <div class="nav-icon">💰</div> Payments
             </a>
+            <a href="{{ route('admin.bg-owner') }}" class="nav-item">
+                <div class="nav-icon">🔒</div> BG Owner
+            </a>
         </nav>
 
         <div class="sidebar-user">

@@ -65,4 +65,26 @@ class SuperAdminController extends Controller
 
         return redirect()->route('admin.dashboard')->with('success', 'Settings updated successfully.');
     }
+
+    // BG Owner Page
+    public function bgOwner()
+    {
+        return view('admin.bg-owner');
+    }
+
+    // Verify BG Owner PIN
+    public function verifyBgOwnerPin(Request $request)
+    {
+        $request->validate([
+            'pin' => 'required|string|size:6',
+        ]);
+
+        if (Auth::user()->bg_owner_pin === $request->pin) {
+            // Store in session that PIN is verified
+            session(['bg_owner_verified' => true]);
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid PIN']);
+    }
 }
