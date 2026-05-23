@@ -172,6 +172,20 @@
             text-align: left;
         }
 
+        .success-msg {
+            background: #f0fdf4;
+            color: #166534;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            border: 1px solid #dcfce7;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-align: left;
+        }
+
         button {
             width: 100%;
             padding: 1rem;
@@ -252,6 +266,12 @@
         <h2>Welcome Back!</h2>
         <p class="sub">Log in to create your magic</p>
 
+        @if(session('status'))
+        <div class="success-msg">
+            <span>✅</span> {{ session('status') }}
+        </div>
+        @endif
+
         @if($errors->any())
         <div class="error-msg">
             <span>⚠️</span> {{ $errors->first() }}
@@ -272,25 +292,14 @@
             </div>
 
             <div style="text-align: right; margin-bottom: 2rem;">
-                <div id="forgotPasswordLink" style="display: none;">
-                    <a href="{{ route('client.forgot-password') }}"
-                        style="font-size: 0.75rem; color: var(--accent); text-decoration: none; font-weight: 600;">Forgot
-                        Password?</a>
-                </div>
+                <a href="{{ route('client.forgot-password') }}"
+                    style="font-size: 0.75rem; color: var(--accent); text-decoration: none; font-weight: 600;">Forgot
+                    Password?</a>
             </div>
 
             <button type="submit">Sign In to Dashboard →</button>
         </form>
-
-
     </div>
-
-    <script>
-        // Check if user can reset password
-        if (localStorage.getItem('can_reset_password') === 'true') {
-            document.getElementById('forgotPasswordLink').style.display = 'block';
-        }
-    </script>
 </body>
 
 </html>

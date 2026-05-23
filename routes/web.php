@@ -5,9 +5,6 @@ use App\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Client\ClientAuthController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
 
 Route::get('/', function () {
     return view('welcome');
@@ -52,38 +49,12 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::post('/logout', [ClientAuthController::class, 'logout'])->name('logout');
     });
 
-    // Password reset routes (only for users who have changed password)
+    // Password reset routes
     Route::get('/forgot-password', [ClientAuthController::class, 'forgotPassword'])->name('forgot-password');
     Route::post('/forgot-password', [ClientAuthController::class, 'sendResetLink'])->name('forgot-password.send');
+    Route::get('/reset-password/{token}', [ClientAuthController::class, 'resetPasswordPage'])->name('password.reset');
+    Route::post('/reset-password', [ClientAuthController::class, 'resetPassword'])->name('password.update');
 });
-
-// Password reset form and processing (outside client group for testing)
-Route::get('/client/reset-password/{token}', function ($token) {
-    $email = request('email');
-    return view('client.reset-password', ['token' => $token, 'email' => $email]);
-})->name('client.password.reset');
-
-Route::post('/client/reset-password', function (Request $request) {
-    $request->validate([
-        'token' => 'required',
-        'email' => 'required|email',
-        'password' => 'required|min:8|confirmed',
-    ]);
-
-    $status = Password::reset(
-        $request->only('email', 'password', 'password_confirmation', 'token'),
-        function ($user, $password) {
-            $user->forceFill([
-                'password' => Hash::make($password),
-                'password_changed' => true,
-            ])->save();
-        }
-    );
-
-    return $status === Password::PASSWORD_RESET
-        ? redirect()->route('client.login')->with('status', 'Password reset successfully!')
-        : back()->withErrors(['email' => [__($status)]]);
-})->name('client.password.update');
 
 // ─── Birthday Card Screens ─────────────────────────────────────
 Route::get('/boy/page/{page}/{variant}', function ($page, $variant) {

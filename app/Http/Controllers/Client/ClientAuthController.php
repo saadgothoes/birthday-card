@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ClientPasswordReset;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use App\Mail\ClientPasswordReset;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class ClientAuthController extends Controller
@@ -19,6 +20,7 @@ class ClientAuthController extends Controller
         if (Auth::check() && Auth::user()->isClient() && Auth::user()->status === 'active') {
             return redirect()->route('client.dashboard');
         }
+
         return view('client.login');
     }
 
@@ -100,31 +102,74 @@ class ClientAuthController extends Controller
     public function sendResetLink(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => [
+                'required',
+                'email',
+                Rule::exists('users', 'email')->where(fn ($query) => $query
+                    ->where('role', 'client')
+                    ->where('status', 'active')),
+            ],
         ]);
 
-        $user = \App\Models\User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+            ->where('role', 'client')
+            ->where('status', 'active')
+            ->firstOrFail();
 
-        // Only allow forgot password if user has changed password at least once
-        if (!$user->hasChangedPassword()) {
-            return back()->withErrors(['email' => 'Password reset is not available for new accounts. Please contact support.']);
-        }
-
-        // Generate reset token
         $token = Password::createToken($user);
-
-        // Create reset URL
         $resetUrl = route('client.password.reset', [
             'token' => $token,
-            'email' => $user->email
+            'email' => $user->email,
         ]);
 
-        // Send custom email
         try {
             Mail::to($user->email)->send(new ClientPasswordReset($resetUrl, $user));
+
             return back()->with('status', 'Password reset link sent to your email!');
         } catch (\Exception $e) {
             return back()->withErrors(['email' => 'Unable to send reset link. Please try again.']);
         }
+    }
+
+    public function resetPasswordPage(string $token, Request $request)
+    {
+        return view('client.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email'),
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => [
+                'required',
+                'email',
+                Rule::exists('users', 'email')->where(fn ($query) => $query
+                    ->where('role', 'client')
+                    ->where('status', 'active')),
+            ],
+            'password' => ['required', 'confirmed', PasswordRule::min(8)->mixedCase()->numbers()],
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                if (!$user->isClient()) {
+                    return;
+                }
+
+                $user->forceFill([
+                    'password' => $password,
+                    'password_changed' => true,
+                    'plain_password' => null,
+                ])->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('client.login')->with('status', 'Password reset successfully!')
+            : back()->withErrors(['email' => [__($status)]])->withInput($request->only('email'));
     }
 }
