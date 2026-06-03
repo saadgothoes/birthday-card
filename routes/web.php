@@ -73,11 +73,13 @@ Route::get('/girl/page/{page}/{variant}', function ($page, $variant) {
     return view($viewName);
 })->name('girl.page.variant');
 
-// ─── Gift Pages ───────────────────────────────────────────────
-Route::get('/boy/gift-1/{page}', function ($page) {
-    return view('birthday.boy-gift-1-' . $page);
-})->name('boy.gift-1');
+// ─── Gift Pages (New Structure) ────────────────────────────────
+Route::get('/boy/page/{page}/{variant}/gift/{gift}/{giftPage}', function ($page, $variant, $gift, $giftPage) {
+    $viewName = 'birthday.boy-page-' . $page . '-variant-' . $variant . '-gift-' . $gift . '-page-' . $giftPage;
+    return view($viewName);
+})->name('boy.page.gift');
 
-Route::get('/girl/gift-1/{page}', function ($page) {
-    return view('birthday.girl-gift-1-' . $page);
-})->name('girl.gift-1');
+Route::get('/girl/page/{page}/{variant}/gift/{gift}/{giftPage}', function ($page, $variant, $gift, $giftPage) {
+    $viewName = 'birthday.girl-page-' . $page . '-variant-' . $variant . '-gift-' . $gift . '-page-' . $giftPage;
+    return view($viewName);
+})->name('girl.page.gift');
