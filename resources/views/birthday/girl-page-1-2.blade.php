@@ -373,11 +373,15 @@
             <div class="pink-particle" style="width:3px;height:3px;left:35%;bottom:25%;animation-delay:2s"></div>
             <div class="pink-particle" style="width:4px;height:4px;left:20%;bottom:40%;animation-delay:4s"></div>
 
-            <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 50%, rgba(199,21,133,0.08) 0%, transparent 60%);pointer-events:none"></div>
+            <div
+                style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 50%, rgba(199,21,133,0.08) 0%, transparent 60%);pointer-events:none">
+            </div>
 
             <div class="flicker" style="position:absolute;top:10%;left:5%;font-size:18px;opacity:0.35">✦</div>
-            <div class="flicker" style="position:absolute;bottom:15%;left:8%;font-size:12px;opacity:0.25;animation-delay:1s">✦</div>
-            <div class="flicker" style="position:absolute;top:30%;left:18%;font-size:14px;opacity:0.2;animation-delay:2.5s">✦</div>
+            <div class="flicker"
+                style="position:absolute;bottom:15%;left:8%;font-size:12px;opacity:0.25;animation-delay:1s">✦</div>
+            <div class="flicker"
+                style="position:absolute;top:30%;left:18%;font-size:14px;opacity:0.2;animation-delay:2.5s">✦</div>
         </div>
 
         <div class="girl2-left">
@@ -405,10 +409,12 @@
                         <ellipse cx="95" cy="300" rx="130" ry="70" fill="#1a0818" clip-path="url(#archclip)" />
                         <rect x="68" y="148" width="54" height="80" rx="5" fill="#2d1230" clip-path="url(#archclip)" />
                         <ellipse cx="95" cy="138" rx="26" ry="28" fill="#ff1493" clip-path="url(#archclip)" />
-                        <path d="M68 148 Q95 125 122 148" stroke="#c71585" stroke-width="1.5" fill="none" clip-path="url(#archclip)" />
+                        <path d="M68 148 Q95 125 122 148" stroke="#c71585" stroke-width="1.5" fill="none"
+                            clip-path="url(#archclip)" />
                         <rect x="62" y="200" width="22" height="45" rx="3" fill="#2d1230" clip-path="url(#archclip)" />
                         <rect x="106" y="200" width="22" height="45" rx="3" fill="#2d1230" clip-path="url(#archclip)" />
-                        <ellipse cx="95" cy="50" rx="50" ry="20" fill="rgba(255,20,147,0.15)" clip-path="url(#archclip)" />
+                        <ellipse cx="95" cy="50" rx="50" ry="20" fill="rgba(255,20,147,0.15)"
+                            clip-path="url(#archclip)" />
                         <circle cx="40" cy="30" r="4" fill="rgba(255,105,180,0.25)" clip-path="url(#archclip)" />
                         <circle cx="155" cy="45" r="3" fill="rgba(255,105,180,0.2)" clip-path="url(#archclip)" />
                         <circle cx="20" cy="80" r="2" fill="rgba(255,105,180,0.3)" clip-path="url(#archclip)" />
@@ -421,7 +427,7 @@
 
         <div class="girl2-right">
             <div class="girl2-title">Enter a Passcode</div>
-            <div class="girl2-subtitle">— secret access —</div>
+            <div class="girl2-subtitle">— secret access —sssssssssssss</div>
 
             <div class="divider-pink"></div>
 

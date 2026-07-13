@@ -399,7 +399,7 @@
                 <button class="girl-btn sym">#</button>
             </div>
 
-            <div class="hint-girl">hint — its our fav code 🌷</div>
+            <div class="hint-girl">hint — its our fav codesssssssss 🌷</div>
         </div>
     </div>
 </body>
