@@ -3,13 +3,21 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Card – 4 Variants</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dark — Espresso Night — Happy Birthday Card</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Permanent+Marker&family=Dancing+Script:wght@600&display=swap"
-        rel="stylesheet">
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&amp;family=Permanent+Marker&amp;family=Dancing+Script:wght@600&amp;display=swap"
+        rel="stylesheet" />
     <style>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
     *,
     *::before,
     *::after {
@@ -650,607 +658,245 @@
     .dk2 .sm-heart {
         color: #e05070;
     }
+
+
+    html,
+    body {
+        height: 100%;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+            url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc5MCcgaGVpZ2h0PSc5MCc+Cjx0ZXh0IHg9JzEwJyB5PSczMCcgZm9udC1zaXplPScyMicgZmlsbD0nI2EwNzAzYycgb3BhY2l0eT0nMC41JyB0cmFuc2Zvcm09J3JvdGF0ZSgtMTIgMTAgMzApJz4mIzEwMDg0OzwvdGV4dD4KPHRleHQgeD0nNTUnIHk9JzcwJyBmb250LXNpemU9JzE2JyBmaWxsPScjYTA3MDNjJyBvcGFjaXR5PScwLjM1JyB0cmFuc2Zvcm09J3JvdGF0ZSgxOCA1NSA3MCknPiYjMTAwODQ7PC90ZXh0Pgo8dGV4dCB4PSc2MCcgeT0nMjAnIGZvbnQtc2l6ZT0nMTInIGZpbGw9JyNhMDcwM2MnIG9wYWNpdHk9JzAuMycgdHJhbnNmb3JtPSdyb3RhdGUoLTI1IDYwIDIwKSc+JiMxMDA4NDs8L3RleHQ+Cjwvc3ZnPg=='),
+            radial-gradient(ellipse at center, #2a1a0e 0%, #0e0804 100%);
+        background-repeat: repeat, no-repeat;
+        background-size: 90px 90px, 100% 100%;
+        background-attachment: fixed, fixed;
+    }
+
+    .card-outer {
+        width: 100%;
+        height: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        position: relative;
+    }
+
+    .card {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        aspect-ratio: auto;
+        border-radius: 0;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    @media (min-width: 481px) {
+        .card-outer {
+            padding: 24px;
+        }
+
+        .card {
+            width: min(100%, 480px);
+            height: auto;
+            aspect-ratio: 9 / 16;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+        }
+    }
+
+    /* ── NEXT BUTTON ── */
+    .next-btn {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: none;
+        font-family: 'Permanent Marker', cursive;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        background: #f0c090;
+        color: #1e120a;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+        text-decoration: none;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .next-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+    }
+
+    .next-btn:active {
+        transform: translateY(0px) scale(0.97);
+    }
+
+    .next-btn svg {
+        width: 14px;
+        height: 14px;
+    }
     </style>
 </head>
 
 <body>
-
-    <h1 class="page-title">✦ happy birthday ✦</h1>
-
-    <div class="grid">
-
-        <!-- ══ VARIANT 1: Light Warm Coffee ══ -->
-        <div class="variant-wrap">
-            <div class="v-label">Light — warm coffee</div>
-            <div class="card lt1">
-                <!-- lips -->
-                <div class="lips">
-                    <span class="lip" style="top:1%;left:3%;transform:rotate(-20deg)">💋</span>
-                    <span class="lip" style="top:0%;left:28%;transform:rotate(10deg)">💋</span>
-                    <span class="lip" style="top:3%;right:4%;transform:rotate(-5deg)">💋</span>
-                    <span class="lip" style="top:8%;left:8%;transform:rotate(30deg)">💋</span>
-                    <span class="lip" style="top:7%;right:18%;transform:rotate(-40deg)">💋</span>
-                    <span class="lip" style="top:14%;left:0%;transform:rotate(15deg)">💋</span>
-                    <span class="lip" style="top:13%;right:1%;transform:rotate(-10deg)">💋</span>
-                    <span class="lip" style="top:20%;right:8%;transform:rotate(25deg)">💋</span>
-                    <span class="lip" style="top:24%;left:5%;transform:rotate(-15deg)">💋</span>
-                    <span class="lip" style="top:28%;left:38%;transform:rotate(5deg)">💋</span>
-                    <span class="lip" style="top:33%;right:14%;transform:rotate(-30deg)">💋</span>
-                    <span class="lip" style="top:38%;left:12%;transform:rotate(20deg)">💋</span>
-                    <span class="lip" style="top:43%;right:6%;transform:rotate(-8deg)">💋</span>
-                    <span class="lip" style="top:47%;left:45%;transform:rotate(12deg)">💋</span>
-                    <span class="lip" style="top:51%;left:2%;transform:rotate(-25deg)">💋</span>
-                    <span class="lip" style="top:56%;right:2%;transform:rotate(18deg)">💋</span>
-                    <span class="lip" style="top:60%;left:55%;transform:rotate(-35deg)">💋</span>
-                    <span class="lip" style="top:65%;left:18%;transform:rotate(40deg)">💋</span>
-                    <span class="lip" style="top:69%;right:22%;transform:rotate(-12deg)">💋</span>
-                    <span class="lip" style="top:73%;left:30%;transform:rotate(8deg)">💋</span>
-                    <span class="lip" style="top:77%;left:5%;transform:rotate(-22deg)">💋</span>
-                    <span class="lip" style="top:80%;right:10%;transform:rotate(14deg)">💋</span>
-                    <span class="lip" style="top:84%;left:42%;transform:rotate(-6deg)">💋</span>
-                    <span class="lip" style="top:88%;left:60%;transform:rotate(22deg)">💋</span>
-                    <span class="lip" style="top:91%;left:22%;transform:rotate(-18deg)">💋</span>
-                    <span class="lip" style="top:94%;right:15%;transform:rotate(32deg)">💋</span>
-                    <span class="lip" style="top:5%;left:60%;transform:rotate(-28deg)">💋</span>
-                    <span class="lip" style="top:17%;left:48%;transform:rotate(16deg)">💋</span>
-                    <span class="lip" style="top:36%;left:65%;transform:rotate(-20deg)">💋</span>
-                    <span class="lip" style="top:75%;left:70%;transform:rotate(6deg)">💋</span>
-                </div>
-
-                <div class="hb-sticker">
-                    <span class="sp" style="top:5px;left:6px">✦</span>
-                    <span class="sp" style="top:5px;right:6px">✦</span>
-                    <span class="h1">HAPPY</span>
-                    <span class="h2">birthday</span>
-                </div>
-
-                <div class="stamp">
-                    <div class="stamp-num">60</div>
-                    <div class="stamp-kisses">
-                        <span style="transform:rotate(-8deg)">💋</span><span
-                            style="transform:rotate(12deg)">💋</span><span style="transform:rotate(-5deg)">💋</span>
-                        <span style="transform:rotate(10deg)">💋</span><span
-                            style="transform:rotate(-15deg)">💋</span><span style="transform:rotate(6deg)">💋</span>
-                    </div>
-                    <div class="postmark">29.V.45<br>PRAHA 21</div>
-                </div>
-
-                <div class="fav">Favorite<br>Person →</div>
-
-                <!-- Polaroid 1 – couple dancing dark scene -->
-                <div class="pol pol1">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="118" height="118" fill="#1a0f0a" />
-                            <circle cx="25" cy="18" r="10" fill="#ff9900" opacity="0.22" />
-                            <circle cx="90" cy="12" r="7" fill="#ffcc44" opacity="0.18" />
-                            <ellipse cx="38" cy="44" rx="8" ry="9" fill="#c8a882" />
-                            <ellipse cx="38" cy="37" rx="8" ry="6" fill="#1a1008" />
-                            <rect x="29" y="53" width="18" height="32" rx="4" fill="#4a3525" />
-                            <rect x="25" y="55" width="7" height="22" rx="3" fill="#4a3525" />
-                            <rect x="41" y="55" width="7" height="22" rx="3" fill="#4a3525" />
-                            <rect x="31" y="85" width="7" height="18" rx="3" fill="#6a4a30" />
-                            <rect x="39" y="85" width="7" height="18" rx="3" fill="#6a4a30" />
-                            <ellipse cx="80" cy="44" rx="8" ry="9" fill="#c8a882" />
-                            <ellipse cx="80" cy="37" rx="8" ry="6" fill="#1a1008" />
-                            <rect x="71" y="53" width="18" height="32" rx="4" fill="#d4c8b8" />
-                            <rect x="67" y="55" width="7" height="22" rx="3" fill="#d4c8b8" />
-                            <rect x="83" y="55" width="7" height="22" rx="3" fill="#d4c8b8" />
-                            <rect x="73" y="85" width="7" height="18" rx="3" fill="#8B6B4A" />
-                            <rect x="81" y="85" width="7" height="18" rx="3" fill="#8B6B4A" />
-                            <ellipse cx="59" cy="66" rx="5" ry="4" fill="#c8a882" opacity="0.8" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Polaroid 2 – restaurant -->
-                <div class="pol pol2">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 124 124" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="124" height="124" fill="#2a1a0e" />
-                            <circle cx="95" cy="25" r="16" fill="#ff9900" opacity="0.28" />
-                            <circle cx="25" cy="35" r="10" fill="#ffcc55" opacity="0.18" />
-                            <rect x="0" y="92" width="124" height="32" fill="#1a0d06" />
-                            <rect x="8" y="90" width="108" height="5" rx="2" fill="#5a3820" />
-                            <ellipse cx="62" cy="47" rx="11" ry="12" fill="#c8a882" />
-                            <ellipse cx="62" cy="38" rx="11" ry="7" fill="#1a1008" />
-                            <ellipse cx="52" cy="43" rx="5" ry="8" fill="#1a1008" />
-                            <ellipse cx="72" cy="43" rx="5" ry="8" fill="#1a1008" />
-                            <ellipse cx="62" cy="58" rx="7" ry="4" fill="#2a1a0a" opacity="0.7" />
-                            <rect x="46" y="59" width="32" height="36" rx="7" fill="#e8e4de" />
-                            <ellipse cx="40" cy="80" rx="6" ry="4" fill="#c8a882" />
-                            <ellipse cx="84" cy="74" rx="6" ry="4" fill="#c8a882" />
-                            <rect x="52" y="95" width="9" height="18" rx="3" fill="#4a3020" />
-                            <rect x="63" y="95" width="9" height="18" rx="3" fill="#4a3020" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Polaroid 3 – solo close-up -->
-                <div class="pol pol3">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="108" height="108" fill="#1e1408" />
-                            <circle cx="54" cy="20" r="22" fill="#ff8800" opacity="0.15" />
-                            <ellipse cx="54" cy="46" rx="13" ry="14" fill="#c8a882" />
-                            <ellipse cx="54" cy="36" rx="13" ry="8" fill="#1a1008" />
-                            <ellipse cx="43" cy="40" rx="5" ry="9" fill="#1a1008" />
-                            <ellipse cx="65" cy="40" rx="5" ry="9" fill="#1a1008" />
-                            <circle cx="48" cy="47" r="2" fill="#333" />
-                            <circle cx="60" cy="47" r="2" fill="#333" />
-                            <ellipse cx="54" cy="55" rx="4" ry="2" fill="#f9a8b0" opacity="0.7" />
-                            <rect x="39" y="60" width="30" height="36" rx="7" fill="#e0dcd6" />
-                            <ellipse cx="41" cy="80" rx="6" ry="4" fill="#c8a882" />
-                            <ellipse cx="67" cy="76" rx="6" ry="4" fill="#c8a882" />
-                            <rect x="42" y="96" width="8" height="10" rx="3" fill="#4a3020" />
-                            <rect x="58" y="96" width="8" height="10" rx="3" fill="#4a3020" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="cap-love">i love you &lt;3</div>
-                <div class="cap-pb">"o, pretty boy,"</div>
-
-                <div class="plate">
-                    <div class="plate-top">SO SPECIAL</div>
-                    <div class="plate-hy"><span class="plate-heart">♥</span><span>YOU</span></div>
-                    <div class="plate-bot">LIVE · LAUGH · LOVE</div>
-                </div>
-
-                <div class="hb-bot">HAppY<br>BiRtHdAy<br><span style="font-size:0.75em">&lt;3</span></div>
-
-                <svg class="kitty" viewBox="0 0 38 44" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="19" cy="28" rx="15" ry="15" fill="#fff" stroke="#eee" stroke-width="1" />
-                    <polygon points="11,11 18,15 11,19" fill="#e22" />
-                    <polygon points="27,11 20,15 27,19" fill="#e22" />
-                    <ellipse cx="19" cy="14" rx="4" ry="3" fill="#e22" />
-                    <circle cx="14" cy="26" r="2" fill="#222" />
-                    <circle cx="24" cy="26" r="2" fill="#222" />
-                    <ellipse cx="19" cy="31" rx="2" ry="1.5" fill="#f9a" />
-                    <line x1="4" y1="27" x2="13" y2="29" stroke="#666" stroke-width="0.8" />
-                    <line x1="4" y1="31" x2="13" y2="31" stroke="#666" stroke-width="0.8" />
-                    <line x1="25" y1="29" x2="34" y2="27" stroke="#666" stroke-width="0.8" />
-                    <line x1="25" y1="31" x2="34" y2="31" stroke="#666" stroke-width="0.8" />
-                </svg>
-                <span class="sm-heart" style="bottom:8%;left:46%">♥</span>
-                <span class="sm-heart" style="bottom:6%;left:52%">♥</span>
+    <div class="card-outer">
+        <div class="card dk1">
+            <div class="lips">
+                <span class="lip" style="top:2%;left:4%;transform:rotate(-18deg)">💋</span>
+                <span class="lip" style="top:1%;left:32%;transform:rotate(12deg)">💋</span>
+                <span class="lip" style="top:4%;right:5%;transform:rotate(-6deg)">💋</span>
+                <span class="lip" style="top:10%;left:10%;transform:rotate(28deg)">💋</span>
+                <span class="lip" style="top:9%;right:20%;transform:rotate(-38deg)">💋</span>
+                <span class="lip" style="top:17%;left:1%;transform:rotate(14deg)">💋</span>
+                <span class="lip" style="top:15%;right:2%;transform:rotate(-11deg)">💋</span>
+                <span class="lip" style="top:22%;right:9%;transform:rotate(24deg)">💋</span>
+                <span class="lip" style="top:27%;left:6%;transform:rotate(-16deg)">💋</span>
+                <span class="lip" style="top:31%;left:39%;transform:rotate(4deg)">💋</span>
+                <span class="lip" style="top:36%;right:15%;transform:rotate(-32deg)">💋</span>
+                <span class="lip" style="top:41%;left:13%;transform:rotate(22deg)">💋</span>
+                <span class="lip" style="top:46%;right:7%;transform:rotate(-9deg)">💋</span>
+                <span class="lip" style="top:50%;left:46%;transform:rotate(11deg)">💋</span>
+                <span class="lip" style="top:55%;left:3%;transform:rotate(-26deg)">💋</span>
+                <span class="lip" style="top:60%;right:3%;transform:rotate(17deg)">💋</span>
+                <span class="lip" style="top:64%;left:56%;transform:rotate(-36deg)">💋</span>
+                <span class="lip" style="top:68%;left:20%;transform:rotate(38deg)">💋</span>
+                <span class="lip" style="top:72%;right:23%;transform:rotate(-13deg)">💋</span>
+                <span class="lip" style="top:76%;left:31%;transform:rotate(7deg)">💋</span>
+                <span class="lip" style="top:80%;left:6%;transform:rotate(-23deg)">💋</span>
+                <span class="lip" style="top:84%;right:11%;transform:rotate(15deg)">💋</span>
+                <span class="lip" style="top:88%;left:43%;transform:rotate(-7deg)">💋</span>
+                <span class="lip" style="top:92%;left:61%;transform:rotate(21deg)">💋</span>
+                <span class="lip" style="top:6%;left:61%;transform:rotate(-19deg)">💋</span>
+                <span class="lip" style="top:19%;left:49%;transform:rotate(31deg)">💋</span>
+                <span class="lip" style="top:38%;left:66%;transform:rotate(-29deg)">💋</span>
+                <span class="lip" style="top:53%;left:26%;transform:rotate(5deg)">💋</span>
+                <span class="lip" style="top:74%;left:71%;transform:rotate(-17deg)">💋</span>
+                <span class="lip" style="top:95%;left:16%;transform:rotate(23deg)">💋</span>
             </div>
-        </div>
-
-        <!-- ══ VARIANT 2: Light Dusty Rose ══ -->
-        <div class="variant-wrap">
-            <div class="v-label">Light — dusty rose</div>
-            <div class="card lt2">
-                <div class="lips">
-                    <span class="lip" style="top:2%;left:5%;transform:rotate(15deg)">💋</span>
-                    <span class="lip" style="top:0%;left:35%;transform:rotate(-8deg)">💋</span>
-                    <span class="lip" style="top:4%;right:8%;transform:rotate(20deg)">💋</span>
-                    <span class="lip" style="top:9%;left:15%;transform:rotate(-30deg)">💋</span>
-                    <span class="lip" style="top:7%;right:25%;transform:rotate(35deg)">💋</span>
-                    <span class="lip" style="top:15%;left:2%;transform:rotate(-12deg)">💋</span>
-                    <span class="lip" style="top:14%;right:3%;transform:rotate(8deg)">💋</span>
-                    <span class="lip" style="top:21%;right:12%;transform:rotate(-22deg)">💋</span>
-                    <span class="lip" style="top:26%;left:8%;transform:rotate(18deg)">💋</span>
-                    <span class="lip" style="top:30%;left:40%;transform:rotate(-5deg)">💋</span>
-                    <span class="lip" style="top:35%;right:18%;transform:rotate(28deg)">💋</span>
-                    <span class="lip" style="top:40%;left:15%;transform:rotate(-20deg)">💋</span>
-                    <span class="lip" style="top:45%;right:7%;transform:rotate(10deg)">💋</span>
-                    <span class="lip" style="top:50%;left:48%;transform:rotate(-14deg)">💋</span>
-                    <span class="lip" style="top:54%;left:3%;transform:rotate(26deg)">💋</span>
-                    <span class="lip" style="top:59%;right:4%;transform:rotate(-18deg)">💋</span>
-                    <span class="lip" style="top:63%;left:58%;transform:rotate(32deg)">💋</span>
-                    <span class="lip" style="top:67%;left:22%;transform:rotate(-38deg)">💋</span>
-                    <span class="lip" style="top:71%;right:24%;transform:rotate(16deg)">💋</span>
-                    <span class="lip" style="top:75%;left:32%;transform:rotate(-4deg)">💋</span>
-                    <span class="lip" style="top:79%;left:8%;transform:rotate(24deg)">💋</span>
-                    <span class="lip" style="top:83%;right:12%;transform:rotate(-16deg)">💋</span>
-                    <span class="lip" style="top:87%;left:44%;transform:rotate(6deg)">💋</span>
-                    <span class="lip" style="top:91%;left:62%;transform:rotate(-24deg)">💋</span>
-                    <span class="lip" style="top:6%;left:62%;transform:rotate(18deg)">💋</span>
-                    <span class="lip" style="top:18%;left:50%;transform:rotate(-30deg)">💋</span>
-                    <span class="lip" style="top:37%;left:67%;transform:rotate(22deg)">💋</span>
-                    <span class="lip" style="top:48%;left:28%;transform:rotate(-8deg)">💋</span>
-                    <span class="lip" style="top:76%;left:72%;transform:rotate(14deg)">💋</span>
-                    <span class="lip" style="top:94%;left:18%;transform:rotate(-20deg)">💋</span>
-                </div>
-
-                <div class="hb-sticker" style="background:#fce8e0">
-                    <span class="sp" style="top:5px;left:6px;color:#8a1a30">✦</span>
-                    <span class="sp" style="top:5px;right:6px;color:#8a1a30">✦</span>
-                    <span class="h1" style="color:#8a1a30">HAPPY</span>
-                    <span class="h2" style="color:#8a1a30">birthday</span>
-                </div>
-
-                <div class="stamp">
-                    <div class="stamp-num">60</div>
-                    <div class="stamp-kisses">
-                        <span style="transform:rotate(-8deg)">💋</span><span
-                            style="transform:rotate(12deg)">💋</span><span style="transform:rotate(-5deg)">💋</span>
-                        <span style="transform:rotate(10deg)">💋</span><span
-                            style="transform:rotate(-15deg)">💋</span><span style="transform:rotate(6deg)">💋</span>
-                    </div>
-                    <div class="postmark">29.V.45<br>PRAHA 21</div>
-                </div>
-
-                <div class="fav">Favorite<br>Person →</div>
-
-                <div class="pol pol1" style="background:#fffaf8">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="118" height="118" fill="#1a0f0a" />
-                            <circle cx="25" cy="18" r="10" fill="#ff9900" opacity="0.22" />
-                            <ellipse cx="38" cy="44" rx="8" ry="9" fill="#c8a882" />
-                            <ellipse cx="38" cy="37" rx="8" ry="6" fill="#1a1008" />
-                            <rect x="29" y="53" width="18" height="32" rx="4" fill="#4a3525" />
-                            <rect x="25" y="55" width="7" height="22" rx="3" fill="#4a3525" />
-                            <rect x="41" y="55" width="7" height="22" rx="3" fill="#4a3525" />
-                            <rect x="31" y="85" width="7" height="18" rx="3" fill="#6a4a30" />
-                            <rect x="39" y="85" width="7" height="18" rx="3" fill="#6a4a30" />
-                            <ellipse cx="80" cy="44" rx="8" ry="9" fill="#c8a882" />
-                            <ellipse cx="80" cy="37" rx="8" ry="6" fill="#1a1008" />
-                            <rect x="71" y="53" width="18" height="32" rx="4" fill="#d4c8b8" />
-                            <rect x="67" y="55" width="7" height="22" rx="3" fill="#d4c8b8" />
-                            <rect x="83" y="55" width="7" height="22" rx="3" fill="#d4c8b8" />
-                            <rect x="73" y="85" width="7" height="18" rx="3" fill="#8B6B4A" />
-                            <rect x="81" y="85" width="7" height="18" rx="3" fill="#8B6B4A" />
-                            <ellipse cx="59" cy="66" rx="5" ry="4" fill="#c8a882" opacity="0.8" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="pol pol2" style="background:#fffaf8">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 124 124" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="124" height="124" fill="#2a1a0e" />
-                            <circle cx="95" cy="25" r="16" fill="#ff9900" opacity="0.28" />
-                            <rect x="0" y="92" width="124" height="32" fill="#1a0d06" />
-                            <ellipse cx="62" cy="47" rx="11" ry="12" fill="#c8a882" />
-                            <ellipse cx="62" cy="38" rx="11" ry="7" fill="#1a1008" />
-                            <ellipse cx="52" cy="43" rx="5" ry="8" fill="#1a1008" />
-                            <ellipse cx="72" cy="43" rx="5" ry="8" fill="#1a1008" />
-                            <rect x="46" y="59" width="32" height="36" rx="7" fill="#e8e4de" />
-                            <ellipse cx="40" cy="80" rx="6" ry="4" fill="#c8a882" />
-                            <rect x="52" y="95" width="9" height="18" rx="3" fill="#4a3020" />
-                            <rect x="63" y="95" width="9" height="18" rx="3" fill="#4a3020" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="pol pol3" style="background:#fffaf8">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="108" height="108" fill="#1e1408" />
-                            <circle cx="54" cy="20" r="22" fill="#ff8800" opacity="0.15" />
-                            <ellipse cx="54" cy="46" rx="13" ry="14" fill="#c8a882" />
-                            <ellipse cx="54" cy="36" rx="13" ry="8" fill="#1a1008" />
-                            <ellipse cx="43" cy="40" rx="5" ry="9" fill="#1a1008" />
-                            <ellipse cx="65" cy="40" rx="5" ry="9" fill="#1a1008" />
-                            <circle cx="48" cy="47" r="2" fill="#333" />
-                            <circle cx="60" cy="47" r="2" fill="#333" />
-                            <rect x="39" y="60" width="30" height="36" rx="7" fill="#e0dcd6" />
-                            <ellipse cx="41" cy="80" rx="6" ry="4" fill="#c8a882" />
-                            <rect x="42" y="96" width="8" height="10" rx="3" fill="#4a3020" />
-                            <rect x="58" y="96" width="8" height="10" rx="3" fill="#4a3020" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="cap-love">i love you &lt;3</div>
-                <div class="cap-pb">"o, pretty boy,"</div>
-                <div class="plate">
-                    <div class="plate-top">SO SPECIAL</div>
-                    <div class="plate-hy"><span class="plate-heart">♥</span><span>YOU</span></div>
-                    <div class="plate-bot">LIVE · LAUGH · LOVE</div>
-                </div>
-                <div class="hb-bot">HAppY<br>BiRtHdAy<br><span style="font-size:0.75em">&lt;3</span></div>
-
-                <svg class="kitty" viewBox="0 0 38 44" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="19" cy="28" rx="15" ry="15" fill="#fff" stroke="#fce0e0" stroke-width="1" />
-                    <polygon points="11,11 18,15 11,19" fill="#c0203a" />
-                    <polygon points="27,11 20,15 27,19" fill="#c0203a" />
-                    <ellipse cx="19" cy="14" rx="4" ry="3" fill="#c0203a" />
-                    <circle cx="14" cy="26" r="2" fill="#222" />
-                    <circle cx="24" cy="26" r="2" fill="#222" />
-                    <ellipse cx="19" cy="31" rx="2" ry="1.5" fill="#f9a" />
-                    <line x1="4" y1="27" x2="13" y2="29" stroke="#999" stroke-width="0.8" />
-                    <line x1="4" y1="31" x2="13" y2="31" stroke="#999" stroke-width="0.8" />
-                    <line x1="25" y1="29" x2="34" y2="27" stroke="#999" stroke-width="0.8" />
-                    <line x1="25" y1="31" x2="34" y2="31" stroke="#999" stroke-width="0.8" />
-                </svg>
-                <span class="sm-heart" style="bottom:8%;left:46%;color:#8a1a30">♥</span>
-                <span class="sm-heart" style="bottom:6%;left:52%;color:#8a1a30">♥</span>
+            <div class="hb-sticker">
+                <span class="sp" style="top:5px;left:6px;color:#f0c080">✦</span>
+                <span class="sp" style="top:5px;right:6px;color:#f0c080">✦</span>
+                <span class="h1">HAPPY</span><span class="h2">birthday</span>
             </div>
-        </div>
-
-        <!-- ══ VARIANT 3: Dark Espresso ══ -->
-        <div class="variant-wrap">
-            <div class="v-label">Dark — espresso night</div>
-            <div class="card dk1">
-                <div class="lips">
-                    <span class="lip" style="top:2%;left:4%;transform:rotate(-18deg)">💋</span>
-                    <span class="lip" style="top:1%;left:32%;transform:rotate(12deg)">💋</span>
-                    <span class="lip" style="top:4%;right:5%;transform:rotate(-6deg)">💋</span>
-                    <span class="lip" style="top:10%;left:10%;transform:rotate(28deg)">💋</span>
-                    <span class="lip" style="top:9%;right:20%;transform:rotate(-38deg)">💋</span>
-                    <span class="lip" style="top:17%;left:1%;transform:rotate(14deg)">💋</span>
-                    <span class="lip" style="top:15%;right:2%;transform:rotate(-11deg)">💋</span>
-                    <span class="lip" style="top:22%;right:9%;transform:rotate(24deg)">💋</span>
-                    <span class="lip" style="top:27%;left:6%;transform:rotate(-16deg)">💋</span>
-                    <span class="lip" style="top:31%;left:39%;transform:rotate(4deg)">💋</span>
-                    <span class="lip" style="top:36%;right:15%;transform:rotate(-32deg)">💋</span>
-                    <span class="lip" style="top:41%;left:13%;transform:rotate(22deg)">💋</span>
-                    <span class="lip" style="top:46%;right:7%;transform:rotate(-9deg)">💋</span>
-                    <span class="lip" style="top:50%;left:46%;transform:rotate(11deg)">💋</span>
-                    <span class="lip" style="top:55%;left:3%;transform:rotate(-26deg)">💋</span>
-                    <span class="lip" style="top:60%;right:3%;transform:rotate(17deg)">💋</span>
-                    <span class="lip" style="top:64%;left:56%;transform:rotate(-36deg)">💋</span>
-                    <span class="lip" style="top:68%;left:20%;transform:rotate(38deg)">💋</span>
-                    <span class="lip" style="top:72%;right:23%;transform:rotate(-13deg)">💋</span>
-                    <span class="lip" style="top:76%;left:31%;transform:rotate(7deg)">💋</span>
-                    <span class="lip" style="top:80%;left:6%;transform:rotate(-23deg)">💋</span>
-                    <span class="lip" style="top:84%;right:11%;transform:rotate(15deg)">💋</span>
-                    <span class="lip" style="top:88%;left:43%;transform:rotate(-7deg)">💋</span>
-                    <span class="lip" style="top:92%;left:61%;transform:rotate(21deg)">💋</span>
-                    <span class="lip" style="top:6%;left:61%;transform:rotate(-19deg)">💋</span>
-                    <span class="lip" style="top:19%;left:49%;transform:rotate(31deg)">💋</span>
-                    <span class="lip" style="top:38%;left:66%;transform:rotate(-29deg)">💋</span>
-                    <span class="lip" style="top:53%;left:26%;transform:rotate(5deg)">💋</span>
-                    <span class="lip" style="top:74%;left:71%;transform:rotate(-17deg)">💋</span>
-                    <span class="lip" style="top:95%;left:16%;transform:rotate(23deg)">💋</span>
+            <div class="stamp">
+                <div class="stamp-num">60</div>
+                <div class="stamp-kisses">
+                    <span style="transform:rotate(-8deg)">💋</span><span style="transform:rotate(12deg)">💋</span><span
+                        style="transform:rotate(-5deg)">💋</span>
+                    <span style="transform:rotate(10deg)">💋</span><span style="transform:rotate(-15deg)">💋</span><span
+                        style="transform:rotate(6deg)">💋</span>
                 </div>
-
-                <div class="hb-sticker">
-                    <span class="sp" style="top:5px;left:6px;color:#f0c080">✦</span>
-                    <span class="sp" style="top:5px;right:6px;color:#f0c080">✦</span>
-                    <span class="h1">HAPPY</span><span class="h2">birthday</span>
-                </div>
-
-                <div class="stamp">
-                    <div class="stamp-num">60</div>
-                    <div class="stamp-kisses">
-                        <span style="transform:rotate(-8deg)">💋</span><span
-                            style="transform:rotate(12deg)">💋</span><span style="transform:rotate(-5deg)">💋</span>
-                        <span style="transform:rotate(10deg)">💋</span><span
-                            style="transform:rotate(-15deg)">💋</span><span style="transform:rotate(6deg)">💋</span>
-                    </div>
-                    <div class="postmark">29.V.45<br>PRAHA 21</div>
-                </div>
-
-                <div class="fav">Favorite<br>Person →</div>
-
-                <div class="pol pol1">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="118" height="118" fill="#1a0f0a" />
-                            <circle cx="25" cy="18" r="10" fill="#ff9900" opacity="0.22" />
-                            <ellipse cx="38" cy="44" rx="8" ry="9" fill="#c8a882" />
-                            <ellipse cx="38" cy="37" rx="8" ry="6" fill="#1a1008" />
-                            <rect x="29" y="53" width="18" height="32" rx="4" fill="#4a3525" />
-                            <rect x="25" y="55" width="7" height="22" rx="3" fill="#4a3525" />
-                            <rect x="41" y="55" width="7" height="22" rx="3" fill="#4a3525" />
-                            <rect x="31" y="85" width="7" height="18" rx="3" fill="#6a4a30" />
-                            <rect x="39" y="85" width="7" height="18" rx="3" fill="#6a4a30" />
-                            <ellipse cx="80" cy="44" rx="8" ry="9" fill="#c8a882" />
-                            <ellipse cx="80" cy="37" rx="8" ry="6" fill="#1a1008" />
-                            <rect x="71" y="53" width="18" height="32" rx="4" fill="#d4c8b8" />
-                            <rect x="67" y="55" width="7" height="22" rx="3" fill="#d4c8b8" />
-                            <rect x="83" y="55" width="7" height="22" rx="3" fill="#d4c8b8" />
-                            <rect x="73" y="85" width="7" height="18" rx="3" fill="#8B6B4A" />
-                            <rect x="81" y="85" width="7" height="18" rx="3" fill="#8B6B4A" />
-                            <ellipse cx="59" cy="66" rx="5" ry="4" fill="#c8a882" opacity="0.8" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="pol pol2">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 124 124" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="124" height="124" fill="#2a1a0e" />
-                            <circle cx="95" cy="25" r="16" fill="#ff9900" opacity="0.28" />
-                            <rect x="0" y="92" width="124" height="32" fill="#1a0d06" />
-                            <ellipse cx="62" cy="47" rx="11" ry="12" fill="#c8a882" />
-                            <ellipse cx="62" cy="38" rx="11" ry="7" fill="#1a1008" />
-                            <ellipse cx="52" cy="43" rx="5" ry="8" fill="#1a1008" />
-                            <ellipse cx="72" cy="43" rx="5" ry="8" fill="#1a1008" />
-                            <rect x="46" y="59" width="32" height="36" rx="7" fill="#e8e4de" />
-                            <ellipse cx="40" cy="80" rx="6" ry="4" fill="#c8a882" />
-                            <rect x="52" y="95" width="9" height="18" rx="3" fill="#4a3020" />
-                            <rect x="63" y="95" width="9" height="18" rx="3" fill="#4a3020" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="pol pol3">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="108" height="108" fill="#1e1408" />
-                            <circle cx="54" cy="20" r="22" fill="#ff8800" opacity="0.15" />
-                            <ellipse cx="54" cy="46" rx="13" ry="14" fill="#c8a882" />
-                            <ellipse cx="54" cy="36" rx="13" ry="8" fill="#1a1008" />
-                            <ellipse cx="43" cy="40" rx="5" ry="9" fill="#1a1008" />
-                            <ellipse cx="65" cy="40" rx="5" ry="9" fill="#1a1008" />
-                            <circle cx="48" cy="47" r="2" fill="#333" />
-                            <circle cx="60" cy="47" r="2" fill="#333" />
-                            <rect x="39" y="60" width="30" height="36" rx="7" fill="#e0dcd6" />
-                            <ellipse cx="41" cy="80" rx="6" ry="4" fill="#c8a882" />
-                            <rect x="42" y="96" width="8" height="10" rx="3" fill="#4a3020" />
-                            <rect x="58" y="96" width="8" height="10" rx="3" fill="#4a3020" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="cap-love">i love you &lt;3</div>
-                <div class="cap-pb">"o, pretty boy,"</div>
-                <div class="plate">
-                    <div class="plate-top">SO SPECIAL</div>
-                    <div class="plate-hy"><span class="plate-heart">♥</span><span>YOU</span></div>
-                    <div class="plate-bot">LIVE · LAUGH · LOVE</div>
-                </div>
-                <div class="hb-bot">HAppY<br>BiRtHdAy<br><span style="font-size:0.75em">&lt;3</span></div>
-
-                <svg class="kitty" viewBox="0 0 38 44" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="19" cy="28" rx="15" ry="15" fill="#2a1a10" stroke="#5a3820" stroke-width="1" />
-                    <polygon points="11,11 18,15 11,19" fill="#d04030" />
-                    <polygon points="27,11 20,15 27,19" fill="#d04030" />
-                    <ellipse cx="19" cy="14" rx="4" ry="3" fill="#d04030" />
-                    <circle cx="14" cy="26" r="2" fill="#f0d090" />
-                    <circle cx="24" cy="26" r="2" fill="#f0d090" />
-                    <ellipse cx="19" cy="31" rx="2" ry="1.5" fill="#f9a" />
-                    <line x1="4" y1="27" x2="13" y2="29" stroke="#7a6050" stroke-width="0.8" />
-                    <line x1="4" y1="31" x2="13" y2="31" stroke="#7a6050" stroke-width="0.8" />
-                    <line x1="25" y1="29" x2="34" y2="27" stroke="#7a6050" stroke-width="0.8" />
-                    <line x1="25" y1="31" x2="34" y2="31" stroke="#7a6050" stroke-width="0.8" />
-                </svg>
-                <span class="sm-heart" style="bottom:8%;left:46%">♥</span>
-                <span class="sm-heart" style="bottom:6%;left:52%">♥</span>
+                <div class="postmark">29.V.45<br />PRAHA 21</div>
             </div>
-        </div>
-
-        <!-- ══ VARIANT 4: Dark Midnight Rose ══ -->
-        <div class="variant-wrap">
-            <div class="v-label">Dark — midnight rose</div>
-            <div class="card dk2">
-                <div class="lips">
-                    <span class="lip" style="top:3%;left:6%;transform:rotate(16deg)">💋</span>
-                    <span class="lip" style="top:0%;left:36%;transform:rotate(-9deg)">💋</span>
-                    <span class="lip" style="top:5%;right:9%;transform:rotate(21deg)">💋</span>
-                    <span class="lip" style="top:11%;left:16%;transform:rotate(-31deg)">💋</span>
-                    <span class="lip" style="top:8%;right:26%;transform:rotate(36deg)">💋</span>
-                    <span class="lip" style="top:18%;left:3%;transform:rotate(-13deg)">💋</span>
-                    <span class="lip" style="top:16%;right:4%;transform:rotate(9deg)">💋</span>
-                    <span class="lip" style="top:23%;right:13%;transform:rotate(-23deg)">💋</span>
-                    <span class="lip" style="top:28%;left:9%;transform:rotate(19deg)">💋</span>
-                    <span class="lip" style="top:32%;left:41%;transform:rotate(-6deg)">💋</span>
-                    <span class="lip" style="top:37%;right:19%;transform:rotate(29deg)">💋</span>
-                    <span class="lip" style="top:42%;left:16%;transform:rotate(-21deg)">💋</span>
-                    <span class="lip" style="top:47%;right:8%;transform:rotate(11deg)">💋</span>
-                    <span class="lip" style="top:52%;left:49%;transform:rotate(-15deg)">💋</span>
-                    <span class="lip" style="top:56%;left:4%;transform:rotate(27deg)">💋</span>
-                    <span class="lip" style="top:62%;right:5%;transform:rotate(-19deg)">💋</span>
-                    <span class="lip" style="top:66%;left:59%;transform:rotate(33deg)">💋</span>
-                    <span class="lip" style="top:70%;left:23%;transform:rotate(-39deg)">💋</span>
-                    <span class="lip" style="top:74%;right:25%;transform:rotate(17deg)">💋</span>
-                    <span class="lip" style="top:78%;left:33%;transform:rotate(-5deg)">💋</span>
-                    <span class="lip" style="top:82%;left:9%;transform:rotate(25deg)">💋</span>
-                    <span class="lip" style="top:86%;right:13%;transform:rotate(-17deg)">💋</span>
-                    <span class="lip" style="top:90%;left:45%;transform:rotate(7deg)">💋</span>
-                    <span class="lip" style="top:93%;left:63%;transform:rotate(-25deg)">💋</span>
-                    <span class="lip" style="top:7%;left:63%;transform:rotate(19deg)">💋</span>
-                    <span class="lip" style="top:20%;left:51%;transform:rotate(-31deg)">💋</span>
-                    <span class="lip" style="top:39%;left:68%;transform:rotate(23deg)">💋</span>
-                    <span class="lip" style="top:55%;left:29%;transform:rotate(-9deg)">💋</span>
-                    <span class="lip" style="top:72%;left:73%;transform:rotate(15deg)">💋</span>
-                    <span class="lip" style="top:96%;left:19%;transform:rotate(-21deg)">💋</span>
+            <div class="fav">Favorite<br />Person →</div>
+            <div class="pol pol1">
+                <div class="pol-inner">
+                    <svg viewbox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
+                        <rect fill="#1a0f0a" height="118" width="118"></rect>
+                        <circle cx="25" cy="18" fill="#ff9900" opacity="0.22" r="10"></circle>
+                        <ellipse cx="38" cy="44" fill="#c8a882" rx="8" ry="9"></ellipse>
+                        <ellipse cx="38" cy="37" fill="#1a1008" rx="8" ry="6"></ellipse>
+                        <rect fill="#4a3525" height="32" rx="4" width="18" x="29" y="53"></rect>
+                        <rect fill="#4a3525" height="22" rx="3" width="7" x="25" y="55"></rect>
+                        <rect fill="#4a3525" height="22" rx="3" width="7" x="41" y="55"></rect>
+                        <rect fill="#6a4a30" height="18" rx="3" width="7" x="31" y="85"></rect>
+                        <rect fill="#6a4a30" height="18" rx="3" width="7" x="39" y="85"></rect>
+                        <ellipse cx="80" cy="44" fill="#c8a882" rx="8" ry="9"></ellipse>
+                        <ellipse cx="80" cy="37" fill="#1a1008" rx="8" ry="6"></ellipse>
+                        <rect fill="#d4c8b8" height="32" rx="4" width="18" x="71" y="53"></rect>
+                        <rect fill="#d4c8b8" height="22" rx="3" width="7" x="67" y="55"></rect>
+                        <rect fill="#d4c8b8" height="22" rx="3" width="7" x="83" y="55"></rect>
+                        <rect fill="#8B6B4A" height="18" rx="3" width="7" x="73" y="85"></rect>
+                        <rect fill="#8B6B4A" height="18" rx="3" width="7" x="81" y="85"></rect>
+                        <ellipse cx="59" cy="66" fill="#c8a882" opacity="0.8" rx="5" ry="4"></ellipse>
+                    </svg>
                 </div>
-
-                <div class="hb-sticker">
-                    <span class="sp" style="top:5px;left:6px;color:#f0a0c0">✦</span>
-                    <span class="sp" style="top:5px;right:6px;color:#f0a0c0">✦</span>
-                    <span class="h1">HAPPY</span><span class="h2">birthday</span>
-                </div>
-
-                <div class="stamp">
-                    <div class="stamp-num">60</div>
-                    <div class="stamp-kisses">
-                        <span style="transform:rotate(-8deg)">💋</span><span
-                            style="transform:rotate(12deg)">💋</span><span style="transform:rotate(-5deg)">💋</span>
-                        <span style="transform:rotate(10deg)">💋</span><span
-                            style="transform:rotate(-15deg)">💋</span><span style="transform:rotate(6deg)">💋</span>
-                    </div>
-                    <div class="postmark">29.V.45<br>PRAHA 21</div>
-                </div>
-
-                <div class="fav">Favorite<br>Person →</div>
-
-                <div class="pol pol1">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="118" height="118" fill="#1a0f0a" />
-                            <circle cx="25" cy="18" r="10" fill="#ff9900" opacity="0.22" />
-                            <ellipse cx="38" cy="44" rx="8" ry="9" fill="#c8a882" />
-                            <ellipse cx="38" cy="37" rx="8" ry="6" fill="#1a1008" />
-                            <rect x="29" y="53" width="18" height="32" rx="4" fill="#4a3525" />
-                            <rect x="25" y="55" width="7" height="22" rx="3" fill="#4a3525" />
-                            <rect x="41" y="55" width="7" height="22" rx="3" fill="#4a3525" />
-                            <rect x="31" y="85" width="7" height="18" rx="3" fill="#6a4a30" />
-                            <rect x="39" y="85" width="7" height="18" rx="3" fill="#6a4a30" />
-                            <ellipse cx="80" cy="44" rx="8" ry="9" fill="#c8a882" />
-                            <ellipse cx="80" cy="37" rx="8" ry="6" fill="#1a1008" />
-                            <rect x="71" y="53" width="18" height="32" rx="4" fill="#d4c8b8" />
-                            <rect x="67" y="55" width="7" height="22" rx="3" fill="#d4c8b8" />
-                            <rect x="83" y="55" width="7" height="22" rx="3" fill="#d4c8b8" />
-                            <rect x="73" y="85" width="7" height="18" rx="3" fill="#8B6B4A" />
-                            <rect x="81" y="85" width="7" height="18" rx="3" fill="#8B6B4A" />
-                            <ellipse cx="59" cy="66" rx="5" ry="4" fill="#c8a882" opacity="0.8" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="pol pol2">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 124 124" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="124" height="124" fill="#2a1a0e" />
-                            <circle cx="95" cy="25" r="16" fill="#ff9900" opacity="0.28" />
-                            <rect x="0" y="92" width="124" height="32" fill="#1a0d06" />
-                            <ellipse cx="62" cy="47" rx="11" ry="12" fill="#c8a882" />
-                            <ellipse cx="62" cy="38" rx="11" ry="7" fill="#1a1008" />
-                            <ellipse cx="52" cy="43" rx="5" ry="8" fill="#1a1008" />
-                            <ellipse cx="72" cy="43" rx="5" ry="8" fill="#1a1008" />
-                            <rect x="46" y="59" width="32" height="36" rx="7" fill="#e8e4de" />
-                            <ellipse cx="40" cy="80" rx="6" ry="4" fill="#c8a882" />
-                            <rect x="52" y="95" width="9" height="18" rx="3" fill="#4a3020" />
-                            <rect x="63" y="95" width="9" height="18" rx="3" fill="#4a3020" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="pol pol3">
-                    <div class="pol-inner">
-                        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="108" height="108" fill="#1e1408" />
-                            <circle cx="54" cy="20" r="22" fill="#ff8800" opacity="0.15" />
-                            <ellipse cx="54" cy="46" rx="13" ry="14" fill="#c8a882" />
-                            <ellipse cx="54" cy="36" rx="13" ry="8" fill="#1a1008" />
-                            <ellipse cx="43" cy="40" rx="5" ry="9" fill="#1a1008" />
-                            <ellipse cx="65" cy="40" rx="5" ry="9" fill="#1a1008" />
-                            <circle cx="48" cy="47" r="2" fill="#333" />
-                            <circle cx="60" cy="47" r="2" fill="#333" />
-                            <rect x="39" y="60" width="30" height="36" rx="7" fill="#e0dcd6" />
-                            <ellipse cx="41" cy="80" rx="6" ry="4" fill="#c8a882" />
-                            <rect x="42" y="96" width="8" height="10" rx="3" fill="#4a3020" />
-                            <rect x="58" y="96" width="8" height="10" rx="3" fill="#4a3020" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="cap-love">i love you &lt;3</div>
-                <div class="cap-pb">"o, pretty boy,"</div>
-                <div class="plate">
-                    <div class="plate-top">SO SPECIAL</div>
-                    <div class="plate-hy"><span class="plate-heart">♥</span><span>YOU</span></div>
-                    <div class="plate-bot">LIVE · LAUGH · LOVE</div>
-                </div>
-                <div class="hb-bot">HAppY<br>BiRtHdAy<br><span style="font-size:0.75em">&lt;3</span></div>
-
-                <svg class="kitty" viewBox="0 0 38 44" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="19" cy="28" rx="15" ry="15" fill="#2a1020" stroke="#5a2040" stroke-width="1" />
-                    <polygon points="11,11 18,15 11,19" fill="#d04070" />
-                    <polygon points="27,11 20,15 27,19" fill="#d04070" />
-                    <ellipse cx="19" cy="14" rx="4" ry="3" fill="#d04070" />
-                    <circle cx="14" cy="26" r="2" fill="#f0b0d0" />
-                    <circle cx="24" cy="26" r="2" fill="#f0b0d0" />
-                    <ellipse cx="19" cy="31" rx="2" ry="1.5" fill="#f9a" />
-                    <line x1="4" y1="27" x2="13" y2="29" stroke="#7a5068" stroke-width="0.8" />
-                    <line x1="4" y1="31" x2="13" y2="31" stroke="#7a5068" stroke-width="0.8" />
-                    <line x1="25" y1="29" x2="34" y2="27" stroke="#7a5068" stroke-width="0.8" />
-                    <line x1="25" y1="31" x2="34" y2="31" stroke="#7a5068" stroke-width="0.8" />
-                </svg>
-                <span class="sm-heart" style="bottom:8%;left:46%">♥</span>
-                <span class="sm-heart" style="bottom:6%;left:52%">♥</span>
             </div>
+            <div class="pol pol2">
+                <div class="pol-inner">
+                    <svg viewbox="0 0 124 124" xmlns="http://www.w3.org/2000/svg">
+                        <rect fill="#2a1a0e" height="124" width="124"></rect>
+                        <circle cx="95" cy="25" fill="#ff9900" opacity="0.28" r="16"></circle>
+                        <rect fill="#1a0d06" height="32" width="124" x="0" y="92"></rect>
+                        <ellipse cx="62" cy="47" fill="#c8a882" rx="11" ry="12"></ellipse>
+                        <ellipse cx="62" cy="38" fill="#1a1008" rx="11" ry="7"></ellipse>
+                        <ellipse cx="52" cy="43" fill="#1a1008" rx="5" ry="8"></ellipse>
+                        <ellipse cx="72" cy="43" fill="#1a1008" rx="5" ry="8"></ellipse>
+                        <rect fill="#e8e4de" height="36" rx="7" width="32" x="46" y="59"></rect>
+                        <ellipse cx="40" cy="80" fill="#c8a882" rx="6" ry="4"></ellipse>
+                        <rect fill="#4a3020" height="18" rx="3" width="9" x="52" y="95"></rect>
+                        <rect fill="#4a3020" height="18" rx="3" width="9" x="63" y="95"></rect>
+                    </svg>
+                </div>
+            </div>
+            <div class="pol pol3">
+                <div class="pol-inner">
+                    <svg viewbox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+                        <rect fill="#1e1408" height="108" width="108"></rect>
+                        <circle cx="54" cy="20" fill="#ff8800" opacity="0.15" r="22"></circle>
+                        <ellipse cx="54" cy="46" fill="#c8a882" rx="13" ry="14"></ellipse>
+                        <ellipse cx="54" cy="36" fill="#1a1008" rx="13" ry="8"></ellipse>
+                        <ellipse cx="43" cy="40" fill="#1a1008" rx="5" ry="9"></ellipse>
+                        <ellipse cx="65" cy="40" fill="#1a1008" rx="5" ry="9"></ellipse>
+                        <circle cx="48" cy="47" fill="#333" r="2"></circle>
+                        <circle cx="60" cy="47" fill="#333" r="2"></circle>
+                        <rect fill="#e0dcd6" height="36" rx="7" width="30" x="39" y="60"></rect>
+                        <ellipse cx="41" cy="80" fill="#c8a882" rx="6" ry="4"></ellipse>
+                        <rect fill="#4a3020" height="10" rx="3" width="8" x="42" y="96"></rect>
+                        <rect fill="#4a3020" height="10" rx="3" width="8" x="58" y="96"></rect>
+                    </svg>
+                </div>
+            </div>
+            <div class="cap-love">i love you &lt;3</div>
+            <div class="cap-pb">"o, pretty boy,"</div>
+            <div class="plate">
+                <div class="plate-top">SO SPECIAL</div>
+                <div class="plate-hy"><span class="plate-heart">♥</span><span>YOU</span></div>
+                <div class="plate-bot">LIVE · LAUGH · LOVE</div>
+            </div>
+            <div class="hb-bot">HAppY<br />BiRtHdAy<br /><span style="font-size:0.75em">&lt;3</span></div>
+            <svg class="kitty" viewbox="0 0 38 44" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="19" cy="28" fill="#2a1a10" rx="15" ry="15" stroke="#5a3820" stroke-width="1"></ellipse>
+                <polygon fill="#d04030" points="11,11 18,15 11,19"></polygon>
+                <polygon fill="#d04030" points="27,11 20,15 27,19"></polygon>
+                <ellipse cx="19" cy="14" fill="#d04030" rx="4" ry="3"></ellipse>
+                <circle cx="14" cy="26" fill="#f0d090" r="2"></circle>
+                <circle cx="24" cy="26" fill="#f0d090" r="2"></circle>
+                <ellipse cx="19" cy="31" fill="#f9a" rx="2" ry="1.5"></ellipse>
+                <line stroke="#7a6050" stroke-width="0.8" x1="4" x2="13" y1="27" y2="29"></line>
+                <line stroke="#7a6050" stroke-width="0.8" x1="4" x2="13" y1="31" y2="31"></line>
+                <line stroke="#7a6050" stroke-width="0.8" x1="25" x2="34" y1="29" y2="27"></line>
+                <line stroke="#7a6050" stroke-width="0.8" x1="25" x2="34" y1="31" y2="31"></line>
+            </svg>
+            <span class="sm-heart" style="bottom:8%;left:46%">♥</span>
+            <span class="sm-heart" style="bottom:6%;left:52%">♥</span>
         </div>
-
-    </div><!-- /grid -->
+    </div>
+    <a class="next-btn" href="card4_dark_midnight_rose.html">
+        Next
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </a>
 </body>
 
 </html>
