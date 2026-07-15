@@ -689,31 +689,84 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0;
+        padding: 16px;
         position: relative;
+        box-sizing: border-box;
     }
 
     .card {
         width: 100%;
-        height: 100vh;
-        height: 100dvh;
-        aspect-ratio: auto;
-        border-radius: 0;
-        max-width: 480px;
+        height: auto;
+        aspect-ratio: 9 / 16;
+        max-width: 420px;
+        max-height: 100%;
+        border-radius: 14px;
         margin: 0 auto;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
     }
 
-    @media (min-width: 481px) {
+    /* ── SMALL PHONES (≤360px) ── */
+    @media (max-width: 360px) {
         .card-outer {
-            padding: 24px;
+            padding: 8px;
         }
 
         .card {
-            width: min(100%, 480px);
-            height: auto;
-            aspect-ratio: 9 / 16;
-            border-radius: 16px;
+            border-radius: 10px;
+        }
+    }
+
+    /* ── TABLETS ── */
+    @media (min-width: 641px) {
+        .card-outer {
+            padding: 32px;
+        }
+
+        .card {
+            max-width: 440px;
+            border-radius: 18px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+        }
+    }
+
+    /* ── LAPTOPS (≥1024px) ── */
+    @media (min-width: 1024px) {
+        .card-outer {
+            padding: 56px 24px;
+        }
+
+        .card {
+            max-width: 460px;
+        }
+    }
+
+    /* ── LAPTOP L / 1440px ── */
+    @media (min-width: 1200px) {
+        .card-outer {
+            padding: 90px 24px;
+        }
+
+        .card {
+            max-width: 480px;
+        }
+    }
+
+    /* ── LARGE DESKTOP / 4K (≥1920px) ── */
+    @media (min-width: 1920px) {
+        .card-outer {
+            padding: 130px 24px;
+        }
+
+        .card {
+            max-width: 520px;
+        }
+    }
+
+    /* ── SHORT VIEWPORTS (landscape phones / low-height windows) ── */
+    @media (max-height: 700px) {
+        .card-outer {
+            padding-top: 16px;
+            padding-bottom: 16px;
         }
     }
 
