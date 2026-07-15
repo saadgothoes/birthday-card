@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Client\ClientAuthController;
+use App\Http\Controllers\Client\BirthdayCardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -47,6 +48,10 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::get('/settings', [ClientAuthController::class, 'settings'])->name('settings');
         Route::post('/settings/password', [ClientAuthController::class, 'updatePassword'])->name('settings.password');
         Route::post('/logout', [ClientAuthController::class, 'logout'])->name('logout');
+
+        // ─── Birthday Card Builder (wizard) ────────────────────
+        Route::post('/card/step1', [BirthdayCardController::class, 'saveStep1'])->name('card.step1');
+        Route::post('/card/step2', [BirthdayCardController::class, 'saveStep2'])->name('card.step2');
     });
 
     // Password reset routes

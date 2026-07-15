@@ -6,345 +6,345 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Birthday Card - Girl Theme - Page 1 Variant 2</title>
     <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        font-family: 'Lora', serif;
-    }
-
-    body {
-        background: linear-gradient(135deg, #1a0a1a 0%, #2d1230 30%, #1a0818 60%, #0f050c 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        min-height: 100vh;
-    }
-
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
-
-    .girl2-wrap {
-        background: linear-gradient(135deg, #1a0a1a 0%, #2d1230 30%, #1a0818 60%, #0f050c 100%);
-        width: 100%;
-        max-width: 900px;
-        aspect-ratio: 16 / 10;
-        display: flex;
-        align-items: stretch;
-        border-radius: 16px;
-        overflow: hidden;
-        position: relative;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    .girl2-deco {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        overflow: hidden;
-    }
-
-    .pink-particle {
-        position: absolute;
-        border-radius: 50%;
-        background: radial-gradient(circle, #ff69b4, #ff1493);
-        opacity: 0;
-        animation: rise 6s ease-in-out infinite;
-    }
-
-    @keyframes rise {
-        0% {
-            opacity: 0;
-            transform: translateY(0) scale(0.5);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        30% {
-            opacity: 0.5;
-        }
-
-        100% {
-            opacity: 0;
-            transform: translateY(-120px) scale(1.2);
-        }
-    }
-
-    .girl2-left {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px;
-        position: relative;
-    }
-
-    .arch-frame {
-        width: min(210px, 25vw);
-        height: auto;
-        aspect-ratio: 210 / 275;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .arch-border {
-        position: absolute;
-        inset: 0;
-        border: 2.5px solid #c71585;
-        border-radius: 110px 110px 8px 8px;
-        box-shadow: 0 0 0 6px rgba(199, 21, 133, 0.1), 0 0 0 12px rgba(199, 21, 133, 0.05), inset 0 0 30px rgba(199, 21, 133, 0.08);
-    }
-
-    .arch-border::before {
-        content: '';
-        position: absolute;
-        inset: 5px;
-        border: 1px solid rgba(199, 21, 133, 0.3);
-        border-radius: 106px 106px 4px 4px;
-    }
-
-    .arch-photo {
-        width: 90%;
-        height: 93%;
-        border-radius: 100px 100px 6px 6px;
-        overflow: hidden;
-        background: linear-gradient(180deg, #2d1230 0%, #1a0818 100%);
-        position: relative;
-    }
-
-    .arch-photo svg {
-        width: 100%;
-        height: 100%;
-    }
-
-    .tiara-top {
-        position: absolute;
-        top: -22px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 28px;
-        filter: drop-shadow(0 0 8px rgba(255, 20, 147, 0.6));
-    }
-
-    .pink-vine {
-        position: absolute;
-        font-size: 22px;
-        opacity: 0.5;
-    }
-
-    .girl2-right {
-        width: 35%;
-        min-width: 280px;
-        background: rgba(199, 21, 133, 0.04);
-        border-left: 1px solid rgba(199, 21, 133, 0.2);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 30px 24px;
-        gap: 18px;
-    }
-
-    .girl2-title {
-        font-family: 'Playfair Display', serif;
-        font-style: italic;
-        font-size: clamp(16px, 4vw, 19px);
-        color: #ff69b4;
-        letter-spacing: 1px;
-        text-align: center;
-    }
-
-    .girl2-subtitle {
-        font-family: 'Lora', serif;
-        font-size: clamp(9px, 2vw, 11px);
-        color: rgba(199, 21, 133, 0.5);
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        text-align: center;
-        margin-top: -12px;
-    }
-
-    .girl2-code-boxes {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-    }
-
-    .girl2-code-box {
-        width: min(52px, 8vw);
-        height: min(58px, 10vw);
-        border: 1.5px solid rgba(199, 21, 133, 0.35);
-        border-radius: 8px;
-        background: rgba(199, 21, 133, 0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Playfair Display', serif;
-        font-size: clamp(20px, 5vw, 26px);
-        color: #ff69b4;
-        position: relative;
-    }
-
-    .girl2-code-box.active {
-        border-color: #c71585;
-        box-shadow: 0 0 16px rgba(199, 21, 133, 0.25), inset 0 0 8px rgba(199, 21, 133, 0.06);
-    }
-
-    .girl2-code-box::after {
-        content: '';
-        position: absolute;
-        bottom: 6px;
-        width: 24px;
-        height: 1.5px;
-        background: rgba(199, 21, 133, 0.4);
-        border-radius: 1px;
-    }
-
-    .girl2-code-box.active::after {
-        background: #ffb6c1;
-        box-shadow: 0 0 6px rgba(255, 182, 193, 0.5);
-        animation: blink2 1s ease-in-out infinite;
-    }
-
-    @keyframes blink2 {
-
-        0%,
-        100% {
-            opacity: 1;
-        }
-
-        50% {
-            opacity: 0;
-        }
-    }
-
-    .girl2-numpad {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        width: 100%;
-    }
-
-    .girl2-btn {
-        aspect-ratio: 1;
-        min-height: 45px;
-        border: 1px solid rgba(199, 21, 133, 0.2);
-        border-radius: 8px;
-        background: rgba(199, 21, 133, 0.05);
-        color: #ff1493;
-        font-family: 'Playfair Display', serif;
-        font-size: clamp(16px, 3vw, 20px);
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .girl2-btn:hover {
-        background: rgba(199, 21, 133, 0.18);
-        border-color: #c71585;
-        box-shadow: 0 0 16px rgba(199, 21, 133, 0.2);
-        transform: translateY(-1px);
-    }
-
-    .girl2-btn.sym {
-        color: rgba(199, 21, 133, 0.45);
-        font-size: clamp(12px, 2vw, 16px);
-    }
-
-    .hint-girl2 {
-        font-family: 'Lora', serif;
-        font-style: italic;
-        font-size: clamp(11px, 2vw, 13px);
-        color: rgba(199, 21, 133, 0.45);
-        text-align: center;
-    }
-
-    .divider-pink {
-        width: 80px;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(199, 21, 133, 0.5), transparent);
-        margin: -4px 0;
-    }
-
-    .flicker {
-        animation: flicker 4s ease-in-out infinite;
-    }
-
-    @keyframes flicker {
-
-        0%,
-        90%,
-        100% {
-            opacity: 0.5;
-        }
-
-        92%,
-        96% {
-            opacity: 0.2;
-        }
-
-        94%,
-        98% {
-            opacity: 0.6;
-        }
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
+        html,
         body {
-            padding: 10px;
+            width: 100%;
+            height: 100%;
+            font-family: 'Lora', serif;
         }
+
+        body {
+            background: linear-gradient(135deg, #1a0a1a 0%, #2d1230 30%, #1a0818 60%, #0f050c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
 
         .girl2-wrap {
-            flex-direction: column;
-            aspect-ratio: auto;
-            max-width: 100%;
-            max-height: 100vh;
+            background: linear-gradient(135deg, #1a0a1a 0%, #2d1230 30%, #1a0818 60%, #0f050c 100%);
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16 / 10;
+            display: flex;
+            align-items: stretch;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .girl2-deco {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pink-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff69b4, #ff1493);
+            opacity: 0;
+            animation: rise 6s ease-in-out infinite;
+        }
+
+        @keyframes rise {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+
+            30% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-120px) scale(1.2);
+            }
         }
 
         .girl2-left {
-            display: none;
-        }
-
-        .girl2-right {
-            width: 100%;
             flex: 1;
-            border-left: none;
-            border-top: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
         }
 
-        .girl2-numpad {
-            gap: 8px;
+        .arch-frame {
+            width: min(210px, 25vw);
+            height: auto;
+            aspect-ratio: 210 / 275;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .girl2-btn {
-            min-height: 40px;
+        .arch-border {
+            position: absolute;
+            inset: 0;
+            border: 2.5px solid #c71585;
+            border-radius: 110px 110px 8px 8px;
+            box-shadow: 0 0 0 6px rgba(199, 21, 133, 0.1), 0 0 0 12px rgba(199, 21, 133, 0.05), inset 0 0 30px rgba(199, 21, 133, 0.08);
         }
-    }
 
-    @media (max-width: 480px) {
+        .arch-border::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border: 1px solid rgba(199, 21, 133, 0.3);
+            border-radius: 106px 106px 4px 4px;
+        }
+
+        .arch-photo {
+            width: 90%;
+            height: 93%;
+            border-radius: 100px 100px 6px 6px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #2d1230 0%, #1a0818 100%);
+            position: relative;
+        }
+
+        .arch-photo svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .tiara-top {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 28px;
+            filter: drop-shadow(0 0 8px rgba(255, 20, 147, 0.6));
+        }
+
+        .pink-vine {
+            position: absolute;
+            font-size: 22px;
+            opacity: 0.5;
+        }
+
         .girl2-right {
-            padding: 20px 16px;
-            gap: 12px;
+            width: 35%;
+            min-width: 280px;
+            background: rgba(199, 21, 133, 0.04);
+            border-left: 1px solid rgba(199, 21, 133, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 24px;
+            gap: 18px;
+        }
+
+        .girl2-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(16px, 4vw, 19px);
+            color: #ff69b4;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .girl2-subtitle {
+            font-family: 'Lora', serif;
+            font-size: clamp(9px, 2vw, 11px);
+            color: rgba(199, 21, 133, 0.5);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-top: -12px;
         }
 
         .girl2-code-boxes {
-            gap: 8px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .girl2-code-box {
+            width: min(52px, 8vw);
+            height: min(58px, 10vw);
+            border: 1.5px solid rgba(199, 21, 133, 0.35);
+            border-radius: 8px;
+            background: rgba(199, 21, 133, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(20px, 5vw, 26px);
+            color: #ff69b4;
+            position: relative;
+        }
+
+        .girl2-code-box.active {
+            border-color: #c71585;
+            box-shadow: 0 0 16px rgba(199, 21, 133, 0.25), inset 0 0 8px rgba(199, 21, 133, 0.06);
+        }
+
+        .girl2-code-box::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            width: 24px;
+            height: 1.5px;
+            background: rgba(199, 21, 133, 0.4);
+            border-radius: 1px;
+        }
+
+        .girl2-code-box.active::after {
+            background: #ffb6c1;
+            box-shadow: 0 0 6px rgba(255, 182, 193, 0.5);
+            animation: blink2 1s ease-in-out infinite;
+        }
+
+        @keyframes blink2 {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
         }
 
         .girl2-numpad {
-            gap: 6px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
         }
-    }
+
+        .girl2-btn {
+            aspect-ratio: 1;
+            min-height: 45px;
+            border: 1px solid rgba(199, 21, 133, 0.2);
+            border-radius: 8px;
+            background: rgba(199, 21, 133, 0.05);
+            color: #ff1493;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(16px, 3vw, 20px);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .girl2-btn:hover {
+            background: rgba(199, 21, 133, 0.18);
+            border-color: #c71585;
+            box-shadow: 0 0 16px rgba(199, 21, 133, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .girl2-btn.sym {
+            color: rgba(199, 21, 133, 0.45);
+            font-size: clamp(12px, 2vw, 16px);
+        }
+
+        .hint-girl2 {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: clamp(11px, 2vw, 13px);
+            color: rgba(199, 21, 133, 0.45);
+            text-align: center;
+        }
+
+        .divider-pink {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(199, 21, 133, 0.5), transparent);
+            margin: -4px 0;
+        }
+
+        .flicker {
+            animation: flicker 4s ease-in-out infinite;
+        }
+
+        @keyframes flicker {
+
+            0%,
+            90%,
+            100% {
+                opacity: 0.5;
+            }
+
+            92%,
+            96% {
+                opacity: 0.2;
+            }
+
+            94%,
+            98% {
+                opacity: 0.6;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .girl2-wrap {
+                flex-direction: column;
+                aspect-ratio: auto;
+                max-width: 100%;
+                max-height: 100vh;
+            }
+
+            .girl2-left {
+                display: none;
+            }
+
+            .girl2-right {
+                width: 100%;
+                flex: 1;
+                border-left: none;
+                border-top: none;
+            }
+
+            .girl2-numpad {
+                gap: 8px;
+            }
+
+            .girl2-btn {
+                min-height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .girl2-right {
+                padding: 20px 16px;
+                gap: 12px;
+            }
+
+            .girl2-code-boxes {
+                gap: 8px;
+            }
+
+            .girl2-numpad {
+                gap: 6px;
+            }
+        }
     </style>
 </head>
 
@@ -373,7 +373,12 @@
             <div class="arch-frame">
                 <span class="tiara-top">👸</span>
                 <div class="arch-border"></div>
+
                 <div class="arch-photo">
+                    @if(request('photo'))
+                        <img src="{{ request('photo') }}" alt="Birthday photo"
+                            style="width:100%;height:100%;object-fit:cover;">
+                    @else
                     <svg viewBox="0 0 190 256" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="gsky" x1="0" y1="0" x2="0" y2="1">
@@ -405,6 +410,7 @@
                         <circle cx="20" cy="80" r="2" fill="rgba(255,105,180,0.3)" clip-path="url(#archclip)" />
                         <circle cx="170" cy="90" r="2.5" fill="rgba(255,105,180,0.2)" clip-path="url(#archclip)" />
                     </svg>
+                    @endif
                 </div>
                 <span class="pink-vine" style="bottom:-14px;left:50%;transform:translateX(-50%)">❀</span>
             </div>

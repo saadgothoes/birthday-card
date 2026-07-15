@@ -33,17 +33,11 @@
         box-sizing: border-box;
     }
 
-    html {
-        overflow-x: hidden;
-        width: 100%;
-    }
-
     body {
         font-family: 'DM Sans', sans-serif;
         background: var(--bg);
         color: var(--text);
         min-height: 100vh;
-        width: 100%;
         display: flex;
         overflow-x: hidden;
     }
@@ -273,7 +267,6 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        flex-wrap: wrap;
     }
 
     .progress-pill {
@@ -674,148 +667,6 @@
         z-index: 1;
     }
 
-    /* Variant preview boxes (shown after theme is picked) */
-    .variant-section {
-        margin-top: 1.6rem;
-        display: none;
-    }
-
-    .variant-section.visible {
-        display: block;
-    }
-
-    .variant-section h4 {
-        font-size: 0.78rem;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 0.8rem;
-    }
-
-    .variant-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.2rem;
-    }
-
-    .variant-choice {
-        border: 2px solid var(--border);
-        border-radius: 14px;
-        padding: 0.6rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        background: var(--surface2);
-        position: relative;
-    }
-
-    .variant-choice:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .variant-choice.selected {
-        border-color: var(--accent);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .variant-choice .variant-check {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--accent);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.68rem;
-        opacity: 0;
-        transition: opacity 0.2s;
-        z-index: 2;
-    }
-
-    .variant-choice.selected .variant-check {
-        opacity: 1;
-    }
-
-    .variant-thumb {
-        width: 100%;
-        max-width: 100%;
-        aspect-ratio: 16 / 10;
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
-        background: linear-gradient(135deg, #fdf2f8 0%, #f8fafc 100%);
-        border: 1px solid rgba(45, 31, 20, 0.08);
-        contain: layout paint;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    }
-
-    /* Real page always rendered at a fixed desktop width (900px) inside the iframe,
-       then scaled down via JS to fit whatever size the thumb container actually is —
-       so the preview looks identical (the full desktop design) on mobile and web. */
-    .variant-thumb iframe {
-        position: absolute;
-        inset: 0;
-        width: 900px;
-        height: 562px;
-        border: 0;
-        background: #fff;
-        transform-origin: top left;
-        pointer-events: none;
-        display: block;
-    }
-
-    .variant-choice:hover .variant-thumb {
-        box-shadow: 0 0 0 3px var(--accent);
-    }
-
-    .variant-label {
-        text-align: center;
-        font-size: 0.82rem;
-        font-weight: 600;
-        margin-top: 0.6rem;
-        color: var(--text-muted);
-    }
-
-    .variant-choice.selected .variant-label {
-        color: var(--accent);
-    }
-
-    /* Hover-to-enlarge popup preview */
-    .variant-zoom-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.55);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 999;
-        padding: 2rem;
-    }
-
-    .variant-zoom-overlay.visible {
-        display: flex;
-    }
-
-    .variant-zoom-box {
-        width: min(700px, 92vw);
-        aspect-ratio: 16 / 10;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        position: relative;
-        background: #111;
-    }
-
-    .variant-zoom-box iframe {
-        width: 100%;
-        height: 100%;
-        border: 0;
-    }
-
     /* Step 2 — Lock Code */
     .lock-display {
         background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -872,191 +723,7 @@
         gap: 0.6rem;
     }
 
-    /* Step 2 — PIN (DD-MM) input */
-    .pin-dob-input {
-        display: block;
-        width: 160px;
-        margin: 0.6rem auto;
-        padding: 0.7rem 0;
-        border-radius: 10px;
-        border: 1.5px solid rgba(255, 255, 255, 0.25);
-        background: rgba(255, 255, 255, 0.08);
-        color: #fff;
-        font-family: 'Playfair Display', serif;
-        font-size: 1.6rem;
-        letter-spacing: 0.15em;
-        text-align: center;
-        outline: none;
-        transition: all 0.2s;
-        position: relative;
-        z-index: 1;
-    }
-
-    .pin-dob-input::placeholder {
-        color: rgba(255, 255, 255, 0.35);
-    }
-
-    .pin-dob-input:focus {
-        border-color: var(--accent);
-        background: rgba(255, 255, 255, 0.15);
-    }
-
-    .pin-recommend-btn {
-        margin-top: 0.9rem;
-        position: relative;
-        z-index: 1;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: #fff;
-        border-radius: 20px;
-        padding: 0.4rem 1rem;
-        font-size: 0.78rem;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .pin-recommend-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
-
-    .live-preview-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--text-muted);
-        margin-bottom: 0.8rem;
-        font-weight: 600;
-    }
-
-    /* Step 2 layout — side-by-side on laptop/web (form left, live preview
-       sticky on the right), stacked full-width on mobile/tablet. */
-    .step2-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1.6rem;
-    }
-
-    @media (min-width: 1000px) {
-        .step2-grid {
-            grid-template-columns: 1.1fr 0.9fr;
-            align-items: start;
-        }
-
-        .step2-preview-col {
-            position: sticky;
-            top: 1.5rem;
-        }
-    }
-
-    /* Step 2 — real page live preview (iframe of the actual public page).
-       Same fixed-desktop-width + JS-scale technique as the Step 1 thumbs,
-       so it always shows the full design shrunk to fit, on any screen size. */
-    .live-page-preview {
-        width: 100%;
-        max-width: 100%;
-        aspect-ratio: 16 / 10;
-        border-radius: 16px;
-        overflow: hidden;
-        position: relative;
-        background: #111;
-        margin-bottom: 1.6rem;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        contain: layout paint;
-    }
-
-    .live-page-preview iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 900px;
-        height: 562px;
-        border: 0;
-        transform-origin: top left;
-        pointer-events: none;
-    }
-
-    /* PIN entry */
-    .pin-set-label {
-        font-size: 0.78rem;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 0.4rem;
-        font-weight: 600;
-    }
-
-    .pin-recommend-hint {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        margin-bottom: 0.9rem;
-    }
-
-    .pin-recommend-hint strong {
-        color: var(--accent);
-    }
-
-    /* Mirror-shaped crop box — matches the real page's .arch-photo frame
-       (viewBox 190x256, fully rounded top / straight bottom corners) so the
-       client can drag/zoom their photo to exactly how it'll appear in the card. */
-    .mirror-crop-wrap {
-        margin-top: 1.2rem;
-        text-align: center;
-    }
-
-    .mirror-crop-label {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        margin-bottom: 0.8rem;
-    }
-
-    .mirror-crop-box {
-        width: 160px;
-        aspect-ratio: 190 / 256;
-        margin: 0 auto;
-        border-radius: 80px 80px 6px 6px;
-        border: 2.5px solid var(--accent);
-        box-shadow: 0 0 0 6px rgba(247, 111, 161, 0.1);
-        overflow: hidden;
-        position: relative;
-        background: #111;
-        cursor: grab;
-        touch-action: none;
-        user-select: none;
-    }
-
-    .mirror-crop-box.dragging {
-        cursor: grabbing;
-    }
-
-    .mirror-crop-box img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        max-width: none;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-    }
-
-    .mirror-crop-zoom {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.6rem;
-        margin-top: 0.9rem;
-    }
-
-    .mirror-crop-zoom input[type="range"] {
-        width: 160px;
-        accent-color: var(--accent);
-    }
-
     /* Step 3 — Welcome screen preview */
-    .welcome-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-    }
-
     .welcome-preview {
         border-radius: 14px;
         overflow: hidden;
@@ -1477,24 +1144,6 @@
         .topbar-right {
             width: 100%;
             justify-content: space-between;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .user-dropdown {
-            margin-left: 0;
-            width: 100%;
-            max-width: 220px;
-        }
-
-        .user-dropdown-btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .user-dropdown-menu {
-            width: 100%;
-            min-width: 0;
         }
 
         .progress-pill {
@@ -1698,25 +1347,6 @@
 
         .welcome-preview {
             border-radius: 12px;
-        }
-
-        .welcome-layout {
-            grid-template-columns: 1fr;
-            gap: 1.2rem;
-        }
-
-        .variant-grid {
-            grid-template-columns: 1fr;
-            gap: 0.9rem;
-        }
-
-        .pin-dob-input {
-            width: 140px;
-            font-size: 1.4rem;
-        }
-
-        .variant-zoom-box {
-            width: 94vw;
         }
 
         .preview-header {
@@ -1927,11 +1557,7 @@
         }
 
         .main {
-            padding: 1rem 0.75rem 2rem;
-        }
-
-        .topbar {
-            margin-bottom: 1rem;
+            padding: 1rem 0.75rem;
         }
 
         .topbar-left h2 {
@@ -1945,13 +1571,6 @@
         .progress-pill {
             font-size: 0.7rem;
             padding: 0.4rem 0.9rem;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .topbar-right {
-            flex-direction: column;
-            align-items: stretch;
         }
 
         .card-header {
@@ -2009,19 +1628,6 @@
             letter-spacing: 0.25em;
         }
 
-        .pin-dob-input {
-            width: 120px;
-            font-size: 1.25rem;
-        }
-
-        .pin-recommend-hint {
-            font-size: 0.75rem;
-        }
-
-        .live-preview-label {
-            font-size: 0.7rem;
-        }
-
         .preview-header {
             padding: 1.5rem 1rem;
         }
@@ -2055,13 +1661,11 @@
 
         .step-nav {
             flex-direction: column;
-            gap: 0.6rem;
         }
 
         .btn-prev,
         .btn-next {
             width: 100%;
-            justify-content: center;
         }
 
         .image-slots {
@@ -2319,11 +1923,8 @@
         </div>
 
         @php
-        $daysLeft = null;
-        if (Auth::user()->subscription_start_date) {
-        $startDate = \Illuminate\Support\Carbon::parse(Auth::user()->subscription_start_date);
-        $daysLeft = now()->diffInDays($startDate->addDays(30));
-        }
+        $daysLeft = Auth::user()->subscription_start_date ?
+        now()->diffInDays(Auth::user()->subscription_start_date->addDays(30)) : null;
         $showPaymentPopup = $daysLeft !== null && $daysLeft <= 6 && Auth::user()->status === 'active';
             $showPasswordAlert = !Auth::user()->hasChangedPassword();
             @endphp
@@ -2380,69 +1981,10 @@
                                 <div class="theme-desc">Soft pinks, florals & dreamy magic</div>
                             </div>
                         </div>
-
-                        <!-- Boy variants -->
-                        <div class="variant-section" id="boyVariants">
-                            <h4>Choose Boy Card Design</h4>
-                            <div class="variant-grid">
-                                <div class="variant-choice" id="boyVariant1" onclick="selectVariant(1)">
-                                    <div class="variant-check">✓</div>
-                                    <div class="variant-thumb">
-                                        <iframe src="{{ route('boy.page.variant',['page'=>1,'variant'=>1]) }}"
-                                            loading="lazy" tabindex="-1"></iframe>
-                                    </div>
-                                    <div class="variant-label">Midnight Gold</div>
-                                </div>
-                                <div class="variant-choice" id="boyVariant2" onclick="selectVariant(2)">
-                                    <div class="variant-check">✓</div>
-                                    <div class="variant-thumb">
-                                        <iframe src="{{ route('boy.page.variant',['page'=>1,'variant'=>2]) }}"
-                                            loading="lazy" tabindex="-1"></iframe>
-                                    </div>
-                                    <div class="variant-label">Light Blue Sky</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Girl variants -->
-                        <div class="variant-section" id="girlVariants">
-                            <h4>Choose Girl Card Design</h4>
-                            <div class="variant-grid">
-                                <div class="variant-choice" id="girlVariant1" onclick="selectVariant(1)">
-                                    <div class="variant-check">✓</div>
-                                    <div class="variant-thumb">
-                                        <iframe src="{{ route('girl.page.variant',['page'=>1,'variant'=>1]) }}"
-                                            loading="lazy" tabindex="-1"></iframe>
-                                    </div>
-                                    <div class="variant-label">Blush Petal</div>
-                                </div>
-                                <div class="variant-choice" id="girlVariant2" onclick="selectVariant(2)">
-                                    <div class="variant-check">✓</div>
-                                    <div class="variant-thumb">
-                                        <iframe src="{{ route('girl.page.variant',['page'=>1,'variant'=>2]) }}"
-                                            loading="lazy" tabindex="-1"></iframe>
-                                    </div>
-                                    <div class="variant-label">Rose Bloom</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="step1-error" id="step1Error"
-                            style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
-                            Please select a card design to continue.</p>
-
                         <div class="step-nav">
-                            <button class="btn-next" id="step1ContinueBtn" onclick="saveStep1AndContinue()">Continue
-                                →</button>
+                            <button class="btn-next" onclick="nextStep()">Continue →</button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Hover-to-enlarge overlay for Step 1 design previews -->
-            <div class="variant-zoom-overlay" id="variantZoomOverlay" onclick="closeZoom()">
-                <div class="variant-zoom-box">
-                    <iframe id="variantZoomIframe" src="about:blank" tabindex="-1"></iframe>
                 </div>
             </div>
 
@@ -2452,68 +1994,35 @@
                     <div class="card-header">
                         <div class="card-icon">🔐</div>
                         <div class="card-title">
-                            <h3>Add Photo & Set PIN</h3>
-                            <p>Position the birthday person's photo and choose a 4-digit PIN</p>
+                            <h3>Set Lock Code</h3>
+                            <p>Only the birthday person can unlock the card using their DOB</p>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="step2-grid">
-                            <div>
-                                <div class="form-group">
-                                    <label>Photo</label>
-                                    <div class="image-upload-zone"
-                                        onclick="document.getElementById('step2ImageInput').click()">
-                                        <span class="upload-icon">📸</span>
-                                        <div class="upload-text">Drop image here or <strong>click to browse</strong>
-                                        </div>
-                                    </div>
-                                    <input type="file" id="step2ImageInput" accept="image/*" style="display:none"
-                                        onchange="onStep2ImageSelected(event)">
-                                </div>
+                        <div class="lock-display">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-code" id="lockCodeDisplay">••••••••</div>
+                            <div class="lock-label">Generated from Date of Birth</div>
+                        </div>
 
-                                <!-- Mirror-shaped crop box: drag the photo to position it inside the frame -->
-                                <div class="mirror-crop-wrap" id="mirrorCropWrap" style="display:none;">
-                                    <div class="mirror-crop-label">Drag the photo to position it inside the mirror
-                                        frame</div>
-                                    <div class="mirror-crop-box" id="mirrorCropBox">
-                                        <img id="mirrorCropImg" draggable="false" alt="Crop preview">
-                                    </div>
-                                    <div class="mirror-crop-zoom">
-                                        <span>🔍</span>
-                                        <input type="range" id="mirrorZoomSlider" min="100" max="250" value="100"
-                                            oninput="onMirrorZoomChange(this.value)">
-                                    </div>
-                                </div>
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" id="dobInput" onchange="generateLockCode(this.value)" />
+                        </div>
 
-                                <div class="pin-set-label" style="margin-top:1.4rem;">Set PIN</div>
-                                <div class="pin-recommend-hint">
-                                    💡 <strong>Recommended:</strong> use the birthday person's date of birth as
-                                    <strong>DD-MM</strong> — but you can set any 4 digits you like.
-                                </div>
+                        <div class="dob-hint">
+                            💡 The lock code will be automatically generated from the birthday person's date of birth
+                            (DDMMYYYY format). They'll need to enter it to open the card.
+                        </div>
 
-                                <div class="lock-display">
-                                    <div class="lock-icon">🔒</div>
-                                    <input type="text" class="pin-dob-input" id="pinDobInput" maxlength="5"
-                                        inputmode="numeric" placeholder="DD-MM" oninput="onPinDobInput(this)">
-                                    <div class="lock-label">4-Digit Unlock PIN (DD-MM)</div>
-                                </div>
+                        <div class="form-group" style="margin-top:1.2rem;">
+                            <label>Custom Hint Message (optional)</label>
+                            <input type="text" placeholder="e.g. Enter your special date to unlock 🎂" />
+                        </div>
 
-                                <p class="step2-error" id="step2Error"
-                                    style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.6rem;"></p>
-
-                                <div class="step-nav">
-                                    <button class="btn-prev" onclick="prevStep()">← Back</button>
-                                    <button class="btn-next" id="step2ContinueBtn"
-                                        onclick="saveStep2AndContinue()">Continue →</button>
-                                </div>
-                            </div>
-
-                            <div class="step2-preview-col">
-                                <div class="live-preview-label">Live Preview — Your Selected Design</div>
-                                <div class="live-page-preview">
-                                    <iframe id="step2LivePreview" src="about:blank" tabindex="-1"></iframe>
-                                </div>
-                            </div>
+                        <div class="step-nav">
+                            <button class="btn-prev" onclick="prevStep()">← Back</button>
+                            <button class="btn-next" onclick="nextStep()">Continue →</button>
                         </div>
                     </div>
                 </div>
@@ -2530,7 +2039,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="welcome-layout">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
                             <div>
                                 <div class="form-row">
                                     <div class="form-group">
@@ -2788,13 +2297,6 @@ It all started the day I first saw your smile. I knew right then that something 
     let currentStep = 1;
     const totalSteps = 5;
     let selectedTheme = 'girl';
-    let selectedVariant = @json($card - > variant ?? null);
-    const CARD_STEP1_URL = @json(route('client.card.step1'));
-    const CARD_STEP2_URL = @json(route('client.card.step2'));
-    const CSRF_TOKEN = @json(csrf_token());
-    let step2ImageFile = null;
-    let step2ImageUrl = @json($card - > profile_image_path ? \Illuminate\ Support\ Facades\ Storage::url($card - >
-        profile_image_path) : null);
 
     function closePopup() {
         document.getElementById('paymentPopup').style.display = 'none';
@@ -2868,10 +2370,6 @@ It all started the day I first saw your smile. I knew right then that something 
         document.querySelectorAll('.step-item')[currentStep - 1].classList.add('active');
         document.getElementById('progressText').textContent = 'Step ' + currentStep + ' of ' + totalSteps;
 
-        if (currentStep === 2) {
-            updateStep2LivePreview();
-        }
-
         // Close sidebar on mobile when step changes
         if (window.innerWidth <= 768) {
             const sidebar = document.querySelector('.sidebar');
@@ -2888,376 +2386,11 @@ It all started the day I first saw your smile. I knew right then that something 
         if (currentStep > 1) goToStep(currentStep - 1);
     }
 
-    const PAGE1_ROUTES = {
-        boy: {
-            1: @json(route('boy.page.variant', ['page' => 1, 'variant' => 1])),
-            2: @json(route('boy.page.variant', ['page' => 1, 'variant' => 2])),
-        },
-        girl: {
-            1: @json(route('girl.page.variant', ['page' => 1, 'variant' => 1])),
-            2: @json(route('girl.page.variant', ['page' => 1, 'variant' => 2])),
-        },
-    };
-
     function selectTheme(t) {
         selectedTheme = t;
-        selectedVariant = null;
         document.getElementById('boyCard').classList.toggle('selected', t === 'boy');
         document.getElementById('girlCard').classList.toggle('selected', t === 'girl');
         setGlobalTheme(t);
-
-        document.getElementById('boyVariants').classList.toggle('visible', t === 'boy');
-        document.getElementById('girlVariants').classList.toggle('visible', t === 'girl');
-        document.querySelectorAll('.variant-choice').forEach(el => el.classList.remove('selected'));
-        document.getElementById('step1Error').style.display = 'none';
-        // thumb container just became visible; measure its width once layout settles
-        requestAnimationFrame(scaleVariantThumbs);
-    }
-
-    function selectVariant(n) {
-        selectedVariant = n;
-        const prefix = selectedTheme === 'boy' ? 'boyVariant' : 'girlVariant';
-        document.querySelectorAll('#' + (selectedTheme === 'boy' ? 'boyVariants' : 'girlVariants') + ' .variant-choice')
-            .forEach(el => el.classList.remove('selected'));
-        document.getElementById(prefix + n).classList.add('selected');
-        document.getElementById('step1Error').style.display = 'none';
-        updateStep2LivePreview();
-    }
-
-    // ── Scale any fixed-desktop-width iframe (900px) down to fit
-    // its actual container size — used by Step 1 thumbs AND the
-    // Step 2 live preview, so both always show the full design
-    // shrunk to fit, on any screen size (mobile or web). ───────
-    const THUMB_IFRAME_WIDTH = 900;
-
-    function scaleVariantThumbs() {
-        document.querySelectorAll('.variant-thumb, .live-page-preview').forEach(box => {
-            const iframe = box.querySelector('iframe');
-            if (!iframe) return;
-            const scale = box.clientWidth / THUMB_IFRAME_WIDTH;
-            iframe.style.transform = 'scale(' + scale + ')';
-        });
-    }
-
-    window.addEventListener('resize', scaleVariantThumbs);
-
-    // True only for devices whose primary input is touch (phones/tablets).
-    // Checking viewport width alone isn't reliable (resized desktop windows,
-    // tablets in landscape, etc.) and was letting mobile's synthetic
-    // mouseenter/mouseleave-on-tap trigger the zoom popup, causing a
-    // visible "blink" when tapping a design box on mobile.
-    const IS_TOUCH_DEVICE = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-
-    // ── Step 1: hover-to-enlarge real design preview (desktop only) ─
-    function openZoom(url) {
-        if (IS_TOUCH_DEVICE) return;
-        document.getElementById('variantZoomIframe').src = url;
-        document.getElementById('variantZoomOverlay').classList.add('visible');
-    }
-
-    function closeZoom() {
-        document.getElementById('variantZoomOverlay').classList.remove('visible');
-        document.getElementById('variantZoomIframe').src = 'about:blank';
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeZoom();
-        }
-    });
-
-    // ── Step 2: live preview of the selected real page ─────
-    function updateStep2LivePreview() {
-        const frame = document.getElementById('step2LivePreview');
-        if (!frame || !selectedTheme || !selectedVariant) return;
-        const base = PAGE1_ROUTES[selectedTheme][selectedVariant];
-        frame.src = step2ImageUrl ? (base + '?photo=' + encodeURIComponent(step2ImageUrl)) : base;
-        requestAnimationFrame(scaleVariantThumbs);
-    }
-
-    // ── Step 2: PIN input (single "DD-MM" field) ────────────
-    function onPinDobInput(el) {
-        let digits = el.value.replace(/[^0-9]/g, '').slice(0, 4);
-        el.value = digits.length > 2 ? digits.slice(0, 2) + '-' + digits.slice(2) : digits;
-    }
-
-    function getPinValue() {
-        return document.getElementById('pinDobInput').value.replace(/[^0-9]/g, '');
-    }
-
-    function setPinValue(pin) {
-        const digits = (pin || '').replace(/[^0-9]/g, '').slice(0, 4);
-        document.getElementById('pinDobInput').value =
-            digits.length > 2 ? digits.slice(0, 2) + '-' + digits.slice(2) : digits;
-    }
-
-    // ── Step 2: photo upload + mirror-shaped drag/zoom crop ─
-    // The crop box matches the real page's arch photo frame ratio (190:256).
-    // The client drags/zooms the image inside it; on every change we render
-    // a cropped canvas snapshot as the actual upload file + live-preview photo,
-    // so what they see in the mirror box is exactly what ends up on the card.
-    const MIRROR_RATIO = 190 / 256;
-    let mirrorImgNatural = {
-        w: 0,
-        h: 0
-    };
-    let mirrorState = {
-        scale: 1,
-        offsetX: 0,
-        offsetY: 0,
-        minScale: 1
-    };
-    let mirrorDrag = null;
-
-    function onStep2ImageSelected(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = e => {
-            const img = document.getElementById('mirrorCropImg');
-            img.onload = () => {
-                mirrorImgNatural = {
-                    w: img.naturalWidth,
-                    h: img.naturalHeight
-                };
-                initMirrorCrop();
-                document.getElementById('mirrorCropWrap').style.display = 'block';
-                renderMirrorCrop();
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function initMirrorCrop() {
-        // Base scale so the image fully covers the mirror box (like object-fit: cover)
-        const boxRatio = MIRROR_RATIO;
-        const imgRatio = mirrorImgNatural.w / mirrorImgNatural.h;
-        let baseW, baseH;
-        if (imgRatio > boxRatio) {
-            baseH = 256;
-            baseW = baseH * imgRatio;
-        } else {
-            baseW = 190;
-            baseH = baseW / imgRatio;
-        }
-        mirrorState.baseW = baseW;
-        mirrorState.baseH = baseH;
-        mirrorState.minScale = 1;
-        mirrorState.scale = 1;
-        mirrorState.offsetX = 0;
-        mirrorState.offsetY = 0;
-        document.getElementById('mirrorZoomSlider').value = 100;
-    }
-
-    function renderMirrorCrop() {
-        const img = document.getElementById('mirrorCropImg');
-        const box = document.getElementById('mirrorCropBox');
-        const boxPxW = box.clientWidth || 160;
-        const scaleToBox = boxPxW / 190; // crop box is laid out at 190-unit width internally
-
-        const w = mirrorState.baseW * mirrorState.scale * scaleToBox;
-        const h = mirrorState.baseH * mirrorState.scale * scaleToBox;
-        img.style.width = w + 'px';
-        img.style.height = h + 'px';
-        img.style.transform = 'translate(calc(-50% + ' + mirrorState.offsetX + 'px), calc(-50% + ' +
-            mirrorState.offsetY + 'px))';
-    }
-
-    function onMirrorZoomChange(val) {
-        mirrorState.scale = val / 100;
-        clampMirrorOffset();
-        renderMirrorCrop();
-        exportMirrorCrop();
-    }
-
-    function clampMirrorOffset() {
-        const box = document.getElementById('mirrorCropBox');
-        const boxPxW = box.clientWidth || 160;
-        const boxPxH = box.clientHeight || (boxPxW * 256 / 190);
-        const scaleToBox = boxPxW / 190;
-        const w = mirrorState.baseW * mirrorState.scale * scaleToBox;
-        const h = mirrorState.baseH * mirrorState.scale * scaleToBox;
-        const maxX = Math.max(0, (w - boxPxW) / 2);
-        const maxY = Math.max(0, (h - boxPxH) / 2);
-        mirrorState.offsetX = Math.min(maxX, Math.max(-maxX, mirrorState.offsetX));
-        mirrorState.offsetY = Math.min(maxY, Math.max(-maxY, mirrorState.offsetY));
-    }
-
-    function setupMirrorDrag() {
-        const box = document.getElementById('mirrorCropBox');
-
-        const start = (x, y) => {
-            mirrorDrag = {
-                x,
-                y,
-                startOffsetX: mirrorState.offsetX,
-                startOffsetY: mirrorState.offsetY
-            };
-            box.classList.add('dragging');
-        };
-        const move = (x, y) => {
-            if (!mirrorDrag) return;
-            mirrorState.offsetX = mirrorDrag.startOffsetX + (x - mirrorDrag.x);
-            mirrorState.offsetY = mirrorDrag.startOffsetY + (y - mirrorDrag.y);
-            clampMirrorOffset();
-            renderMirrorCrop();
-        };
-        const end = () => {
-            if (!mirrorDrag) return;
-            mirrorDrag = null;
-            box.classList.remove('dragging');
-            exportMirrorCrop();
-        };
-
-        box.addEventListener('mousedown', e => start(e.clientX, e.clientY));
-        window.addEventListener('mousemove', e => move(e.clientX, e.clientY));
-        window.addEventListener('mouseup', end);
-
-        box.addEventListener('touchstart', e => {
-            const t = e.touches[0];
-            start(t.clientX, t.clientY);
-        }, {
-            passive: true
-        });
-        box.addEventListener('touchmove', e => {
-            const t = e.touches[0];
-            move(t.clientX, t.clientY);
-        }, {
-            passive: true
-        });
-        box.addEventListener('touchend', end);
-    }
-
-    function exportMirrorCrop() {
-        const img = document.getElementById('mirrorCropImg');
-        const box = document.getElementById('mirrorCropBox');
-        const boxPxW = box.clientWidth || 160;
-        const boxPxH = box.clientHeight || (boxPxW * 256 / 190);
-        const scaleToBox = boxPxW / 190;
-
-        // Output at the template's native 190x256 resolution for crisp results
-        const outW = 190,
-            outH = 256;
-        const canvas = document.createElement('canvas');
-        canvas.width = outW;
-        canvas.height = outH;
-        const ctx = canvas.getContext('2d');
-
-        const drawW = mirrorState.baseW * mirrorState.scale;
-        const drawH = mirrorState.baseH * mirrorState.scale;
-        const drawX = outW / 2 - drawW / 2 + (mirrorState.offsetX / scaleToBox);
-        const drawY = outH / 2 - drawH / 2 + (mirrorState.offsetY / scaleToBox);
-
-        ctx.drawImage(img, drawX, drawY, drawW, drawH);
-
-        canvas.toBlob(blob => {
-            if (!blob) return;
-            step2ImageFile = new File([blob], 'photo.jpg', {
-                type: 'image/jpeg'
-            });
-            if (step2ImageUrl && step2ImageUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(step2ImageUrl);
-            }
-            step2ImageUrl = URL.createObjectURL(blob);
-            updateStep2LivePreview();
-        }, 'image/jpeg', 0.92);
-    }
-
-    function saveStep2AndContinue() {
-        const pin = getPinValue();
-        const errorEl = document.getElementById('step2Error');
-        errorEl.style.display = 'none';
-
-        if (pin.length !== 4) {
-            errorEl.textContent = 'Please enter a full 4-digit PIN.';
-            errorEl.style.display = 'block';
-            return;
-        }
-
-        const btn = document.getElementById('step2ContinueBtn');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Saving…';
-
-        const formData = new FormData();
-        formData.append('theme', selectedTheme);
-        formData.append('variant', selectedVariant);
-        formData.append('lock_code', pin);
-        if (step2ImageFile) formData.append('photo', step2ImageFile);
-
-        fetch(CARD_STEP2_URL, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                },
-                body: formData,
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Save failed');
-                return res.json();
-            })
-            .then(data => {
-                if (data.profile_image_url) {
-                    if (step2ImageUrl && step2ImageUrl.startsWith('blob:')) {
-                        URL.revokeObjectURL(step2ImageUrl);
-                    }
-                    step2ImageUrl = data.profile_image_url;
-                    step2ImageFile = null;
-                }
-                nextStep();
-            })
-            .catch(() => {
-                errorEl.textContent = 'Could not save your details. Please try again.';
-                errorEl.style.display = 'block';
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            });
-    }
-
-    function saveStep1AndContinue() {
-        if (!selectedTheme || !selectedVariant) {
-            document.getElementById('step1Error').style.display = 'block';
-            return;
-        }
-
-        const btn = document.getElementById('step1ContinueBtn');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Saving…';
-
-        fetch(CARD_STEP1_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                },
-                body: JSON.stringify({
-                    theme: selectedTheme,
-                    variant: selectedVariant,
-                }),
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Save failed');
-                return res.json();
-            })
-            .then(() => {
-                nextStep();
-            })
-            .catch(() => {
-                document.getElementById('step1Error').textContent =
-                    'Could not save your selection. Please try again.';
-                document.getElementById('step1Error').style.display = 'block';
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            });
     }
 
     function setGlobalTheme(t) {
@@ -3327,21 +2460,6 @@ It all started the day I first saw your smile. I knew right then that something 
 
     window.addEventListener('load', function() {
         updateMenuButton();
-        scaleVariantThumbs();
-        setupMirrorDrag();
-
-        const savedTheme = @json($card - > theme ?? null);
-        if (savedTheme) {
-            selectTheme(savedTheme);
-            if (selectedVariant) {
-                selectVariant(selectedVariant);
-            }
-        }
-
-        const savedPin = @json($card - > lock_code ?? null);
-        if (savedPin) {
-            setPinValue(savedPin);
-        }
     });
     </script>
 </body>

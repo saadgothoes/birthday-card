@@ -374,6 +374,10 @@
                 <span class="crown-top">👑</span>
                 <div class="arch-border"></div>
                 <div class="arch-photo">
+                    @if(request('photo'))
+                        <img src="{{ request('photo') }}" alt="Birthday photo"
+                            style="width:100%;height:100%;object-fit:cover;">
+                    @else
                     <svg viewBox="0 0 190 256" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="bsky" x1="0" y1="0" x2="0" y2="1">
@@ -405,6 +409,7 @@
                         <circle cx="20" cy="80" r="2" fill="rgba(255,160,0,0.3)" clip-path="url(#archclip)" />
                         <circle cx="170" cy="90" r="2.5" fill="rgba(255,140,0,0.2)" clip-path="url(#archclip)" />
                     </svg>
+                    @endif
                 </div>
                 <span class="gold-vine" style="bottom:-14px;left:50%;transform:translateX(-50%)">❧</span>
             </div>

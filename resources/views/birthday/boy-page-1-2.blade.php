@@ -444,9 +444,7 @@
 
                 <div class="arch-photo">
 
-                    <!-- replace image -->
-
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200&auto=format&fit=crop"
+                    <img src="{{ request('photo', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200&auto=format&fit=crop') }}"
                         alt="birthday boy">
 
                 </div>

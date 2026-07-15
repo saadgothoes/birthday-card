@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ClientPasswordReset;
+use App\Models\BirthdayCard;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,7 +46,12 @@ class ClientAuthController extends Controller
 
     public function dashboard()
     {
-        return view('client.dashboard');
+        $card = BirthdayCard::where('user_id', Auth::id())
+            ->where('is_published', false)
+            ->latest()
+            ->first();
+
+        return view('client.dashboard', ['card' => $card]);
     }
 
     public function logout(Request $request)

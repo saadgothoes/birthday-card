@@ -45,4 +45,9 @@ class User extends Authenticatable
     {
         return $this->password_changed;
     }
+
+    public function birthdayCards()
+    {
+        return $this->hasMany(BirthdayCard::class);
+    }
 }
