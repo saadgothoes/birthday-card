@@ -112,15 +112,19 @@ class ClientAuthController extends Controller
                 'required',
                 'email',
                 Rule::exists('users', 'email')->where(fn ($query) => $query
-                    ->where('role', 'client')
-                    ->where('status', 'active')),
+                    ->where('role', 'client')),
             ],
         ]);
 
         $user = User::where('email', $request->email)
             ->where('role', 'client')
-            ->where('status', 'active')
             ->firstOrFail();
+
+        if ($user->status !== 'active') {
+            return back()->withErrors([
+                'email' => 'Your account is currently disabled. Please contact support to reactivate it before resetting your password.',
+            ])->withInput();
+        }
 
         $token = Password::createToken($user);
         $resetUrl = route('client.password.reset', [

@@ -766,6 +766,12 @@
         transform-origin: top left;
         pointer-events: none;
         display: block;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+
+    .variant-thumb iframe.loaded {
+        opacity: 1;
     }
 
     .variant-choice:hover .variant-thumb {
@@ -2387,17 +2393,15 @@
                             <div class="variant-grid">
                                 <div class="variant-choice" id="boyVariant1" onclick="selectVariant(1)">
                                     <div class="variant-check">✓</div>
-                                    <div class="variant-thumb">
-                                        <iframe src="{{ route('boy.page.variant',['page'=>1,'variant'=>1]) }}"
-                                            loading="lazy" tabindex="-1"></iframe>
+                                    <div class="variant-thumb" onmouseenter="openZoom('{{ route('boy.page.variant',['page'=>1,'variant'=>1]) }}')" onmouseleave="closeZoom()">
+                                        <iframe data-src="{{ route('boy.page.variant',['page'=>1,'variant'=>1]) }}" tabindex="-1"></iframe>
                                     </div>
                                     <div class="variant-label">Midnight Gold</div>
                                 </div>
                                 <div class="variant-choice" id="boyVariant2" onclick="selectVariant(2)">
                                     <div class="variant-check">✓</div>
-                                    <div class="variant-thumb">
-                                        <iframe src="{{ route('boy.page.variant',['page'=>1,'variant'=>2]) }}"
-                                            loading="lazy" tabindex="-1"></iframe>
+                                    <div class="variant-thumb" onmouseenter="openZoom('{{ route('boy.page.variant',['page'=>1,'variant'=>2]) }}')" onmouseleave="closeZoom()">
+                                        <iframe data-src="{{ route('boy.page.variant',['page'=>1,'variant'=>2]) }}" tabindex="-1"></iframe>
                                     </div>
                                     <div class="variant-label">Light Blue Sky</div>
                                 </div>
@@ -2410,17 +2414,15 @@
                             <div class="variant-grid">
                                 <div class="variant-choice" id="girlVariant1" onclick="selectVariant(1)">
                                     <div class="variant-check">✓</div>
-                                    <div class="variant-thumb">
-                                        <iframe src="{{ route('girl.page.variant',['page'=>1,'variant'=>1]) }}"
-                                            loading="lazy" tabindex="-1"></iframe>
+                                    <div class="variant-thumb" onmouseenter="openZoom('{{ route('girl.page.variant',['page'=>1,'variant'=>1]) }}')" onmouseleave="closeZoom()">
+                                        <iframe data-src="{{ route('girl.page.variant',['page'=>1,'variant'=>1]) }}" tabindex="-1"></iframe>
                                     </div>
                                     <div class="variant-label">Blush Petal</div>
                                 </div>
                                 <div class="variant-choice" id="girlVariant2" onclick="selectVariant(2)">
                                     <div class="variant-check">✓</div>
-                                    <div class="variant-thumb">
-                                        <iframe src="{{ route('girl.page.variant',['page'=>1,'variant'=>2]) }}"
-                                            loading="lazy" tabindex="-1"></iframe>
+                                    <div class="variant-thumb" onmouseenter="openZoom('{{ route('girl.page.variant',['page'=>1,'variant'=>2]) }}')" onmouseleave="closeZoom()">
+                                        <iframe data-src="{{ route('girl.page.variant',['page'=>1,'variant'=>2]) }}" tabindex="-1"></iframe>
                                     </div>
                                     <div class="variant-label">Rose Bloom</div>
                                 </div>
@@ -2788,13 +2790,12 @@ It all started the day I first saw your smile. I knew right then that something 
     let currentStep = 1;
     const totalSteps = 5;
     let selectedTheme = 'girl';
-    let selectedVariant = @json($card - > variant ?? null);
+    let selectedVariant = @json($card->variant ?? null);
     const CARD_STEP1_URL = @json(route('client.card.step1'));
     const CARD_STEP2_URL = @json(route('client.card.step2'));
     const CSRF_TOKEN = @json(csrf_token());
     let step2ImageFile = null;
-    let step2ImageUrl = @json($card - > profile_image_path ? \Illuminate\ Support\ Facades\ Storage::url($card - >
-        profile_image_path) : null);
+    let step2ImageUrl = @json($card?->profile_image_path ? \Illuminate\Support\Facades\Storage::url($card->profile_image_path) : null);
 
     function closePopup() {
         document.getElementById('paymentPopup').style.display = 'none';
@@ -2910,8 +2911,23 @@ It all started the day I first saw your smile. I knew right then that something 
         document.getElementById('girlVariants').classList.toggle('visible', t === 'girl');
         document.querySelectorAll('.variant-choice').forEach(el => el.classList.remove('selected'));
         document.getElementById('step1Error').style.display = 'none';
-        // thumb container just became visible; measure its width once layout settles
+
+        // Lazy-load only the thumbs for the chosen theme (first time), then
+        // measure once layout settles. Loading all 4 real pages up front —
+        // even while hidden — was causing a visible "blink" on web when the
+        // section toggled to display:block, since browsers repaint iframes
+        // that were still rendering in the background as soon as they're shown.
+        loadVariantThumbs(t === 'boy' ? 'boyVariants' : 'girlVariants');
         requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    function loadVariantThumbs(sectionId) {
+        document.querySelectorAll('#' + sectionId + ' .variant-thumb iframe').forEach(iframe => {
+            if (!iframe.src && iframe.dataset.src) {
+                iframe.addEventListener('load', () => iframe.classList.add('loaded'));
+                iframe.src = iframe.dataset.src;
+            }
+        });
     }
 
     function selectVariant(n) {
@@ -3330,7 +3346,7 @@ It all started the day I first saw your smile. I knew right then that something 
         scaleVariantThumbs();
         setupMirrorDrag();
 
-        const savedTheme = @json($card - > theme ?? null);
+        const savedTheme = @json($card->theme ?? null);
         if (savedTheme) {
             selectTheme(savedTheme);
             if (selectedVariant) {
@@ -3338,7 +3354,7 @@ It all started the day I first saw your smile. I knew right then that something 
             }
         }
 
-        const savedPin = @json($card - > lock_code ?? null);
+        const savedPin = @json($card->lock_code ?? null);
         if (savedPin) {
             setPinValue(savedPin);
         }

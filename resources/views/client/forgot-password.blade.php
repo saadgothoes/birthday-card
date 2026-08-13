@@ -235,6 +235,51 @@
                 font-size: 1.6rem;
             }
         }
+
+        /* ─── Disabled-account popup ─── */
+        .disabled-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 1.5rem;
+        }
+
+        .disabled-popup {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 2.2rem 2rem;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .disabled-popup-icon {
+            font-size: 2.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .disabled-popup h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: #e11d48;
+            margin-bottom: 0.6rem;
+        }
+
+        .disabled-popup p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 1.6rem;
+        }
+
+        .disabled-popup button {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 
@@ -255,13 +300,17 @@
         <h2>Reset Password</h2>
         <p class="sub">Enter your email to receive a password reset link</p>
 
+        @php
+            $isDisabledError = $errors->has('email') && str_contains($errors->first('email'), 'currently disabled');
+        @endphp
+
         @if(session('status'))
         <div class="success-msg">
             ✅ {{ session('status') }}
         </div>
         @endif
 
-        @if($errors->any())
+        @if($errors->any() && !$isDisabledError)
         <div class="error-msg">
             ❌ {{ $errors->first() }}
         </div>
@@ -281,6 +330,18 @@
             <a href="{{ route('client.login') }}">← Back to Login</a>
         </div>
     </div>
+
+    @if($isDisabledError)
+    <div class="disabled-popup-overlay" id="disabledPopup">
+        <div class="disabled-popup">
+            <div class="disabled-popup-icon">🚫</div>
+            <h3>Account Disabled</h3>
+            <p>You are currently disabled from this app. Please contact support to reactivate your account before
+                resetting your password.</p>
+            <button type="button" onclick="document.getElementById('disabledPopup').style.display='none'">Okay</button>
+        </div>
+    </div>
+    @endif
 </body>
 
 </html>

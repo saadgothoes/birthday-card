@@ -10,16 +10,15 @@
         rel="stylesheet">
     <style>
         :root {
-            --bg: #f5f7fa;
+            --bg: #f7f5fc;
             --surface: #ffffff;
-            --border: #e2e8f0;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --accent: #6366f1;
-            /* Indigo - Neutral/Uni */
-            --accent-soft: #eff6ff;
+            --border: #e7e0fa;
+            --text: #120d1c;
+            --text-muted: #6b6478;
+            --accent: #8B5CF6;
+            --accent-soft: #f3edfe;
             --radius: 16px;
-            --shadow: 0 4px 32px rgba(99, 102, 241, 0.08);
+            --shadow: 0 4px 32px rgba(139, 92, 246, 0.1);
         }
 
         * {
@@ -186,30 +185,69 @@
             text-align: left;
         }
 
-        button {
+.submit-btn {
+            position: relative;
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--accent), #818cf8);
+            padding: 1.05rem;
+            background: var(--accent);
             color: white;
             border: none;
-            border-radius: 14px;
+            border-radius: 100px;
             font-size: 1rem;
             cursor: pointer;
             font-weight: 700;
             margin-top: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+            transition: transform 0.35s cubic-bezier(.16,1,.3,1), box-shadow 0.35s ease;
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.32);
             font-family: 'DM Sans', sans-serif;
+            overflow: hidden;
+            isolation: isolate;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
         }
 
-        button:hover {
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #120d1c;
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 0.5s cubic-bezier(.16,1,.3,1);
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        .submit-btn:hover::before { transform: scaleX(1); }
+
+        .submit-btn .arrow { transition: transform 0.4s cubic-bezier(.16,1,.3,1); display: inline-flex; }
+        .submit-btn:hover .arrow { transform: translateX(5px); }
+
+        .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 14px 36px rgba(139, 92, 246, 0.42);
         }
 
-        button:active {
-            transform: translateY(0);
+        .submit-btn:active {
+            transform: translateY(0) scale(0.98);
         }
+
+        .back-home {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 1.6rem;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .back-home:hover { color: var(--accent); transform: translateX(-2px); }
 
         .footer-links {
             margin-top: 2rem;
@@ -262,6 +300,7 @@
 
     <div class="login-card">
 
+        <a href="{{ url('/') }}" class="back-home">&larr; Back to home</a>
 
         <h2>Welcome Back!</h2>
         <p class="sub">Log in to create your magic</p>
@@ -297,9 +336,30 @@
                     Password?</a>
             </div>
 
-            <button type="submit">Sign In to Dashboard →</button>
+            <button type="submit" class="submit-btn" id="loginSubmit">
+                <span>Sign In to Dashboard</span>
+                <span class="arrow">→</span>
+            </button>
         </form>
     </div>
+
+    <script>
+        (function () {
+            var btn = document.getElementById('loginSubmit');
+            if (!btn || window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+
+            btn.addEventListener('mousemove', function (e) {
+                var rect = btn.getBoundingClientRect();
+                var relX = (e.clientX - rect.left - rect.width / 2) * 0.25;
+                var relY = (e.clientY - rect.top - rect.height / 2) * 0.35;
+                btn.style.transform = 'translate(' + relX + 'px,' + (relY - 2) + 'px)';
+            });
+
+            btn.addEventListener('mouseleave', function () {
+                btn.style.transform = '';
+            });
+        })();
+    </script>
 </body>
 
 </html>
