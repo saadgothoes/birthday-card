@@ -465,6 +465,10 @@
             <!-- polaroids (soft rose) -->
             <div class="pol pol1">
                 <div class="pol-inner">
+                    @if(request('photo1'))
+                    <img src="{{ request('photo1') }}" alt=""
+                        style="width:100%;height:100%;object-fit:cover;display:block;">
+                    @else
                     <svg viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
                         <rect fill="#1a0f0a" height="118" width="118" />
                         <circle cx="25" cy="18" fill="#d98a90" opacity="0.2" r="10" />
@@ -484,11 +488,16 @@
                         <rect fill="#8B6B4A" height="18" rx="3" width="7" x="81" y="85" />
                         <ellipse cx="59" cy="66" fill="#c8a882" opacity="0.8" rx="5" ry="4" />
                     </svg>
+                    @endif
                 </div>
             </div>
 
             <div class="pol pol2">
                 <div class="pol-inner">
+                    @if(request('photo2'))
+                    <img src="{{ request('photo2') }}" alt=""
+                        style="width:100%;height:100%;object-fit:cover;display:block;">
+                    @else
                     <svg viewBox="0 0 124 124" xmlns="http://www.w3.org/2000/svg">
                         <rect fill="#2a1a0e" height="124" width="124" />
                         <circle cx="95" cy="25" fill="#d98a90" opacity="0.25" r="16" />
@@ -502,11 +511,16 @@
                         <rect fill="#4a3020" height="18" rx="3" width="9" x="52" y="95" />
                         <rect fill="#4a3020" height="18" rx="3" width="9" x="63" y="95" />
                     </svg>
+                    @endif
                 </div>
             </div>
 
             <div class="pol pol3">
                 <div class="pol-inner">
+                    @if(request('photo3'))
+                    <img src="{{ request('photo3') }}" alt=""
+                        style="width:100%;height:100%;object-fit:cover;display:block;">
+                    @else
                     <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
                         <rect fill="#1e1408" height="108" width="108" />
                         <circle cx="54" cy="20" fill="#d98a90" opacity="0.15" r="22" />
@@ -521,6 +535,7 @@
                         <rect fill="#4a3020" height="10" rx="3" width="8" x="42" y="96" />
                         <rect fill="#4a3020" height="10" rx="3" width="8" x="58" y="96" />
                     </svg>
+                    @endif
                 </div>
             </div>
 

@@ -354,6 +354,9 @@
                 <div class="grid">
 
                     <div class="tile walk">
+                        @if(request('photo1'))
+                        <img src="{{ request('photo1') }}" alt="" style="width:100%;height:100%;object-fit:cover;">
+                        @else
                         <svg viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <linearGradient id="skyWalk" x1="0" y1="0" x2="0" y2="1">
@@ -374,16 +377,20 @@
                                 <path d="M9 -3 Q17 -10 25 -3 L27 32 L7 32 Z" fill="var(--card-bg)" />
                             </g>
                         </svg>
+                        @endif
                     </div>
 
                     <div class="tile name">
                         <div class="names">
-                            <span class="first">Emma</span>
-                            <span class="second">Lucas</span>
+                            <span class="first">{{ request('name_first', 'Emma') }}</span>
+                            <span class="second">{{ request('name_second', 'Lucas') }}</span>
                         </div>
                     </div>
 
                     <div class="tile beach">
+                        @if(request('photo2'))
+                        <img src="{{ request('photo2') }}" alt="" style="width:100%;height:100%;object-fit:cover;">
+                        @else
                         <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <linearGradient id="beachSky" x1="0" y1="0" x2="0" y2="1">
@@ -401,9 +408,13 @@
                                 <path d="M8 24 Q18 10 26 18 L20 40 L4 36 Z" fill="var(--card-bg)" />
                             </g>
                         </svg>
+                        @endif
                     </div>
 
                     <div class="tile coffee">
+                        @if(request('photo3'))
+                        <img src="{{ request('photo3') }}" alt="" style="width:100%;height:100%;object-fit:cover;">
+                        @else
                         <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
                             <rect width="200" height="140" fill="#ecdcbc" />
                             <rect x="0" y="0" width="200" height="55" fill="#b89664" />
@@ -414,9 +425,13 @@
                             <rect x="35" y="60" width="130" height="14" rx="7" fill="#0e0804" opacity="0.55" />
                             <circle cx="150" cy="63" r="5" fill="var(--heart)" />
                         </svg>
+                        @endif
                     </div>
 
                     <div class="tile embrace">
+                        @if(request('photo4'))
+                        <img src="{{ request('photo4') }}" alt="" style="width:100%;height:100%;object-fit:cover;">
+                        @else
                         <svg viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
                             <rect width="200" height="170" fill="#b89664" />
                             <g transform="translate(100,90)">
@@ -426,27 +441,35 @@
                                 <path d="M0 -16 Q14 -26 28 -16 L32 44 L-4 44 Z" fill="var(--card-bg)" opacity="0.92" />
                             </g>
                         </svg>
+                        @endif
                     </div>
 
+                    @php
+                        $calDays = [
+                            'lead' => [31],
+                            'days' => range(1, 30),
+                            'trail' => [1, 2, 3, 4],
+                        ];
+                        $markedDay = (int) request('cal_day', 8);
+                    @endphp
                     <div class="tile cal">
-                        <p class="cal-title">November 2019</p>
+                        <p class="cal-title">{{ request('cal_month', 'November 2019') }}</p>
                         <div class="cal-dow">
                             <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
                         </div>
                         <div class="cal-days">
-                            <span
-                                class="muted">31</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span
-                                class="marked">8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span
-                                class="muted">1</span><span class="muted">2</span><span class="muted">3</span><span
-                                class="muted">4</span>
+                            @foreach($calDays['lead'] as $d)<span class="muted">{{ $d }}</span>@endforeach
+                            @foreach($calDays['days'] as $d)<span
+                                @if($d === $markedDay) class="marked" @endif>{{ $d }}</span>@endforeach
+                            @foreach($calDays['trail'] as $d)<span class="muted">{{ $d }}</span>@endforeach
                         </div>
                     </div>
 
                 </div>
 
                 <div class="note">
-                    <p>Two cups, one warmth — that’s really all we’ve ever needed.</p>
-                    <span class="signed">— yours, E</span>
+                    <p>{{ request('message', "Two cups, one warmth — that’s really all we’ve ever needed.") }}</p>
+                    <span class="signed">{{ request('signed', '— yours, E') }}</span>
                 </div>
 
                 <div class="caption">est. together</div>

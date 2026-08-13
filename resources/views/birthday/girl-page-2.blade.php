@@ -164,6 +164,7 @@
             max-width: 360px;
             opacity: 0.85;
             margin: 0 0 clamp(24px, 5vw, 36px);
+            white-space: pre-line;
         }
 
         .gb-next {
@@ -307,8 +308,7 @@
         </div>
 
         <div class="gb-title">
-            Happy Birthday
-            <em>My Love</em>
+            <em>{{ request('heading', 'Happy Birthday My Love') }}</em>
         </div>
 
         <div class="gb-divider">
@@ -317,7 +317,7 @@
             <div class="gb-div-line"></div>
         </div>
 
-        <p class="gb-msg">You make every day feel like a celebration.<br>Today is all about you, my love. 🌸</p>
+        <p class="gb-msg">{{ request('message', "You make every day feel like a celebration.\nToday is all about you, my love. 🌸") }}</p>
 
         <button class="gb-next">NEXT</button>
     </div>

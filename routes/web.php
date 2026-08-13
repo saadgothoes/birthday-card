@@ -52,6 +52,10 @@ Route::prefix('client')->name('client.')->group(function () {
         // ─── Birthday Card Builder (wizard) ────────────────────
         Route::post('/card/step1', [BirthdayCardController::class, 'saveStep1'])->name('card.step1');
         Route::post('/card/step2', [BirthdayCardController::class, 'saveStep2'])->name('card.step2');
+        Route::post('/card/step3', [BirthdayCardController::class, 'saveStep3'])->name('card.step3');
+        Route::post('/card/step4', [BirthdayCardController::class, 'saveStep4'])->name('card.step4');
+        Route::post('/card/step5', [BirthdayCardController::class, 'saveStep5'])->name('card.step5');
+        Route::post('/card/step6', [BirthdayCardController::class, 'saveStep6'])->name('card.step6');
     });
 
     // Password reset routes

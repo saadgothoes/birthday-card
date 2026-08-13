@@ -696,19 +696,22 @@
 
             <!-- Three polaroid photos -->
             <div class="polaroid-row">
-                <figure class="polaroid p1" tabindex="0" data-full="https://picsum.photos/seed/lovenote1/700/820">
-                    <img src="https://picsum.photos/seed/lovenote1/320/380" alt="A favorite memory together"
-                        loading="lazy">
+                <figure class="polaroid p1" tabindex="0"
+                    data-full="{{ request('photo1', 'https://picsum.photos/seed/lovenote1/700/820') }}">
+                    <img src="{{ request('photo1', 'https://picsum.photos/seed/lovenote1/320/380') }}"
+                        alt="A favorite memory together" loading="lazy">
                     <figcaption>that day</figcaption>
                 </figure>
-                <figure class="polaroid p2" tabindex="0" data-full="https://picsum.photos/seed/lovenote2/700/820">
-                    <img src="https://picsum.photos/seed/lovenote2/320/380" alt="A favorite memory together"
-                        loading="lazy">
+                <figure class="polaroid p2" tabindex="0"
+                    data-full="{{ request('photo2', 'https://picsum.photos/seed/lovenote2/700/820') }}">
+                    <img src="{{ request('photo2', 'https://picsum.photos/seed/lovenote2/320/380') }}"
+                        alt="A favorite memory together" loading="lazy">
                     <figcaption>us</figcaption>
                 </figure>
-                <figure class="polaroid p3" tabindex="0" data-full="https://picsum.photos/seed/lovenote3/700/820">
-                    <img src="https://picsum.photos/seed/lovenote3/320/380" alt="A favorite memory together"
-                        loading="lazy">
+                <figure class="polaroid p3" tabindex="0"
+                    data-full="{{ request('photo3', 'https://picsum.photos/seed/lovenote3/700/820') }}">
+                    <img src="{{ request('photo3', 'https://picsum.photos/seed/lovenote3/320/380') }}"
+                        alt="A favorite memory together" loading="lazy">
                     <figcaption>forever</figcaption>
                 </figure>
             </div>
@@ -716,13 +719,13 @@
             <!-- Calendar + handwritten note -->
             <div class="mini-row">
                 <div class="mini-calendar">
-                    <div class="cal-head">August</div>
+                    <div class="cal-head">{{ request('cal_month', 'August') }}</div>
                     <div class="cal-grid" id="calGrid">
                         <!-- filled by script -->
                     </div>
                 </div>
                 <div class="mini-note">
-                    <p>Your laugh is my favorite sound.</p>
+                    <p>{{ request('message', 'Your laugh is my favorite sound.') }}</p>
                 </div>
             </div>
 
@@ -765,7 +768,7 @@
         /* ---------------- Mini calendar ---------------- */
         const calGrid = document.getElementById('calGrid');
         const DAYS_IN_MONTH = 31;
-        const HIGHLIGHT_DAY = 14; // change this to your special date
+        const HIGHLIGHT_DAY = {{ (int) request('cal_day', 14) }}; // change this to your special date
         for (let d = 1; d <= DAYS_IN_MONTH; d++) {
             const cell = document.createElement('span');
             cell.textContent = d;

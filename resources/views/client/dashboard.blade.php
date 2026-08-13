@@ -770,6 +770,14 @@
         transition: opacity 0.25s ease;
     }
 
+    /* The gift-box screen (page 3) switches to a pure-CSS mobile layout
+       below 1024px — render its thumb wider than that breakpoint so it
+       always shows the real desktop gift image, not the mobile fallback. */
+    .gift-variant-thumb iframe {
+        width: 1280px;
+        height: 800px;
+    }
+
     .variant-thumb iframe.loaded {
         opacity: 1;
     }
@@ -788,38 +796,6 @@
 
     .variant-choice.selected .variant-label {
         color: var(--accent);
-    }
-
-    /* Hover-to-enlarge popup preview */
-    .variant-zoom-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.55);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 999;
-        padding: 2rem;
-    }
-
-    .variant-zoom-overlay.visible {
-        display: flex;
-    }
-
-    .variant-zoom-box {
-        width: min(700px, 92vw);
-        aspect-ratio: 16 / 10;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        position: relative;
-        background: #111;
-    }
-
-    .variant-zoom-box iframe {
-        width: 100%;
-        height: 100%;
-        border: 0;
     }
 
     /* Step 2 — Lock Code */
@@ -1214,6 +1190,38 @@
         font-size: 0.7rem;
         margin-top: 0.3rem;
         font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Gift 1 / Gift 2 photo slots — reuses .image-slot, adds a filled state
+       that swaps the "+" placeholder for the uploaded photo thumbnail. */
+    .image-slot {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .image-slot .slot-preview {
+        display: none;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-slot.filled {
+        border-style: solid;
+    }
+
+    .image-slot.filled .slot-preview {
+        display: block;
+    }
+
+    .image-slot.filled .slot-plus {
+        display: none;
+    }
+
+    .gift2-field-row {
+        margin-top: 1.4rem;
     }
 
     /* Book preview */
@@ -1719,10 +1727,6 @@
         .pin-dob-input {
             width: 140px;
             font-size: 1.4rem;
-        }
-
-        .variant-zoom-box {
-            width: 94vw;
         }
 
         .preview-header {
@@ -2248,12 +2252,26 @@
             <div class="step-item" onclick="goToStep(4)">
                 <div class="step-num" id="sn4">4</div>
                 <div>
-                    <div class="step-label">Gift Section</div>
-                    <div class="step-sub">3 gifts to configure</div>
+                    <div class="step-label">Gift Box Screen</div>
+                    <div class="step-sub">Choose the gift screen design</div>
                 </div>
             </div>
             <div class="step-item" onclick="goToStep(5)">
                 <div class="step-num" id="sn5">5</div>
+                <div>
+                    <div class="step-label">Gift 1</div>
+                    <div class="step-sub">Theme & photos</div>
+                </div>
+            </div>
+            <div class="step-item" onclick="goToStep(6)">
+                <div class="step-num" id="sn6">6</div>
+                <div>
+                    <div class="step-label">Gift 2</div>
+                    <div class="step-sub">Theme, photos, date & note</div>
+                </div>
+            </div>
+            <div class="step-item" onclick="goToStep(7)">
+                <div class="step-num" id="sn7">7</div>
                 <div>
                     <div class="step-label">Generate & Share</div>
                     <div class="step-sub">URL & QR code</div>
@@ -2393,14 +2411,14 @@
                             <div class="variant-grid">
                                 <div class="variant-choice" id="boyVariant1" onclick="selectVariant(1)">
                                     <div class="variant-check">✓</div>
-                                    <div class="variant-thumb" onmouseenter="openZoom('{{ route('boy.page.variant',['page'=>1,'variant'=>1]) }}')" onmouseleave="closeZoom()">
+                                    <div class="variant-thumb">
                                         <iframe data-src="{{ route('boy.page.variant',['page'=>1,'variant'=>1]) }}" tabindex="-1"></iframe>
                                     </div>
                                     <div class="variant-label">Midnight Gold</div>
                                 </div>
                                 <div class="variant-choice" id="boyVariant2" onclick="selectVariant(2)">
                                     <div class="variant-check">✓</div>
-                                    <div class="variant-thumb" onmouseenter="openZoom('{{ route('boy.page.variant',['page'=>1,'variant'=>2]) }}')" onmouseleave="closeZoom()">
+                                    <div class="variant-thumb">
                                         <iframe data-src="{{ route('boy.page.variant',['page'=>1,'variant'=>2]) }}" tabindex="-1"></iframe>
                                     </div>
                                     <div class="variant-label">Light Blue Sky</div>
@@ -2414,14 +2432,14 @@
                             <div class="variant-grid">
                                 <div class="variant-choice" id="girlVariant1" onclick="selectVariant(1)">
                                     <div class="variant-check">✓</div>
-                                    <div class="variant-thumb" onmouseenter="openZoom('{{ route('girl.page.variant',['page'=>1,'variant'=>1]) }}')" onmouseleave="closeZoom()">
+                                    <div class="variant-thumb">
                                         <iframe data-src="{{ route('girl.page.variant',['page'=>1,'variant'=>1]) }}" tabindex="-1"></iframe>
                                     </div>
                                     <div class="variant-label">Blush Petal</div>
                                 </div>
                                 <div class="variant-choice" id="girlVariant2" onclick="selectVariant(2)">
                                     <div class="variant-check">✓</div>
-                                    <div class="variant-thumb" onmouseenter="openZoom('{{ route('girl.page.variant',['page'=>1,'variant'=>2]) }}')" onmouseleave="closeZoom()">
+                                    <div class="variant-thumb">
                                         <iframe data-src="{{ route('girl.page.variant',['page'=>1,'variant'=>2]) }}" tabindex="-1"></iframe>
                                     </div>
                                     <div class="variant-label">Rose Bloom</div>
@@ -2438,13 +2456,6 @@
                                 →</button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Hover-to-enlarge overlay for Step 1 design previews -->
-            <div class="variant-zoom-overlay" id="variantZoomOverlay" onclick="closeZoom()">
-                <div class="variant-zoom-box">
-                    <iframe id="variantZoomIframe" src="about:blank" tabindex="-1"></iframe>
                 </div>
             </div>
 
@@ -2534,205 +2545,298 @@
                     <div class="card-body">
                         <div class="welcome-layout">
                             <div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Recipient's Name</label>
-                                        <input type="text" placeholder="e.g. Aisha" id="recipientName"
-                                            oninput="updatePreview()" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Your Name</label>
-                                        <input type="text" placeholder="e.g. Bilal" />
-                                    </div>
+                                <div class="form-group">
+                                    <label>Heading</label>
+                                    <input type="text" placeholder="e.g. Happy Birthday My Love" id="step3Heading"
+                                        oninput="updateStep3LivePreview()" />
                                 </div>
                                 <div class="form-group">
-                                    <label>Welcome Message</label>
-                                    <textarea placeholder="Write a heartfelt welcome message…" id="welcomeMsg"
-                                        oninput="updatePreview()">You are someone so special, and today is all about you. Open each gift with love. 🎀</textarea>
+                                    <label>Message</label>
+                                    <textarea placeholder="Write a heartfelt message…" id="step3Message"
+                                        oninput="updateStep3LivePreview()"></textarea>
                                 </div>
-                                <div class="form-group">
-                                    <label>Profile Image</label>
-                                    <div class="image-upload-zone">
-                                        <span class="upload-icon">📸</span>
-                                        <div class="upload-text">Drop image here or <strong>click to browse</strong>
-                                        </div>
-                                    </div>
-                                </div>
+                                <p class="step3-error" id="step3Error"
+                                    style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.6rem;"></p>
                             </div>
-                            <div>
-                                <div
-                                    style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:0.8rem; font-weight:600;">
-                                    Live Preview</div>
-                                <div class="welcome-preview">
-                                    <div class="preview-header">
-                                        <div class="preview-avatar-wrap">🌸</div>
-                                        <h3 id="previewName">Happy Birthday!</h3>
-                                        <p id="previewSub">Your special day has arrived</p>
-                                    </div>
-                                    <div class="preview-body">
-                                        <div class="preview-message" id="previewMsg">You are someone so special, and
-                                            today
-                                            is all about you. Open each gift with love. 🎀</div>
-                                    </div>
+                            <div class="step2-preview-col">
+                                <div class="live-preview-label">Live Preview — Your Selected Design</div>
+                                <div class="live-page-preview">
+                                    <iframe id="step3LivePreview" src="about:blank" tabindex="-1"></iframe>
                                 </div>
                             </div>
                         </div>
                         <div class="step-nav">
                             <button class="btn-prev" onclick="prevStep()">← Back</button>
-                            <button class="btn-next" onclick="nextStep()">Continue →</button>
+                            <button class="btn-next" id="step3ContinueBtn" onclick="saveStep3AndContinue()">Continue
+                                →</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ── STEP 4: Gift Sections ── -->
+            <!-- ── STEP 4: Gift Box Screen ── -->
             <div class="step-panel" id="panel4">
                 <div class="card">
                     <div class="card-header">
                         <div class="card-icon">🎁</div>
                         <div class="card-title">
-                            <h3>Configure Gift Sections</h3>
-                            <p>3 unique gifts — each with its own style and surprise</p>
+                            <h3>Choose Gift Box Screen Design</h3>
+                            <p>This is the screen they'll tap gifts open from</p>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="gift-tabs">
-                            <button class="gift-tab active" onclick="switchGift(1,this)">🖼️ Gift 1 · Gallery</button>
-                            <button class="gift-tab" onclick="switchGift(2,this)">💌 Gift 2 · Love Letter</button>
-                            <button class="gift-tab" onclick="switchGift(3,this)">📖 Gift 3 · Story Book</button>
-                        </div>
-
-                        <!-- Gift 1 -->
-                        <div class="gift-panel active" id="gift1">
-                            <div class="form-group">
-                                <label>Gift Title</label>
-                                <input type="text" placeholder="e.g. Our Memories Together 📸"
-                                    value="Our Memories Together 📸" />
-                            </div>
-                            <div class="form-group">
-                                <label>Image Gallery (upload photos — no text, pure visuals)</label>
-                                <div class="image-upload-zone">
-                                    <span class="upload-icon">🖼️</span>
-                                    <div class="upload-text">Drop multiple photos or <strong>click to browse</strong>
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <div class="variant-grid">
+                                <div class="variant-choice" id="giftVariant1" onclick="selectGiftVariant(1)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb gift-variant-thumb">
+                                        <iframe id="giftVariantFrame1" tabindex="-1"></iframe>
                                     </div>
+                                    <div class="variant-label">Design 1</div>
                                 </div>
-                                <div class="image-slots">
-                                    <div class="image-slot">+<span>Photo 1</span></div>
-                                    <div class="image-slot">+<span>Photo 2</span></div>
-                                    <div class="image-slot">+<span>Photo 3</span></div>
-                                    <div class="image-slot">+<span>Photo 4</span></div>
-                                    <div class="image-slot">+<span>Photo 5</span></div>
-                                    <div class="image-slot">+<span>Photo 6</span></div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Gallery Layout</label>
-                                <select>
-                                    <option>Grid (3 columns)</option>
-                                    <option>Masonry</option>
-                                    <option>Slideshow / Carousel</option>
-                                    <option>Polaroid style</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Gift 2 -->
-                        <div class="gift-panel" id="gift2">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Gift Title</label>
-                                    <input type="text" placeholder="e.g. A Letter From My Heart 💌"
-                                        value="A Letter From My Heart 💌" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Envelope Color</label>
-                                    <select>
-                                        <option>Pink & Gold ✨</option>
-                                        <option>Red & White ❤️</option>
-                                        <option>Blue & Silver 💙</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Love Letter Content</label>
-                                <textarea placeholder="Pour your heart out here…" style="min-height:150px;">Dear Aisha,
-
-Every day with you feels like a blessing. On your birthday, I want you to know that you light up every room you walk into, and my life has been so much brighter since you've been in it.
-
-With all my love 💕</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Accompanying Image</label>
-                                <div class="image-upload-zone">
-                                    <span class="upload-icon">📷</span>
-                                    <div class="upload-text">Upload 1 meaningful photo to go with the letter</div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Text Position</label>
-                                <select>
-                                    <option>Letter left, Image right</option>
-                                    <option>Image left, Letter right</option>
-                                    <option>Letter above, Image below</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Gift 3 -->
-                        <div class="gift-panel" id="gift3">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Book Title</label>
-                                    <input type="text" placeholder="e.g. Our Story 📖" value="The Story of Us 📖" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Book Cover Style</label>
-                                    <select>
-                                        <option>Classic Leather</option>
-                                        <option>Floral Vintage</option>
-                                        <option>Modern Minimal</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Story / Letter (shown on left page)</label>
-                                <textarea
-                                    style="min-height:130px;">Chapter 1: The Beginning
-
-It all started the day I first saw your smile. I knew right then that something magical was about to unfold — a story worth telling for the rest of my life…</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Book Image (shown on right page)</label>
-                                <div class="image-upload-zone">
-                                    <span class="upload-icon">📸</span>
-                                    <div class="upload-text">Upload your favourite together photo</div>
-                                </div>
-                            </div>
-                            <div class="book-preview">
-                                <div class="book-header">
-                                    <div class="book-title">✦ The Story of Us ✦</div>
-                                </div>
-                                <div class="book-content">
-                                    <div class="book-text-side">
-                                        Chapter 1: The Beginning<br><br>
-                                        It all started the day I first saw your smile. I knew right then that something
-                                        magical was about to unfold…
+                                <div class="variant-choice" id="giftVariant2" onclick="selectGiftVariant(2)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb gift-variant-thumb">
+                                        <iframe id="giftVariantFrame2" tabindex="-1"></iframe>
                                     </div>
-                                    <div class="book-img-side">📷</div>
+                                    <div class="variant-label">Design 2</div>
                                 </div>
                             </div>
+                            <p class="step4-error" id="step4Error"
+                                style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
+                                Please select a gift screen design to continue.</p>
                         </div>
 
                         <div class="step-nav">
                             <button class="btn-prev" onclick="prevStep()">← Back</button>
-                            <button class="btn-next" onclick="nextStep()">Continue →</button>
+                            <button class="btn-next" id="step4ContinueBtn"
+                                onclick="saveStep4AndContinue()">Continue →</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ── STEP 5: Generate ── -->
+            <!-- ── STEP 5: Gift 1 ── -->
             <div class="step-panel" id="panel5">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🖼️</div>
+                        <div class="card-title">
+                            <h3>Gift 1 — Memory Photos</h3>
+                            <p>Pick a style, then add the photos</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <h4>Choose a Theme</h4>
+                            <div class="variant-grid" id="gift1ThemeGrid">
+                                <div class="variant-choice" id="gift1Theme1" onclick="selectGiftTheme(1,1)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe id="gift1ThemeFrame1" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme 1</div>
+                                </div>
+                                <div class="variant-choice" id="gift1Theme2" onclick="selectGiftTheme(1,2)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe id="gift1ThemeFrame2" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme 2</div>
+                                </div>
+                                <div class="variant-choice" id="gift1Theme3" onclick="selectGiftTheme(1,3)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe id="gift1ThemeFrame3" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme 3</div>
+                                </div>
+                                <div class="variant-choice" id="gift1Theme4" onclick="selectGiftTheme(1,4)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe id="gift1ThemeFrame4" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme 4</div>
+                                </div>
+                            </div>
+                            <p class="step5-error" id="step5Error"
+                                style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
+                                Please choose a theme to continue.</p>
+                        </div>
+
+                        <div class="form-group gift2-field-row">
+                            <label>Photos (3)</label>
+                            <div class="image-slots">
+                                <div class="image-slot" id="gift1Slot0"
+                                    onclick="document.getElementById('gift1PhotoInput0').click()">
+                                    <img class="slot-preview" id="gift1PhotoPreview0" alt="">
+                                    <span class="slot-plus">+<span>Photo 1</span></span>
+                                </div>
+                                <div class="image-slot" id="gift1Slot1"
+                                    onclick="document.getElementById('gift1PhotoInput1').click()">
+                                    <img class="slot-preview" id="gift1PhotoPreview1" alt="">
+                                    <span class="slot-plus">+<span>Photo 2</span></span>
+                                </div>
+                                <div class="image-slot" id="gift1Slot2"
+                                    onclick="document.getElementById('gift1PhotoInput2').click()">
+                                    <img class="slot-preview" id="gift1PhotoPreview2" alt="">
+                                    <span class="slot-plus">+<span>Photo 3</span></span>
+                                </div>
+                            </div>
+                            <input type="file" id="gift1PhotoInput0" accept="image/*" style="display:none"
+                                onchange="onGiftPhotoSelected('gift1',0,this)">
+                            <input type="file" id="gift1PhotoInput1" accept="image/*" style="display:none"
+                                onchange="onGiftPhotoSelected('gift1',1,this)">
+                            <input type="file" id="gift1PhotoInput2" accept="image/*" style="display:none"
+                                onchange="onGiftPhotoSelected('gift1',2,this)">
+                        </div>
+
+                        <div class="gift2-field-row">
+                            <div class="live-preview-label">Live Preview</div>
+                            <div class="live-page-preview">
+                                <iframe id="gift1LivePreview" src="about:blank" tabindex="-1"></iframe>
+                            </div>
+                        </div>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" onclick="prevStep()">← Back</button>
+                            <button class="btn-next" id="step5ContinueBtn"
+                                onclick="saveStep5AndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── STEP 6: Gift 2 ── -->
+            <div class="step-panel" id="panel6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💌</div>
+                        <div class="card-title">
+                            <h3>Gift 2 — Photos, Date &amp; Note</h3>
+                            <p>Pick a style, then personalize it</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <h4>Choose a Theme</h4>
+                            <div class="variant-grid" id="gift2ThemeGrid">
+                                <div class="variant-choice" id="gift2Theme1" onclick="selectGiftTheme(2,1)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe id="gift2ThemeFrame1" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme 1</div>
+                                </div>
+                                <div class="variant-choice" id="gift2Theme2" onclick="selectGiftTheme(2,2)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe id="gift2ThemeFrame2" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme 2</div>
+                                </div>
+                                <div class="variant-choice" id="gift2Theme3" onclick="selectGiftTheme(2,3)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe id="gift2ThemeFrame3" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme 3</div>
+                                </div>
+                                <div class="variant-choice" id="gift2Theme4" onclick="selectGiftTheme(2,4)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe id="gift2ThemeFrame4" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme 4</div>
+                                </div>
+                            </div>
+                            <p class="step6-error" id="step6Error"
+                                style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
+                                Please choose a theme to continue.</p>
+                        </div>
+
+                        <div class="form-group gift2-field-row">
+                            <label>Photos</label>
+                            <div class="image-slots">
+                                <div class="image-slot" id="gift2Slot0"
+                                    onclick="document.getElementById('gift2PhotoInput0').click()">
+                                    <img class="slot-preview" id="gift2PhotoPreview0" alt="">
+                                    <span class="slot-plus">+<span>Photo 1</span></span>
+                                </div>
+                                <div class="image-slot" id="gift2Slot1"
+                                    onclick="document.getElementById('gift2PhotoInput1').click()">
+                                    <img class="slot-preview" id="gift2PhotoPreview1" alt="">
+                                    <span class="slot-plus">+<span>Photo 2</span></span>
+                                </div>
+                                <div class="image-slot" id="gift2Slot2"
+                                    onclick="document.getElementById('gift2PhotoInput2').click()">
+                                    <img class="slot-preview" id="gift2PhotoPreview2" alt="">
+                                    <span class="slot-plus">+<span>Photo 3</span></span>
+                                </div>
+                                <div class="image-slot" id="gift2Slot3Wrap"
+                                    onclick="document.getElementById('gift2PhotoInput3').click()">
+                                    <img class="slot-preview" id="gift2PhotoPreview3" alt="">
+                                    <span class="slot-plus">+<span>Photo 4</span></span>
+                                </div>
+                            </div>
+                            <input type="file" id="gift2PhotoInput0" accept="image/*" style="display:none"
+                                onchange="onGiftPhotoSelected('gift2',0,this)">
+                            <input type="file" id="gift2PhotoInput1" accept="image/*" style="display:none"
+                                onchange="onGiftPhotoSelected('gift2',1,this)">
+                            <input type="file" id="gift2PhotoInput2" accept="image/*" style="display:none"
+                                onchange="onGiftPhotoSelected('gift2',2,this)">
+                            <input type="file" id="gift2PhotoInput3" accept="image/*" style="display:none"
+                                onchange="onGiftPhotoSelected('gift2',3,this)">
+                        </div>
+
+                        <div class="form-row gift2-field-row" id="gift2NamesRow">
+                            <div class="form-group">
+                                <label>Name 1</label>
+                                <input type="text" id="gift2NameFirst" placeholder="e.g. Emma"
+                                    oninput="updateGift2LivePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Name 2</label>
+                                <input type="text" id="gift2NameSecond" placeholder="e.g. Lucas"
+                                    oninput="updateGift2LivePreview()">
+                            </div>
+                        </div>
+
+                        <div class="form-group gift2-field-row" id="gift2CalRow">
+                            <label>Special Date</label>
+                            <input type="date" id="gift2CalDate" oninput="updateGift2LivePreview()">
+                        </div>
+
+                        <div class="form-group gift2-field-row">
+                            <label>Message</label>
+                            <textarea id="gift2Message" placeholder="Write a heartfelt note…"
+                                oninput="updateGift2LivePreview()"></textarea>
+                        </div>
+
+                        <div class="form-group gift2-field-row" id="gift2SignedGroup">
+                            <label>Signed</label>
+                            <input type="text" id="gift2Signed" placeholder="e.g. — always, E"
+                                oninput="updateGift2LivePreview()">
+                        </div>
+
+                        <div class="gift2-field-row">
+                            <div class="live-preview-label">Live Preview</div>
+                            <div class="live-page-preview">
+                                <iframe id="gift2LivePreview" src="about:blank" tabindex="-1"></iframe>
+                            </div>
+                        </div>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" onclick="prevStep()">← Back</button>
+                            <button class="btn-next" id="step6ContinueBtn"
+                                onclick="saveStep6AndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── STEP 7: Generate ── -->
+            <div class="step-panel" id="panel7">
                 <div class="card">
                     <div class="card-header">
                         <div class="card-icon">✨</div>
@@ -2788,14 +2892,40 @@ It all started the day I first saw your smile. I knew right then that something 
 
     <script>
     let currentStep = 1;
-    const totalSteps = 5;
+    const totalSteps = 7;
     let selectedTheme = 'girl';
     let selectedVariant = @json($card->variant ?? null);
     const CARD_STEP1_URL = @json(route('client.card.step1'));
     const CARD_STEP2_URL = @json(route('client.card.step2'));
+    const CARD_STEP3_URL = @json(route('client.card.step3'));
+    const CARD_STEP4_URL = @json(route('client.card.step4'));
+    const CARD_STEP5_URL = @json(route('client.card.step5'));
+    const CARD_STEP6_URL = @json(route('client.card.step6'));
     const CSRF_TOKEN = @json(csrf_token());
     let step2ImageFile = null;
     let step2ImageUrl = @json($card?->profile_image_path ? \Illuminate\Support\Facades\Storage::url($card->profile_image_path) : null);
+    let selectedGiftVariant = @json($card->gift_screen_variant ?? null);
+
+    let selectedGift1Theme = @json($card->gift1_data['theme'] ?? null);
+    let selectedGift2Theme = @json($card->gift2_data['theme'] ?? null);
+    const giftPhotoFiles = {
+        gift1: [null, null, null],
+        gift2: [null, null, null, null],
+    };
+    @php
+        $gift1PhotoUrls = array_map(
+            fn ($p) => $p ? \Illuminate\Support\Facades\Storage::url($p) : null,
+            $card->gift1_data['photos'] ?? [null, null, null]
+        );
+        $gift2PhotoUrls = array_map(
+            fn ($p) => $p ? \Illuminate\Support\Facades\Storage::url($p) : null,
+            $card->gift2_data['photos'] ?? [null, null, null, null]
+        );
+    @endphp
+    const giftPhotoUrls = {
+        gift1: @json($gift1PhotoUrls),
+        gift2: @json($gift2PhotoUrls),
+    };
 
     function closePopup() {
         document.getElementById('paymentPopup').style.display = 'none';
@@ -2869,8 +2999,33 @@ It all started the day I first saw your smile. I knew right then that something 
         document.querySelectorAll('.step-item')[currentStep - 1].classList.add('active');
         document.getElementById('progressText').textContent = 'Step ' + currentStep + ' of ' + totalSteps;
 
+        // Whichever step just became visible may hold thumbs/previews that
+        // were left at scale(0) from a previous step change (see the guard
+        // in scaleVariantThumbs) — recompute now that they have real layout.
+        requestAnimationFrame(scaleVariantThumbs);
+
         if (currentStep === 2) {
             updateStep2LivePreview();
+        }
+
+        if (currentStep === 3) {
+            ensureStep3Defaults();
+            updateStep3LivePreview(true);
+        }
+
+        if (currentStep === 4) {
+            loadGiftVariantThumbs();
+        }
+
+        if (currentStep === 5) {
+            loadGiftThemeThumbs(1);
+            updateGift1LivePreview(true);
+        }
+
+        if (currentStep === 6) {
+            loadGiftThemeThumbs(2);
+            updateGift2FieldsVisibility();
+            updateGift2LivePreview(true);
         }
 
         // Close sidebar on mobile when step changes
@@ -2899,6 +3054,55 @@ It all started the day I first saw your smile. I knew right then that something 
             2: @json(route('girl.page.variant', ['page' => 1, 'variant' => 2])),
         },
     };
+
+    // ── Step 3: welcome screen (heading + message) ──────────
+    const PAGE2_ROUTES = {
+        boy: {
+            1: @json(route('boy.page.variant', ['page' => 2, 'variant' => 1])),
+            2: @json(route('boy.page.variant', ['page' => 2, 'variant' => 2])),
+        },
+        girl: {
+            1: @json(route('girl.page.variant', ['page' => 2, 'variant' => 1])),
+            2: @json(route('girl.page.variant', ['page' => 2, 'variant' => 2])),
+        },
+    };
+
+    const STEP3_DEFAULTS = {
+        boy: {
+            1: {
+                heading: 'Happy Birthday My Love',
+                message: 'You are my favourite person in this world.\nToday is all yours, my king. 🕯️'
+            },
+            2: {
+                heading: 'Happy Birthday King',
+                message: 'You are the main character today.\nEverything is built around your moment ✨'
+            },
+        },
+        girl: {
+            1: {
+                heading: 'Happy Birthday My Love',
+                message: 'You make every day feel like a celebration.\nToday is all about you, my love. 🌸'
+            },
+            2: {
+                heading: 'Happy Birthday Princess',
+                message: 'In this dark little universe,\nyou are the softest light in my life ✨'
+            },
+        },
+    };
+
+    // ── Step 4: gift-box screen design ───────────────────────
+    const PAGE3_ROUTES = {
+        boy: {
+            1: @json(route('boy.page.variant', ['page' => 3, 'variant' => 1])),
+            2: @json(route('boy.page.variant', ['page' => 3, 'variant' => 2])),
+        },
+        girl: {
+            1: @json(route('girl.page.variant', ['page' => 3, 'variant' => 1])),
+            2: @json(route('girl.page.variant', ['page' => 3, 'variant' => 2])),
+        },
+    };
+
+    let giftVariantThumbsTheme = null;
 
     function selectTheme(t) {
         selectedTheme = t;
@@ -2950,37 +3154,25 @@ It all started the day I first saw your smile. I knew right then that something 
         document.querySelectorAll('.variant-thumb, .live-page-preview').forEach(box => {
             const iframe = box.querySelector('iframe');
             if (!iframe) return;
-            const scale = box.clientWidth / THUMB_IFRAME_WIDTH;
+            // Boxes on an inactive step (display:none) report 0 width. Skip
+            // them instead of zeroing their scale — this ran on every step
+            // change (via updateStep2LivePreview's own recalibration), so
+            // switching to Step 2 was silently collapsing Step 1's already
+            // -correct thumbs to scale(0), leaving them blank until a full
+            // page refresh recomputed everything from scratch.
+            if (box.clientWidth === 0) return;
+            // Each iframe scales against its own CSS-defined width (usually
+            // THUMB_IFRAME_WIDTH, but the gift-screen thumbs render wider —
+            // see .gift-variant-thumb iframe — so they land past the real
+            // page's own 1024px breakpoint and show its desktop image
+            // instead of the mobile CSS fallback).
+            const iframeWidth = iframe.offsetWidth || THUMB_IFRAME_WIDTH;
+            const scale = box.clientWidth / iframeWidth;
             iframe.style.transform = 'scale(' + scale + ')';
         });
     }
 
     window.addEventListener('resize', scaleVariantThumbs);
-
-    // True only for devices whose primary input is touch (phones/tablets).
-    // Checking viewport width alone isn't reliable (resized desktop windows,
-    // tablets in landscape, etc.) and was letting mobile's synthetic
-    // mouseenter/mouseleave-on-tap trigger the zoom popup, causing a
-    // visible "blink" when tapping a design box on mobile.
-    const IS_TOUCH_DEVICE = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-
-    // ── Step 1: hover-to-enlarge real design preview (desktop only) ─
-    function openZoom(url) {
-        if (IS_TOUCH_DEVICE) return;
-        document.getElementById('variantZoomIframe').src = url;
-        document.getElementById('variantZoomOverlay').classList.add('visible');
-    }
-
-    function closeZoom() {
-        document.getElementById('variantZoomOverlay').classList.remove('visible');
-        document.getElementById('variantZoomIframe').src = 'about:blank';
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeZoom();
-        }
-    });
 
     // ── Step 2: live preview of the selected real page ─────
     function updateStep2LivePreview() {
@@ -2989,6 +3181,387 @@ It all started the day I first saw your smile. I knew right then that something 
         const base = PAGE1_ROUTES[selectedTheme][selectedVariant];
         frame.src = step2ImageUrl ? (base + '?photo=' + encodeURIComponent(step2ImageUrl)) : base;
         requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    // ── Step 3: fill the heading/message inputs with the design's
+    // default copy — but only if the client hasn't typed anything yet,
+    // so we never clobber their own words or a saved draft. ─────
+    function ensureStep3Defaults() {
+        if (!selectedTheme || !selectedVariant) return;
+        const d = STEP3_DEFAULTS[selectedTheme][selectedVariant];
+        const headingEl = document.getElementById('step3Heading');
+        const messageEl = document.getElementById('step3Message');
+        if (!headingEl.value) headingEl.value = d.heading;
+        if (!messageEl.value) messageEl.value = d.message;
+    }
+
+    // ── Step 3: live preview of the real welcome-screen page, updated
+    // as the client types (debounced so every keystroke doesn't force
+    // a full iframe reload). ─────────────────────────────────
+    let step3DebounceTimer = null;
+
+    function updateStep3LivePreview(immediate) {
+        const frame = document.getElementById('step3LivePreview');
+        if (!frame || !selectedTheme || !selectedVariant) return;
+        clearTimeout(step3DebounceTimer);
+        const render = () => {
+            const base = PAGE2_ROUTES[selectedTheme][selectedVariant];
+            const params = new URLSearchParams({
+                heading: document.getElementById('step3Heading').value,
+                message: document.getElementById('step3Message').value,
+            });
+            frame.src = base + '?' + params.toString();
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render();
+        else step3DebounceTimer = setTimeout(render, 250);
+    }
+
+    function saveStep3AndContinue() {
+        const btn = document.getElementById('step3ContinueBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        fetch(CARD_STEP3_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                },
+                body: JSON.stringify({
+                    heading: document.getElementById('step3Heading').value,
+                    message: document.getElementById('step3Message').value,
+                }),
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Save failed');
+                return res.json();
+            })
+            .then(() => {
+                nextStep();
+            })
+            .catch(() => {
+                const errorEl = document.getElementById('step3Error');
+                errorEl.textContent = 'Could not save your details. Please try again.';
+                errorEl.style.display = 'block';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            });
+    }
+
+    // ── Step 4: gift-box screen design picker (2 real-page thumbs,
+    // same lazy-load + fade-in pattern as the Step 1 variant thumbs). ──
+    function loadGiftVariantThumbs() {
+        if (!selectedTheme) return;
+        if (giftVariantThumbsTheme === selectedTheme) {
+            requestAnimationFrame(scaleVariantThumbs);
+            return;
+        }
+        giftVariantThumbsTheme = selectedTheme;
+        [1, 2].forEach(n => {
+            const iframe = document.getElementById('giftVariantFrame' + n);
+            iframe.classList.remove('loaded');
+            iframe.addEventListener('load', () => iframe.classList.add('loaded'), {
+                once: true
+            });
+            iframe.src = PAGE3_ROUTES[selectedTheme][n];
+        });
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    function selectGiftVariant(n) {
+        selectedGiftVariant = n;
+        document.querySelectorAll('#giftVariant1, #giftVariant2').forEach(el => el.classList.remove('selected'));
+        document.getElementById('giftVariant' + n).classList.add('selected');
+        document.getElementById('step4Error').style.display = 'none';
+    }
+
+    function saveStep4AndContinue() {
+        if (!selectedGiftVariant) {
+            document.getElementById('step4Error').style.display = 'block';
+            return;
+        }
+
+        const btn = document.getElementById('step4ContinueBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        fetch(CARD_STEP4_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                },
+                body: JSON.stringify({
+                    gift_screen_variant: selectedGiftVariant,
+                }),
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Save failed');
+                return res.json();
+            })
+            .then(() => {
+                nextStep();
+            })
+            .catch(() => {
+                const errorEl = document.getElementById('step4Error');
+                errorEl.textContent = 'Could not save your selection. Please try again.';
+                errorEl.style.display = 'block';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            });
+    }
+
+    // ── Step 5 / Step 6: Gift 1 & Gift 2 theme pickers ──────
+    // Real published pages, same lazy-load-once + fade-in pattern as
+    // Step 4's design thumbs. URL shape: /{theme}/page/3/{giftVariant}/gift/{giftNum}/{themePage}
+    function giftPageUrl(giftNum, themePage) {
+        if (!selectedTheme || !selectedGiftVariant) return null;
+        return '/' + selectedTheme + '/page/3/' + selectedGiftVariant + '/gift/' + giftNum + '/' + themePage;
+    }
+
+    let gift1ThemeLoadedKey = null;
+    let gift2ThemeLoadedKey = null;
+
+    function loadGiftThemeThumbs(giftNum) {
+        if (!selectedTheme || !selectedGiftVariant) return;
+        const key = selectedTheme + '-' + selectedGiftVariant;
+        const isGift1 = giftNum === 1;
+        if (isGift1 && gift1ThemeLoadedKey === key) {
+            requestAnimationFrame(scaleVariantThumbs);
+            return;
+        }
+        if (!isGift1 && gift2ThemeLoadedKey === key) {
+            requestAnimationFrame(scaleVariantThumbs);
+            return;
+        }
+        if (isGift1) gift1ThemeLoadedKey = key;
+        else gift2ThemeLoadedKey = key;
+
+        for (let n = 1; n <= 4; n++) {
+            const iframe = document.getElementById('gift' + giftNum + 'ThemeFrame' + n);
+            if (!iframe) continue;
+            iframe.classList.remove('loaded');
+            iframe.addEventListener('load', () => iframe.classList.add('loaded'), {
+                once: true
+            });
+            iframe.src = giftPageUrl(giftNum, n);
+        }
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    function selectGiftTheme(giftNum, n) {
+        if (giftNum === 1) selectedGift1Theme = n;
+        else selectedGift2Theme = n;
+
+        document.querySelectorAll('#gift' + giftNum + 'ThemeGrid .variant-choice').forEach(el => el.classList
+            .remove('selected'));
+        document.getElementById('gift' + giftNum + 'Theme' + n).classList.add('selected');
+        document.getElementById('step' + (giftNum === 1 ? 5 : 6) + 'Error').style.display = 'none';
+
+        if (giftNum === 1) updateGift1LivePreview(true);
+        else updateGift2LivePreview(true);
+    }
+
+    // ── Step 5 / Step 6: photo upload slots ─────────────────
+    function onGiftPhotoSelected(giftKey, index, inputEl) {
+        const file = inputEl.files[0];
+        if (!file) return;
+
+        giftPhotoFiles[giftKey][index] = file;
+        if (giftPhotoUrls[giftKey][index] && giftPhotoUrls[giftKey][index].startsWith('blob:')) {
+            URL.revokeObjectURL(giftPhotoUrls[giftKey][index]);
+        }
+        const url = URL.createObjectURL(file);
+        giftPhotoUrls[giftKey][index] = url;
+
+        const slot = document.getElementById(giftKey + 'Slot' + index) || document.getElementById(giftKey +
+            'Slot' + index + 'Wrap');
+        const img = document.getElementById(giftKey + 'PhotoPreview' + index);
+        img.src = url;
+        slot.classList.add('filled');
+
+        if (giftKey === 'gift1') updateGift1LivePreview();
+        else updateGift2LivePreview();
+    }
+
+    // ── Step 5: Gift 1 live preview + save ──────────────────
+    let gift1DebounceTimer = null;
+
+    function updateGift1LivePreview(immediate) {
+        const frame = document.getElementById('gift1LivePreview');
+        if (!frame || !selectedGift1Theme) return;
+        clearTimeout(gift1DebounceTimer);
+        const render = () => {
+            const base = giftPageUrl(1, selectedGift1Theme);
+            if (!base) return;
+            const params = new URLSearchParams();
+            giftPhotoUrls.gift1.forEach((url, i) => {
+                if (url) params.set('photo' + (i + 1), url);
+            });
+            frame.src = base + (params.toString() ? '?' + params.toString() : '');
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render();
+        else gift1DebounceTimer = setTimeout(render, 250);
+    }
+
+    function saveStep5AndContinue() {
+        if (!selectedGift1Theme) {
+            document.getElementById('step5Error').style.display = 'block';
+            return;
+        }
+
+        const btn = document.getElementById('step5ContinueBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        const formData = new FormData();
+        formData.append('theme', selectedGift1Theme);
+        giftPhotoFiles.gift1.forEach((file, i) => {
+            if (file) formData.append('photos[' + i + ']', file);
+        });
+
+        fetch(CARD_STEP5_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                },
+                body: formData,
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Save failed');
+                return res.json();
+            })
+            .then(data => {
+                (data.photo_urls || []).forEach((url, i) => {
+                    if (!url) return;
+                    if (giftPhotoUrls.gift1[i] && giftPhotoUrls.gift1[i].startsWith('blob:')) {
+                        URL.revokeObjectURL(giftPhotoUrls.gift1[i]);
+                    }
+                    giftPhotoUrls.gift1[i] = url;
+                    giftPhotoFiles.gift1[i] = null;
+                });
+                nextStep();
+            })
+            .catch(() => {
+                const errorEl = document.getElementById('step5Error');
+                errorEl.textContent = 'Could not save. Please try again.';
+                errorEl.style.display = 'block';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            });
+    }
+
+    // ── Step 6: Gift 2 live preview + save ──────────────────
+    // Boy designs show names/calendar/signature; girl designs (as built)
+    // don't use those fields — hide them instead of sending unused data.
+    function updateGift2FieldsVisibility() {
+        const isBoy = selectedTheme === 'boy';
+        document.getElementById('gift2NamesRow').style.display = isBoy ? 'flex' : 'none';
+        document.getElementById('gift2CalRow').style.display = isBoy ? 'block' : 'none';
+        document.getElementById('gift2SignedGroup').style.display = isBoy ? 'block' : 'none';
+        document.getElementById('gift2Slot3Wrap').style.display = isBoy ? 'flex' : 'none';
+    }
+
+    let gift2DebounceTimer = null;
+
+    function updateGift2LivePreview(immediate) {
+        const frame = document.getElementById('gift2LivePreview');
+        if (!frame || !selectedGift2Theme) return;
+        clearTimeout(gift2DebounceTimer);
+        const render = () => {
+            const base = giftPageUrl(2, selectedGift2Theme);
+            if (!base) return;
+            const params = new URLSearchParams();
+            giftPhotoUrls.gift2.forEach((url, i) => {
+                if (url) params.set('photo' + (i + 1), url);
+            });
+            const nameFirst = document.getElementById('gift2NameFirst').value;
+            const nameSecond = document.getElementById('gift2NameSecond').value;
+            const dateVal = document.getElementById('gift2CalDate').value;
+            const message = document.getElementById('gift2Message').value;
+            const signed = document.getElementById('gift2Signed').value;
+            if (nameFirst) params.set('name_first', nameFirst);
+            if (nameSecond) params.set('name_second', nameSecond);
+            if (dateVal) params.set('cal_day', String(new Date(dateVal + 'T00:00:00').getDate()));
+            if (message) params.set('message', message);
+            if (signed) params.set('signed', signed);
+            frame.src = base + (params.toString() ? '?' + params.toString() : '');
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render();
+        else gift2DebounceTimer = setTimeout(render, 250);
+    }
+
+    function saveStep6AndContinue() {
+        if (!selectedGift2Theme) {
+            document.getElementById('step6Error').style.display = 'block';
+            return;
+        }
+
+        const btn = document.getElementById('step6ContinueBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        const dateVal = document.getElementById('gift2CalDate').value;
+
+        const formData = new FormData();
+        formData.append('theme', selectedGift2Theme);
+        giftPhotoFiles.gift2.forEach((file, i) => {
+            if (file) formData.append('photos[' + i + ']', file);
+        });
+        formData.append('name_first', document.getElementById('gift2NameFirst').value);
+        formData.append('name_second', document.getElementById('gift2NameSecond').value);
+        if (dateVal) formData.append('cal_date', dateVal);
+        formData.append('message', document.getElementById('gift2Message').value);
+        formData.append('signed', document.getElementById('gift2Signed').value);
+
+        fetch(CARD_STEP6_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                },
+                body: formData,
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Save failed');
+                return res.json();
+            })
+            .then(data => {
+                (data.photo_urls || []).forEach((url, i) => {
+                    if (!url) return;
+                    if (giftPhotoUrls.gift2[i] && giftPhotoUrls.gift2[i].startsWith('blob:')) {
+                        URL.revokeObjectURL(giftPhotoUrls.gift2[i]);
+                    }
+                    giftPhotoUrls.gift2[i] = url;
+                    giftPhotoFiles.gift2[i] = null;
+                });
+                nextStep();
+            })
+            .catch(() => {
+                const errorEl = document.getElementById('step6Error');
+                errorEl.textContent = 'Could not save. Please try again.';
+                errorEl.style.display = 'block';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            });
     }
 
     // ── Step 2: PIN input (single "DD-MM" field) ────────────
@@ -3286,10 +3859,6 @@ It all started the day I first saw your smile. I knew right then that something 
         document.getElementById('sidebarGirl').className = 'theme-btn' + (t === 'girl' ? ' active-girl' : '');
         document.getElementById('boyCard').classList.toggle('selected', t === 'boy');
         document.getElementById('girlCard').classList.toggle('selected', t === 'girl');
-        document.querySelector('.preview-header').style.background =
-            t === 'boy' ?
-            'linear-gradient(135deg, #4f8ef7, #90b9ff)' :
-            'linear-gradient(135deg, #f76fa1, #ff9dcd)';
         document.querySelector('.generate-btn').style.background =
             t === 'boy' ?
             'linear-gradient(135deg, #4f8ef7, #90b9ff)' :
@@ -3303,20 +3872,6 @@ It all started the day I first saw your smile. I knew right then that something 
         const mon = String(d.getMonth() + 1).padStart(2, '0');
         const yr = d.getFullYear();
         document.getElementById('lockCodeDisplay').textContent = day + mon + yr;
-    }
-
-    function updatePreview() {
-        const name = document.getElementById('recipientName').value || 'Birthday Star';
-        const msg = document.getElementById('welcomeMsg').value;
-        document.getElementById('previewName').textContent = 'Happy Birthday, ' + name + '! 🎉';
-        document.getElementById('previewMsg').textContent = msg;
-    }
-
-    function switchGift(n, el) {
-        document.querySelectorAll('.gift-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.gift-panel').forEach(p => p.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('gift' + n).classList.add('active');
     }
 
     function generateCard() {
@@ -3358,6 +3913,46 @@ It all started the day I first saw your smile. I knew right then that something 
         if (savedPin) {
             setPinValue(savedPin);
         }
+
+        const savedHeading = @json($card->heading ?? null);
+        const savedMessage = @json($card->welcome_message ?? null);
+        if (savedHeading) document.getElementById('step3Heading').value = savedHeading;
+        if (savedMessage) document.getElementById('step3Message').value = savedMessage;
+
+        if (selectedGiftVariant) {
+            document.getElementById('giftVariant' + selectedGiftVariant).classList.add('selected');
+        }
+
+        if (selectedGift1Theme) {
+            document.getElementById('gift1Theme' + selectedGift1Theme).classList.add('selected');
+        }
+        giftPhotoUrls.gift1.forEach((url, i) => {
+            if (!url) return;
+            document.getElementById('gift1PhotoPreview' + i).src = url;
+            document.getElementById('gift1Slot' + i).classList.add('filled');
+        });
+
+        if (selectedGift2Theme) {
+            document.getElementById('gift2Theme' + selectedGift2Theme).classList.add('selected');
+        }
+        giftPhotoUrls.gift2.forEach((url, i) => {
+            if (!url) return;
+            document.getElementById('gift2PhotoPreview' + i).src = url;
+            const slot = document.getElementById('gift2Slot' + i) || document.getElementById('gift2Slot' + i +
+                'Wrap');
+            slot.classList.add('filled');
+        });
+        const savedGift2 = @json($card->gift2_data ?? null);
+        if (savedGift2) {
+            if (savedGift2.name_first) document.getElementById('gift2NameFirst').value = savedGift2.name_first;
+            if (savedGift2.name_second) document.getElementById('gift2NameSecond').value = savedGift2
+                .name_second;
+            if (savedGift2.cal_date) document.getElementById('gift2CalDate').value = savedGift2.cal_date;
+            if (savedGift2.message) document.getElementById('gift2Message').value = savedGift2.message;
+            if (savedGift2.signed) document.getElementById('gift2Signed').value = savedGift2.signed;
+        }
+
+        updateGift2FieldsVisibility();
     });
     </script>
 </body>

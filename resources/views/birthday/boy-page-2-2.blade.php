@@ -211,6 +211,7 @@
             font-style: italic;
             line-height: 1.7;
             margin-bottom: 30px;
+            white-space: pre-line;
         }
 
         /* button */
@@ -296,8 +297,7 @@
         </div>
 
         <div class="bb-title">
-            Happy Birthday
-            <em>King</em>
+            <em>{{ request('heading', 'Happy Birthday King') }}</em>
         </div>
 
         <div class="bb-divider">
@@ -306,10 +306,7 @@
             <div class="bb-div-line"></div>
         </div>
 
-        <div class="bb-msg">
-            You are the main character today.<br>
-            Everything is built around your moment ✨
-        </div>
+        <div class="bb-msg">{{ request('message', "You are the main character today.\nEverything is built around your moment ✨") }}</div>
 
         <button class="bb-next">NEXT →</button>
 

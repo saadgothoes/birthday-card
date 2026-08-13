@@ -240,6 +240,7 @@
             color: rgba(255, 235, 242, 0.88);
 
             margin-bottom: 38px;
+            white-space: pre-line;
         }
 
         .gb-next {
@@ -401,8 +402,7 @@
         </div>
 
         <div class="gb-title">
-            Happy Birthday
-            <em>Princess</em>
+            <em>{{ request('heading', 'Happy Birthday Princess') }}</em>
         </div>
 
         <div class="gb-divider">
@@ -411,10 +411,7 @@
             <div class="gb-div-line"></div>
         </div>
 
-        <p class="gb-msg">
-            In this dark little universe,<br>
-            you are the softest light in my life ✨
-        </p>
+        <p class="gb-msg">{{ request('message', "In this dark little universe,\nyou are the softest light in my life ✨") }}</p>
 
         <button class="gb-next">NEXT</button>
 

@@ -76,4 +76,126 @@ class BirthdayCardController extends Controller
             'profile_image_url' => $card->profile_image_path ? Storage::url($card->profile_image_path) : null,
         ]);
     }
+
+    // Step 3 — save welcome screen heading + message
+    public function saveStep3(Request $request)
+    {
+        $data = $request->validate([
+            'heading' => 'nullable|string|max:255',
+            'message' => 'nullable|string|max:2000',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->heading = $data['heading'] ?? null;
+        $card->welcome_message = $data['message'] ?? null;
+        $card->current_step = max($card->current_step, 4);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+        ]);
+    }
+
+    // Step 4 — save which gift-box screen design was chosen
+    public function saveStep4(Request $request)
+    {
+        $data = $request->validate([
+            'gift_screen_variant' => 'required|integer|in:1,2',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->gift_screen_variant = $data['gift_screen_variant'];
+        $card->current_step = max($card->current_step, 5);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+        ]);
+    }
+
+    // Step 5 — Gift 1: theme choice (1-4) + up to 3 photos
+    public function saveStep5(Request $request)
+    {
+        $data = $request->validate([
+            'theme' => 'required|integer|in:1,2,3,4',
+            'photos' => 'nullable|array|max:3',
+            'photos.*' => 'nullable|image|max:5120',
+        ]);
+
+        $card = $this->currentDraft();
+        $existing = $card->gift1_data ?? [];
+        $photos = $existing['photos'] ?? [null, null, null];
+
+        foreach ($request->file('photos', []) as $i => $file) {
+            if (! $file) {
+                continue;
+            }
+            if (! empty($photos[$i])) {
+                Storage::disk('public')->delete($photos[$i]);
+            }
+            $photos[$i] = $file->store('birthday-cards/gift1', 'public');
+        }
+
+        $card->gift1_data = [
+            'theme' => (int) $data['theme'],
+            'photos' => $photos,
+        ];
+        $card->current_step = max($card->current_step, 6);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+        ]);
+    }
+
+    // Step 6 — Gift 2: theme choice (1-4) + up to 4 photos + names + date + note
+    public function saveStep6(Request $request)
+    {
+        $data = $request->validate([
+            'theme' => 'required|integer|in:1,2,3,4',
+            'photos' => 'nullable|array|max:4',
+            'photos.*' => 'nullable|image|max:5120',
+            'name_first' => 'nullable|string|max:100',
+            'name_second' => 'nullable|string|max:100',
+            'cal_date' => 'nullable|date',
+            'message' => 'nullable|string|max:2000',
+            'signed' => 'nullable|string|max:100',
+        ]);
+
+        $card = $this->currentDraft();
+        $existing = $card->gift2_data ?? [];
+        $photos = $existing['photos'] ?? [null, null, null, null];
+
+        foreach ($request->file('photos', []) as $i => $file) {
+            if (! $file) {
+                continue;
+            }
+            if (! empty($photos[$i])) {
+                Storage::disk('public')->delete($photos[$i]);
+            }
+            $photos[$i] = $file->store('birthday-cards/gift2', 'public');
+        }
+
+        $card->gift2_data = [
+            'theme' => (int) $data['theme'],
+            'photos' => $photos,
+            'name_first' => $data['name_first'] ?? null,
+            'name_second' => $data['name_second'] ?? null,
+            'cal_date' => $data['cal_date'] ?? null,
+            'message' => $data['message'] ?? null,
+            'signed' => $data['signed'] ?? null,
+        ];
+        $card->current_step = max($card->current_step, 7);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+        ]);
+    }
 }

@@ -865,6 +865,10 @@
             <!-- Polaroid 1 – couple dancing dark scene -->
             <div class="pol pol1">
                 <div class="pol-inner">
+                    @if(request('photo1'))
+                    <img src="{{ request('photo1') }}" alt=""
+                        style="width:100%;height:100%;object-fit:cover;display:block;">
+                    @else
                     <svg viewbox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
                         <rect fill="#1a0f0a" height="118" width="118"></rect>
                         <circle cx="25" cy="18" fill="#ff9900" opacity="0.22" r="10"></circle>
@@ -885,11 +889,16 @@
                         <rect fill="#8B6B4A" height="18" rx="3" width="7" x="81" y="85"></rect>
                         <ellipse cx="59" cy="66" fill="#c8a882" opacity="0.8" rx="5" ry="4"></ellipse>
                     </svg>
+                    @endif
                 </div>
             </div>
             <!-- Polaroid 2 – restaurant -->
             <div class="pol pol2">
                 <div class="pol-inner">
+                    @if(request('photo2'))
+                    <img src="{{ request('photo2') }}" alt=""
+                        style="width:100%;height:100%;object-fit:cover;display:block;">
+                    @else
                     <svg viewbox="0 0 124 124" xmlns="http://www.w3.org/2000/svg">
                         <rect fill="#2a1a0e" height="124" width="124"></rect>
                         <circle cx="95" cy="25" fill="#ff9900" opacity="0.28" r="16"></circle>
@@ -907,11 +916,16 @@
                         <rect fill="#4a3020" height="18" rx="3" width="9" x="52" y="95"></rect>
                         <rect fill="#4a3020" height="18" rx="3" width="9" x="63" y="95"></rect>
                     </svg>
+                    @endif
                 </div>
             </div>
             <!-- Polaroid 3 – solo close-up -->
             <div class="pol pol3">
                 <div class="pol-inner">
+                    @if(request('photo3'))
+                    <img src="{{ request('photo3') }}" alt=""
+                        style="width:100%;height:100%;object-fit:cover;display:block;">
+                    @else
                     <svg viewbox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
                         <rect fill="#1e1408" height="108" width="108"></rect>
                         <circle cx="54" cy="20" fill="#ff8800" opacity="0.15" r="22"></circle>
@@ -928,6 +942,7 @@
                         <rect fill="#4a3020" height="10" rx="3" width="8" x="42" y="96"></rect>
                         <rect fill="#4a3020" height="10" rx="3" width="8" x="58" y="96"></rect>
                     </svg>
+                    @endif
                 </div>
             </div>
             <div class="cap-love">i love you &lt;3</div>

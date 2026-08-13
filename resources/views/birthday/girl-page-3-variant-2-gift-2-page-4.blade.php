@@ -1176,21 +1176,21 @@
                 <div class="stage-dim" id="stageDim"></div>
 
                 <div class="polaroid" id="photo0" style="--tilt:-7deg"
-                    data-src="https://picsum.photos/seed/giftphoto1/500/560" tabindex="0" role="button"
+                    data-src="{{ request('photo1', 'https://picsum.photos/seed/giftphoto1/500/560') }}" tabindex="0" role="button"
                     aria-label="View memory one">
-                    <img src="https://picsum.photos/seed/giftphoto1/500/560" alt="A cherished memory">
+                    <img src="{{ request('photo1', 'https://picsum.photos/seed/giftphoto1/500/560') }}" alt="A cherished memory">
                     <p class="polaroid-cap">memory one</p>
                 </div>
                 <div class="polaroid" id="photo1" style="--tilt:5deg"
-                    data-src="https://picsum.photos/seed/giftphoto2/500/560" tabindex="0" role="button"
+                    data-src="{{ request('photo2', 'https://picsum.photos/seed/giftphoto2/500/560') }}" tabindex="0" role="button"
                     aria-label="View memory two">
-                    <img src="https://picsum.photos/seed/giftphoto2/500/560" alt="A cherished memory">
+                    <img src="{{ request('photo2', 'https://picsum.photos/seed/giftphoto2/500/560') }}" alt="A cherished memory">
                     <p class="polaroid-cap">memory two</p>
                 </div>
                 <div class="polaroid" id="photo2" style="--tilt:-4deg"
-                    data-src="https://picsum.photos/seed/giftphoto3/500/560" tabindex="0" role="button"
+                    data-src="{{ request('photo3', 'https://picsum.photos/seed/giftphoto3/500/560') }}" tabindex="0" role="button"
                     aria-label="View memory three">
-                    <img src="https://picsum.photos/seed/giftphoto3/500/560" alt="A cherished memory">
+                    <img src="{{ request('photo3', 'https://picsum.photos/seed/giftphoto3/500/560') }}" alt="A cherished memory">
                     <p class="polaroid-cap">memory three</p>
                 </div>
 
@@ -1498,19 +1498,12 @@
             /* ===================================================================================
                HANDWRITING ENGINE — pen-style character reveal, not a typewriter
             =================================================================================== */
-            const LETTER_TEXT = [
-                'Dear Love,',
-                '',
-                'Every day with you makes my life more beautiful.',
-                '',
-                'Thank you for every smile,',
-                'every memory,',
-                'every moment.',
-                '',
-                'You are my favorite chapter.',
-                '',
-                '\u2764'
-            ];
+            @php
+                $letterLines = request('message')
+                    ? preg_split('/\r\n|\r|\n/', request('message'))
+                    : ['Dear Love,', '', 'Every day with you makes my life more beautiful.', '', 'Thank you for every smile,', 'every memory,', 'every moment.', '', 'You are my favorite chapter.', '', "\u{2764}"];
+            @endphp
+            const LETTER_TEXT = @json($letterLines);
 
             const penTip = createEl('span', 'pen-tip', letterPaper);
 

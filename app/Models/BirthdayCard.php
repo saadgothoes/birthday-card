@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
     'user_id',
     'theme',
     'variant',
+    'heading',
     'dob',
     'lock_code',
     'lock_hint',
@@ -17,6 +18,9 @@ use Illuminate\Database\Eloquent\Model;
     'welcome_message',
     'profile_image_path',
     'gifts',
+    'gift_screen_variant',
+    'gift1_data',
+    'gift2_data',
     'current_step',
     'slug',
     'is_published',
@@ -28,6 +32,8 @@ class BirthdayCard extends Model
         return [
             'dob' => 'date',
             'gifts' => 'array',
+            'gift1_data' => 'array',
+            'gift2_data' => 'array',
             'is_published' => 'boolean',
         ];
     }

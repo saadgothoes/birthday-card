@@ -160,6 +160,7 @@
             line-height: 1.7;
             max-width: 360px;
             margin: 0 0 clamp(24px, 5vw, 36px);
+            white-space: pre-line;
         }
 
         .bb-next {
@@ -323,8 +324,7 @@
         </div>
 
         <div class="bb-title">
-            Happy Birthday
-            <em>My Love</em>
+            <em>{{ request('heading', 'Happy Birthday My Love') }}</em>
         </div>
 
         <div class="bb-divider">
@@ -333,7 +333,7 @@
             <div class="bb-div-line"></div>
         </div>
 
-        <p class="bb-msg">You are my favourite person in this world.<br>Today is all yours, my king. 🕯️</p>
+        <p class="bb-msg">{{ request('message', "You are my favourite person in this world.\nToday is all yours, my king. 🕯️") }}</p>
 
         <button class="bb-next">NEXT</button>
     </div>
