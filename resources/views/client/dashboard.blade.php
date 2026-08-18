@@ -1224,6 +1224,125 @@
         margin-top: 1.4rem;
     }
 
+    .gift3-field-row {
+        margin-top: 1.4rem;
+    }
+
+    /* Gift 3 is a portrait book sized off the viewport height, so a 900x562
+       desktop-shaped iframe would leave it floating tiny in the middle.
+       Render its thumbs and preview in a phone-shaped viewport instead. */
+    .gift3-thumb {
+        aspect-ratio: 7 / 11;
+    }
+
+    .gift3-thumb iframe,
+    .gift3-preview iframe {
+        width: 460px;
+        height: 723px;
+    }
+
+    .gift3-preview {
+        aspect-ratio: 7 / 11;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* ── Gift 3 book-page sub-wizard ──────────────────────────
+       The book has 10 pages; showing every page's fields at once would
+       bury Step 7 under ~35 inputs. One book page is shown at a time. */
+    .book-step-dots {
+        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.1rem;
+    }
+
+    .book-step-dots span {
+        width: 28px;
+        height: 5px;
+        border-radius: 100px;
+        background: var(--border);
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .book-step-dots span.done {
+        background: var(--accent-soft);
+    }
+
+    .book-step-dots span.active {
+        background: var(--accent);
+    }
+
+    .book-step-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 1rem;
+    }
+
+    .book-step-head h4 {
+        margin: 0;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.05rem;
+    }
+
+    .book-step-count {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--accent);
+        background: var(--accent-soft);
+        border-radius: 100px;
+        padding: 0.3rem 0.8rem;
+        white-space: nowrap;
+    }
+
+    .book-page-panel {
+        display: none;
+    }
+
+    .book-page-panel.active {
+        display: block;
+    }
+
+    .book-page-nav {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.8rem;
+        margin-top: 1.3rem;
+    }
+
+    .book-photo-slots {
+        grid-template-columns: repeat(auto-fill, minmax(0, 116px));
+    }
+
+    .checklist-row {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .checklist-row input[type="text"] {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .checklist-row .done-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
     /* Book preview */
     .book-preview {
         background: #fdf4e7;
@@ -2273,6 +2392,13 @@
             <div class="step-item" onclick="goToStep(7)">
                 <div class="step-num" id="sn7">7</div>
                 <div>
+                    <div class="step-label">Gift 3</div>
+                    <div class="step-sub">Story book, page by page</div>
+                </div>
+            </div>
+            <div class="step-item" onclick="goToStep(8)">
+                <div class="step-num" id="sn8">8</div>
+                <div>
                     <div class="step-label">Generate & Share</div>
                     <div class="step-sub">URL & QR code</div>
                 </div>
@@ -2835,8 +2961,230 @@
                 </div>
             </div>
 
-            <!-- ── STEP 7: Generate ── -->
+            <!-- ── STEP 7: Gift 3 — the "Our Story" book ── -->
+            @php
+                // One entry per page of the book, in book order. The wizard
+                // reveals exactly one of these at a time so the 10-page book
+                // doesn't turn Step 7 into a wall of ~35 inputs.
+                // Every default is the template's own original text, so a
+                // client who changes nothing still gets a complete book.
+                // (The closed cover is deliberately not editable.)
+                $gift3Pages = [
+                    [
+                        'title' => 'Title Page',
+                        'fields' => [
+                            ['key' => 'eyebrow', 'label' => 'Book Title', 'default' => 'Our Story'],
+                            ['key' => 'from_name', 'label' => 'Made By', 'default' => 'Emma'],
+                            ['key' => 'to_name', 'label' => 'For', 'default' => 'Lucas'],
+                        ],
+                    ],
+                    [
+                        'title' => 'The Big Photo',
+                        'fields' => [
+                            ['key' => 'photo1', 'type' => 'photo', 'index' => 0, 'label' => 'Photo'],
+                            ['key' => 'caption', 'label' => 'Caption', 'default' => 'The day everything changed.'],
+                        ],
+                    ],
+                    [
+                        'title' => 'A Memory',
+                        'fields' => [
+                            ['key' => 'photo2', 'type' => 'photo', 'index' => 1, 'label' => 'Photo'],
+                            ['key' => 'memory_text', 'label' => 'Handwritten Note', 'default' => '"I still remember that smile."'],
+                        ],
+                    ],
+                    [
+                        'title' => 'Polaroids',
+                        'fields' => [
+                            ['key' => 'polaroid_label', 'label' => 'Page Title', 'default' => 'A few of my favorites'],
+                            ['key' => 'photo3', 'type' => 'photo', 'index' => 2, 'label' => 'Polaroid 1'],
+                            ['key' => 'note1', 'label' => 'Polaroid 1 Caption', 'default' => 'us :)'],
+                            ['key' => 'photo4', 'type' => 'photo', 'index' => 3, 'label' => 'Polaroid 2'],
+                            ['key' => 'note2', 'label' => 'Polaroid 2 Caption', 'default' => 'that day'],
+                            ['key' => 'photo5', 'type' => 'photo', 'index' => 4, 'label' => 'Polaroid 3'],
+                            ['key' => 'note3', 'label' => 'Polaroid 3 Caption', 'default' => 'forever'],
+                        ],
+                    ],
+                    [
+                        'title' => 'The Letter',
+                        'fields' => [
+                            ['key' => 'letter_label', 'label' => 'Page Title', 'default' => 'A letter for you'],
+                            ['key' => 'letter', 'type' => 'textarea', 'label' => 'Letter', 'default' => "Dear Love,\n\nThank you for making every ordinary day feel special.\n\nI love you."],
+                            ['key' => 'envelope_hint', 'label' => 'Envelope Hint', 'default' => 'Tap the envelope'],
+                        ],
+                    ],
+                    [
+                        'title' => 'Special Dates',
+                        'fields' => [
+                            ['key' => 'dates_label', 'label' => 'Page Title', 'default' => 'Special Dates'],
+                            ['key' => 'date1_name', 'label' => 'Date 1', 'default' => 'First Meet'],
+                            ['key' => 'date1_value', 'label' => 'Date 1 — when', 'default' => '', 'placeholder' => 'e.g. 12 March 2020 (optional)'],
+                            ['key' => 'date2_name', 'label' => 'Date 2', 'default' => 'First Call'],
+                            ['key' => 'date2_value', 'label' => 'Date 2 — when', 'default' => '', 'placeholder' => 'e.g. 3 April 2020 (optional)'],
+                            ['key' => 'date3_name', 'label' => 'Date 3', 'default' => 'First Date'],
+                            ['key' => 'date3_value', 'label' => 'Date 3 — when', 'default' => '', 'placeholder' => 'e.g. 21 June 2020 (optional)'],
+                            ['key' => 'date4_name', 'label' => 'Date 4', 'default' => 'Anniversary'],
+                            ['key' => 'date4_value', 'label' => 'Date 4 — when', 'default' => '', 'placeholder' => 'e.g. 14 Feb (optional)'],
+                        ],
+                    ],
+                    [
+                        'title' => 'Future Dreams',
+                        'fields' => [
+                            ['key' => 'dreams_label', 'label' => 'Page Title', 'default' => 'Future Dreams'],
+                            ['key' => 'dream1', 'type' => 'check', 'label' => 'Dream 1', 'default' => 'First Coffee', 'done' => true],
+                            ['key' => 'dream2', 'type' => 'check', 'label' => 'Dream 2', 'default' => 'First Selfie', 'done' => true],
+                            ['key' => 'dream3', 'type' => 'check', 'label' => 'Dream 3', 'default' => 'First Trip', 'done' => true],
+                            ['key' => 'dream4', 'type' => 'check', 'label' => 'Dream 4', 'default' => 'Endless Laughs', 'done' => true],
+                            ['key' => 'dream5', 'type' => 'check', 'label' => 'Dream 5', 'default' => 'Grow Old Together', 'done' => false],
+                        ],
+                    ],
+                    [
+                        'title' => 'Favourite Quote',
+                        'fields' => [
+                            ['key' => 'quote', 'type' => 'textarea', 'label' => 'Quote', 'default' => 'Every love story is beautiful, but ours is my favorite.'],
+                        ],
+                    ],
+                    [
+                        'title' => 'The Secret Page',
+                        'fields' => [
+                            ['key' => 'secret_label', 'label' => 'Ribbon Hint', 'default' => 'Pull the ribbon down'],
+                            ['key' => 'secret_message', 'label' => 'Hidden Message', 'default' => 'You found the secret page ❤'],
+                        ],
+                    ],
+                    [
+                        'title' => 'The Last Page',
+                        'fields' => [
+                            ['key' => 'final_line1', 'label' => 'Closing Line 1', 'default' => "This isn't the end..."],
+                            ['key' => 'final_line2', 'label' => 'Closing Line 2', 'default' => "It's just the beginning."],
+                            ['key' => 'replay_label', 'label' => 'Replay Button', 'default' => 'Replay Story'],
+                        ],
+                    ],
+                ];
+                $gift3PageCount = count($gift3Pages);
+            @endphp
             <div class="step-panel" id="panel7">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📖</div>
+                        <div class="card-title">
+                            <h3>Gift 3 — Our Story Book</h3>
+                            <p>Pick a style, then fill the book one page at a time</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <h4>Choose a Theme</h4>
+                            <div class="variant-grid" id="gift3ThemeGrid">
+                                @for ($n = 1; $n <= 4; $n++)
+                                <div class="variant-choice" id="gift3Theme{{ $n }}"
+                                    onclick="selectGiftTheme(3,{{ $n }})">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb gift3-thumb">
+                                        <iframe id="gift3ThemeFrame{{ $n }}" tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Theme {{ $n }}</div>
+                                </div>
+                                @endfor
+                            </div>
+                            <p class="step7-error" id="step7Error"
+                                style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
+                                Please choose a theme to continue.</p>
+                        </div>
+
+                        <div class="gift3-field-row">
+                            <div class="book-step-dots" id="bookStepDots">
+                                @foreach ($gift3Pages as $i => $bookPage)
+                                <span onclick="goToBookPage({{ $i + 1 }})" title="{{ $bookPage['title'] }}"></span>
+                                @endforeach
+                            </div>
+
+                            @foreach ($gift3Pages as $i => $bookPage)
+                            <div class="book-page-panel" id="bookPage{{ $i + 1 }}">
+                                <div class="book-step-head">
+                                    <h4>{{ $bookPage['title'] }}</h4>
+                                    <span class="book-step-count">Book page {{ $i + 1 }} of
+                                        {{ $gift3PageCount }}</span>
+                                </div>
+
+                                @foreach ($bookPage['fields'] as $field)
+                                @php $type = $field['type'] ?? 'text'; @endphp
+
+                                @if ($type === 'photo')
+                                <div class="form-group">
+                                    <label>{{ $field['label'] }} <span style="color:#dc2626">*</span></label>
+                                    <div class="image-slots book-photo-slots">
+                                        <div class="image-slot" id="gift3Slot{{ $field['index'] }}"
+                                            onclick="document.getElementById('gift3PhotoInput{{ $field['index'] }}').click()">
+                                            <img class="slot-preview" id="gift3PhotoPreview{{ $field['index'] }}"
+                                                alt="">
+                                            <span class="slot-plus">+<span>{{ $field['label'] }}</span></span>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="gift3PhotoInput{{ $field['index'] }}" accept="image/*"
+                                        style="display:none"
+                                        onchange="onGiftPhotoSelected('gift3',{{ $field['index'] }},this)">
+                                </div>
+
+                                @elseif ($type === 'textarea')
+                                <div class="form-group">
+                                    <label>{{ $field['label'] }}</label>
+                                    <textarea id="gift3_{{ $field['key'] }}" rows="5"
+                                        oninput="updateGift3LivePreview()">{{ $field['default'] }}</textarea>
+                                </div>
+
+                                @elseif ($type === 'check')
+                                <div class="form-group">
+                                    <label>{{ $field['label'] }}</label>
+                                    <div class="checklist-row">
+                                        <input type="text" id="gift3_{{ $field['key'] }}"
+                                            value="{{ $field['default'] }}" oninput="updateGift3LivePreview()">
+                                        <label class="done-toggle">
+                                            <input type="checkbox" id="gift3_{{ $field['key'] }}_done"
+                                                @checked($field['done']) onchange="updateGift3LivePreview(true)">
+                                            Ticked
+                                        </label>
+                                    </div>
+                                </div>
+
+                                @else
+                                <div class="form-group">
+                                    <label>{{ $field['label'] }}</label>
+                                    <input type="text" id="gift3_{{ $field['key'] }}"
+                                        value="{{ $field['default'] }}"
+                                        placeholder="{{ $field['placeholder'] ?? $field['default'] }}"
+                                        oninput="updateGift3LivePreview()">
+                                </div>
+                                @endif
+
+                                @endforeach
+                            </div>
+                            @endforeach
+
+                            <div class="book-page-nav">
+                                <button class="btn-prev" id="gift3PrevPageBtn"
+                                    onclick="goToBookPage(currentBookPage - 1)">← Previous page</button>
+                                <button class="btn-next" id="gift3NextPageBtn"
+                                    onclick="goToBookPage(currentBookPage + 1)">Next page →</button>
+                            </div>
+                        </div>
+
+                        <div class="gift3-field-row">
+                            <div class="live-preview-label">Live Preview</div>
+                            <div class="live-page-preview gift3-preview">
+                                <iframe id="gift3LivePreview" src="about:blank" tabindex="-1"></iframe>
+                            </div>
+                        </div>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" onclick="prevStep()">← Back</button>
+                            <button class="btn-next" id="step7ContinueBtn" style="display:none;"
+                                onclick="saveStep7AndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── STEP 8: Generate ── -->
+            <div class="step-panel" id="panel8">
                 <div class="card">
                     <div class="card-header">
                         <div class="card-icon">✨</div>
@@ -2892,7 +3240,7 @@
 
     <script>
     let currentStep = 1;
-    const totalSteps = 7;
+    const totalSteps = 8;
     let selectedTheme = 'girl';
     let selectedVariant = @json($card->variant ?? null);
     const CARD_STEP1_URL = @json(route('client.card.step1'));
@@ -2901,6 +3249,7 @@
     const CARD_STEP4_URL = @json(route('client.card.step4'));
     const CARD_STEP5_URL = @json(route('client.card.step5'));
     const CARD_STEP6_URL = @json(route('client.card.step6'));
+    const CARD_STEP7_URL = @json(route('client.card.step7'));
     const CSRF_TOKEN = @json(csrf_token());
     let step2ImageFile = null;
     let step2ImageUrl = @json($card?->profile_image_path ? \Illuminate\Support\Facades\Storage::url($card->profile_image_path) : null);
@@ -2908,9 +3257,11 @@
 
     let selectedGift1Theme = @json($card->gift1_data['theme'] ?? null);
     let selectedGift2Theme = @json($card->gift2_data['theme'] ?? null);
+    let selectedGift3Theme = @json($card->gift3_data['theme'] ?? null);
     const giftPhotoFiles = {
         gift1: [null, null, null],
         gift2: [null, null, null, null],
+        gift3: [null, null, null, null, null],
     };
     @php
         $gift1PhotoUrls = array_map(
@@ -2921,11 +3272,25 @@
             fn ($p) => $p ? \Illuminate\Support\Facades\Storage::url($p) : null,
             $card->gift2_data['photos'] ?? [null, null, null, null]
         );
+        $gift3PhotoUrls = array_map(
+            fn ($p) => $p ? \Illuminate\Support\Facades\Storage::url($p) : null,
+            $card->gift3_data['photos'] ?? [null, null, null, null, null]
+        );
     @endphp
     const giftPhotoUrls = {
         gift1: @json($gift1PhotoUrls),
         gift2: @json($gift2PhotoUrls),
+        gift3: @json($gift3PhotoUrls),
     };
+
+    // Single source of truth for the Gift 3 field names — the save endpoint
+    // validates against these same two lists, and the book templates read
+    // them straight off the query string.
+    const GIFT3_TEXT_KEYS = @json(\App\Http\Controllers\Client\BirthdayCardController::GIFT3_TEXT_KEYS);
+    const GIFT3_FLAG_KEYS = @json(\App\Http\Controllers\Client\BirthdayCardController::GIFT3_FLAG_KEYS);
+    const GIFT3_SAVED = @json($card->gift3_data ?? null);
+    const TOTAL_BOOK_PAGES = {{ $gift3PageCount ?? 10 }};
+    let currentBookPage = 1;
 
     function closePopup() {
         document.getElementById('paymentPopup').style.display = 'none';
@@ -3026,6 +3391,11 @@
             loadGiftThemeThumbs(2);
             updateGift2FieldsVisibility();
             updateGift2LivePreview(true);
+        }
+
+        if (currentStep === 7) {
+            loadGiftThemeThumbs(3);
+            goToBookPage(currentBookPage);
         }
 
         // Close sidebar on mobile when step changes
@@ -3328,23 +3698,22 @@
         return '/' + selectedTheme + '/page/3/' + selectedGiftVariant + '/gift/' + giftNum + '/' + themePage;
     }
 
-    let gift1ThemeLoadedKey = null;
-    let gift2ThemeLoadedKey = null;
+    // Per-gift memo of the theme+gift-variant the thumbs were last built for,
+    // so revisiting a step doesn't reload four iframes for nothing.
+    const giftThemeLoadedKeys = {
+        1: null,
+        2: null,
+        3: null
+    };
 
     function loadGiftThemeThumbs(giftNum) {
         if (!selectedTheme || !selectedGiftVariant) return;
         const key = selectedTheme + '-' + selectedGiftVariant;
-        const isGift1 = giftNum === 1;
-        if (isGift1 && gift1ThemeLoadedKey === key) {
+        if (giftThemeLoadedKeys[giftNum] === key) {
             requestAnimationFrame(scaleVariantThumbs);
             return;
         }
-        if (!isGift1 && gift2ThemeLoadedKey === key) {
-            requestAnimationFrame(scaleVariantThumbs);
-            return;
-        }
-        if (isGift1) gift1ThemeLoadedKey = key;
-        else gift2ThemeLoadedKey = key;
+        giftThemeLoadedKeys[giftNum] = key;
 
         for (let n = 1; n <= 4; n++) {
             const iframe = document.getElementById('gift' + giftNum + 'ThemeFrame' + n);
@@ -3360,15 +3729,18 @@
 
     function selectGiftTheme(giftNum, n) {
         if (giftNum === 1) selectedGift1Theme = n;
-        else selectedGift2Theme = n;
+        else if (giftNum === 2) selectedGift2Theme = n;
+        else selectedGift3Theme = n;
 
         document.querySelectorAll('#gift' + giftNum + 'ThemeGrid .variant-choice').forEach(el => el.classList
             .remove('selected'));
         document.getElementById('gift' + giftNum + 'Theme' + n).classList.add('selected');
-        document.getElementById('step' + (giftNum === 1 ? 5 : 6) + 'Error').style.display = 'none';
+        // Gift 1 is step 5, Gift 2 step 6, Gift 3 step 7.
+        document.getElementById('step' + (giftNum + 4) + 'Error').style.display = 'none';
 
         if (giftNum === 1) updateGift1LivePreview(true);
-        else updateGift2LivePreview(true);
+        else if (giftNum === 2) updateGift2LivePreview(true);
+        else updateGift3LivePreview(true);
     }
 
     // ── Step 5 / Step 6: photo upload slots ─────────────────
@@ -3390,7 +3762,8 @@
         slot.classList.add('filled');
 
         if (giftKey === 'gift1') updateGift1LivePreview();
-        else updateGift2LivePreview();
+        else if (giftKey === 'gift2') updateGift2LivePreview();
+        else updateGift3LivePreview();
     }
 
     // ── Step 5: Gift 1 live preview + save ──────────────────
@@ -3555,6 +3928,150 @@
             })
             .catch(() => {
                 const errorEl = document.getElementById('step6Error');
+                errorEl.textContent = 'Could not save. Please try again.';
+                errorEl.style.display = 'block';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            });
+    }
+
+    // ── Step 7: Gift 3 — the "Our Story" book ───────────────
+    // The book is 10 pages long, so its fields are walked one book page at a
+    // time and the live preview jumps to whichever page is being edited
+    // (?preview_page=N opens the book straight to that page).
+    function goToBookPage(n) {
+        if (n < 1 || n > TOTAL_BOOK_PAGES) return;
+
+        const previous = document.getElementById('bookPage' + currentBookPage);
+        if (previous) previous.classList.remove('active');
+        currentBookPage = n;
+        document.getElementById('bookPage' + currentBookPage).classList.add('active');
+
+        document.querySelectorAll('#bookStepDots span').forEach((dot, i) => {
+            dot.classList.toggle('active', i === n - 1);
+            dot.classList.toggle('done', i < n - 1);
+        });
+
+        const onLastPage = n === TOTAL_BOOK_PAGES;
+        document.getElementById('gift3PrevPageBtn').style.visibility = n === 1 ? 'hidden' : 'visible';
+        document.getElementById('gift3NextPageBtn').style.display = onLastPage ? 'none' : '';
+        // Continue only appears once the whole book has been walked through.
+        document.getElementById('step7ContinueBtn').style.display = onLastPage ? '' : 'none';
+
+        updateGift3LivePreview(true);
+    }
+
+    function gift3Params() {
+        const params = new URLSearchParams();
+        giftPhotoUrls.gift3.forEach((url, i) => {
+            if (url) params.set('photo' + (i + 1), url);
+        });
+        GIFT3_TEXT_KEYS.forEach(key => {
+            const el = document.getElementById('gift3_' + key);
+            if (el && el.value !== '') params.set(key, el.value);
+        });
+        GIFT3_FLAG_KEYS.forEach(key => {
+            const el = document.getElementById('gift3_' + key);
+            if (el) params.set(key, el.checked ? '1' : '0');
+        });
+        return params;
+    }
+
+    let gift3DebounceTimer = null;
+
+    function updateGift3LivePreview(immediate) {
+        const frame = document.getElementById('gift3LivePreview');
+        if (!frame || !selectedGift3Theme) return;
+        clearTimeout(gift3DebounceTimer);
+        const render = () => {
+            const base = giftPageUrl(3, selectedGift3Theme);
+            if (!base) return;
+            const params = gift3Params();
+            params.set('preview_page', String(currentBookPage));
+            frame.src = base + '?' + params.toString();
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render();
+        else gift3DebounceTimer = setTimeout(render, 250);
+    }
+
+    function saveStep7AndContinue() {
+        const errorEl = document.getElementById('step7Error');
+
+        if (!selectedGift3Theme) {
+            errorEl.textContent = 'Please choose a theme to continue.';
+            errorEl.style.display = 'block';
+            document.getElementById('gift3ThemeGrid').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            return;
+        }
+
+        // All five photos are required — the book lays out a slot for each and
+        // an empty one falls back to a placeholder glyph.
+        const missing = [];
+        giftPhotoUrls.gift3.forEach((url, i) => {
+            if (!url && !giftPhotoFiles.gift3[i]) missing.push(i + 1);
+        });
+        if (missing.length) {
+            errorEl.textContent = 'Please add every photo before continuing (missing: photo ' +
+                missing.join(', ') + ').';
+            errorEl.style.display = 'block';
+            errorEl.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            return;
+        }
+
+        errorEl.style.display = 'none';
+
+        const btn = document.getElementById('step7ContinueBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        const formData = new FormData();
+        formData.append('theme', selectedGift3Theme);
+        giftPhotoFiles.gift3.forEach((file, i) => {
+            if (file) formData.append('photos[' + i + ']', file);
+        });
+        GIFT3_TEXT_KEYS.forEach(key => {
+            const el = document.getElementById('gift3_' + key);
+            if (el) formData.append(key, el.value);
+        });
+        GIFT3_FLAG_KEYS.forEach(key => {
+            const el = document.getElementById('gift3_' + key);
+            if (el) formData.append(key, el.checked ? '1' : '0');
+        });
+
+        fetch(CARD_STEP7_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                },
+                body: formData,
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Save failed');
+                return res.json();
+            })
+            .then(data => {
+                (data.photo_urls || []).forEach((url, i) => {
+                    if (!url) return;
+                    if (giftPhotoUrls.gift3[i] && giftPhotoUrls.gift3[i].startsWith('blob:')) {
+                        URL.revokeObjectURL(giftPhotoUrls.gift3[i]);
+                    }
+                    giftPhotoUrls.gift3[i] = url;
+                    giftPhotoFiles.gift3[i] = null;
+                });
+                nextStep();
+            })
+            .catch(() => {
                 errorEl.textContent = 'Could not save. Please try again.';
                 errorEl.style.display = 'block';
             })
@@ -3953,6 +4470,32 @@
         }
 
         updateGift2FieldsVisibility();
+
+        if (selectedGift3Theme) {
+            document.getElementById('gift3Theme' + selectedGift3Theme).classList.add('selected');
+        }
+        giftPhotoUrls.gift3.forEach((url, i) => {
+            if (!url) return;
+            document.getElementById('gift3PhotoPreview' + i).src = url;
+            document.getElementById('gift3Slot' + i).classList.add('filled');
+        });
+        // Fields render with the book's own default text; anything the client
+        // already saved overrides it here.
+        if (GIFT3_SAVED) {
+            GIFT3_TEXT_KEYS.forEach(key => {
+                const el = document.getElementById('gift3_' + key);
+                if (el && GIFT3_SAVED[key] !== null && GIFT3_SAVED[key] !== undefined) {
+                    el.value = GIFT3_SAVED[key];
+                }
+            });
+            GIFT3_FLAG_KEYS.forEach(key => {
+                const el = document.getElementById('gift3_' + key);
+                if (el && GIFT3_SAVED[key] !== null && GIFT3_SAVED[key] !== undefined) {
+                    el.checked = !!GIFT3_SAVED[key];
+                }
+            });
+        }
+        goToBookPage(1);
     });
     </script>
 </body>

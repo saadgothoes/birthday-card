@@ -198,4 +198,103 @@ class BirthdayCardController extends Controller
             'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
         ]);
     }
+
+    /**
+     * Every text slot in the Gift 3 book, in book-page order. Whitelisted so
+     * the stored JSON keeps a known shape, and so the dashboard, the save
+     * endpoint and the template all agree on one set of keys.
+     */
+    public const GIFT3_TEXT_KEYS = [
+        // Book page 1 — title
+        'eyebrow', 'from_name', 'to_name',
+        // Book page 2 — big photo
+        'caption',
+        // Book page 3 — memory
+        'memory_text',
+        // Book page 4 — polaroids
+        'polaroid_label', 'note1', 'note2', 'note3',
+        // Book page 5 — letter
+        'letter_label', 'letter', 'envelope_hint',
+        // Book page 6 — special dates
+        'dates_label',
+        'date1_name', 'date1_value', 'date2_name', 'date2_value',
+        'date3_name', 'date3_value', 'date4_name', 'date4_value',
+        // Book page 7 — future dreams
+        'dreams_label',
+        'dream1', 'dream2', 'dream3', 'dream4', 'dream5',
+        // Book page 8 — quote
+        'quote',
+        // Book page 9 — secret
+        'secret_label', 'secret_message',
+        // Book page 10 — final
+        'final_line1', 'final_line2', 'replay_label',
+    ];
+
+    /** Checked/unchecked state of the "Future Dreams" checklist items. */
+    public const GIFT3_FLAG_KEYS = [
+        'dream1_done', 'dream2_done', 'dream3_done', 'dream4_done', 'dream5_done',
+    ];
+
+    /**
+     * Step 7 — Gift 3: the "Our Story" book.
+     *
+     * Theme choice (1-4), the 5 photos the book lays out, and the text of
+     * all 10 of its pages. Only the closed cover stays fixed.
+     */
+    public function saveStep7(Request $request)
+    {
+        $rules = [
+            'theme' => 'required|integer|in:1,2,3,4',
+            'photos' => 'nullable|array|max:5',
+            'photos.*' => 'nullable|image|max:5120',
+            'letter' => 'nullable|string|max:2000',
+        ];
+
+        foreach (self::GIFT3_TEXT_KEYS as $key) {
+            if ($key === 'letter') {
+                continue; // already given a longer limit above
+            }
+            $rules[$key] = 'nullable|string|max:255';
+        }
+        foreach (self::GIFT3_FLAG_KEYS as $key) {
+            $rules[$key] = 'nullable|boolean';
+        }
+
+        $data = $request->validate($rules);
+
+        $card = $this->currentDraft();
+        $existing = $card->gift3_data ?? [];
+        $photos = $existing['photos'] ?? [null, null, null, null, null];
+
+        foreach ($request->file('photos', []) as $i => $file) {
+            if (! $file) {
+                continue;
+            }
+            if (! empty($photos[$i])) {
+                Storage::disk('public')->delete($photos[$i]);
+            }
+            $photos[$i] = $file->store('birthday-cards/gift3', 'public');
+        }
+
+        $gift3 = [
+            'theme' => (int) $data['theme'],
+            'photos' => $photos,
+        ];
+        foreach (self::GIFT3_TEXT_KEYS as $key) {
+            $gift3[$key] = $data[$key] ?? null;
+        }
+        foreach (self::GIFT3_FLAG_KEYS as $key) {
+            $gift3[$key] = $request->boolean($key);
+        }
+
+        $card->gift3_data = $gift3;
+        $card->current_step = max($card->current_step, 8);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+        ]);
+    }
 }

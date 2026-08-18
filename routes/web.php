@@ -56,6 +56,7 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::post('/card/step4', [BirthdayCardController::class, 'saveStep4'])->name('card.step4');
         Route::post('/card/step5', [BirthdayCardController::class, 'saveStep5'])->name('card.step5');
         Route::post('/card/step6', [BirthdayCardController::class, 'saveStep6'])->name('card.step6');
+        Route::post('/card/step7', [BirthdayCardController::class, 'saveStep7'])->name('card.step7');
     });
 
     // Password reset routes

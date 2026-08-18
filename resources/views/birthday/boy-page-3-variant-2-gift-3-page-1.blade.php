@@ -706,6 +706,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
     }
 
     .polaroid-note {
@@ -883,6 +884,17 @@
         font-family: var(--font-display);
         font-size: clamp(15px, 4vw, 18px);
         color: var(--espresso);
+    }
+
+    /* Only rendered when the client fills a date in — without it the list
+   looks exactly as it did before. */
+    .date-value {
+        margin-left: auto;
+        font-family: var(--font-body);
+        font-size: clamp(13px, 3.4vw, 15px);
+        color: var(--leather);
+        opacity: 0.85;
+        white-space: nowrap;
     }
 
     /* ---------- Page 7: Checklist ---------- */
@@ -1347,12 +1359,12 @@
                     <section class="page" data-index="0">
                         <div class="page-inner title-page">
                             <span class="heart-deco">❦</span>
-                            <p class="eyebrow">Our Story</p>
+                            <p class="eyebrow">{{ request('eyebrow', 'Our Story') }}</p>
                             <div class="title-rule"></div>
-                            <p class="made-by">Made by</p>
-                            <h2 class="name-script" id="fromName">Emma</h2>
-                            <p class="made-by">For</p>
-                            <h2 class="name-script" id="toName">Lucas</h2>
+                            <p class="made-by">{{ request('made_by_label', 'Made by') }}</p>
+                            <h2 class="name-script" id="fromName">{{ request('from_name', 'Emma') }}</h2>
+                            <p class="made-by">{{ request('for_label', 'For') }}</p>
+                            <h2 class="name-script" id="toName">{{ request('to_name', 'Lucas') }}</h2>
                             <span class="heart-deco small">❤</span>
                         </div>
                     </section>
@@ -1362,10 +1374,15 @@
                         <div class="page-inner photo-page">
                             <div class="photo-frame large">
                                 <div class="photo-placeholder" data-photo="1">
+                                    @if(request('photo1'))
+                                    <img src="{{ request('photo1') }}" alt=""
+                                        style="width:100%;height:100%;object-fit:cover;">
+                                    @else
                                     <span class="photo-icon">✦</span>
+                                    @endif
                                 </div>
                             </div>
-                            <p class="caption">The day everything changed.</p>
+                            <p class="caption">{{ request('caption', 'The day everything changed.') }}</p>
                         </div>
                     </section>
 
@@ -1374,13 +1391,19 @@
                         <div class="page-inner memory-page letter-style">
                             <div class="memory-photo">
                                 <div class="photo-placeholder small" data-photo="2">
+                                    @if(request('photo2'))
+                                    <img src="{{ request('photo2') }}" alt=""
+                                        style="width:100%;height:100%;object-fit:cover;">
+                                    @else
                                     <span class="photo-icon">✦</span>
+                                    @endif
                                 </div>
                                 <span class="doodle flower f1">✿</span>
                                 <span class="doodle heart h1">♡</span>
                             </div>
                             <div class="memory-text">
-                                <p class="handwritten">"I still remember that smile."</p>
+                                <p class="handwritten">{{ request('memory_text', '"I still remember that smile."') }}
+                                </p>
                                 <span class="doodle flower f2">✿</span>
                             </div>
                         </div>
@@ -1389,20 +1412,28 @@
                     <!-- PAGE 4 — Polaroids -->
                     <section class="page" data-index="3">
                         <div class="page-inner polaroid-page">
-                            <p class="page-label">A few of my favorites</p>
+                            <p class="page-label">{{ request('polaroid_label', 'A few of my favorites') }}</p>
+                            @php
+                                $polaroids = [
+                                    ['n' => 3, 'cls' => 'p1', 'note' => 'us :)'],
+                                    ['n' => 4, 'cls' => 'p2', 'note' => 'that day'],
+                                    ['n' => 5, 'cls' => 'p3', 'note' => 'forever'],
+                                ];
+                            @endphp
                             <div class="polaroid-stack">
-                                <div class="polaroid p1" tabindex="0" data-photo="3">
-                                    <div class="polaroid-photo"><span class="photo-icon">✦</span></div>
-                                    <span class="polaroid-note">us :)</span>
+                                @foreach($polaroids as $i => $p)
+                                <div class="polaroid {{ $p['cls'] }}" tabindex="0" data-photo="{{ $p['n'] }}">
+                                    <div class="polaroid-photo">
+                                        @if(request('photo' . $p['n']))
+                                        <img src="{{ request('photo' . $p['n']) }}" alt=""
+                                            style="width:100%;height:100%;object-fit:cover;">
+                                        @else
+                                        <span class="photo-icon">✦</span>
+                                        @endif
+                                    </div>
+                                    <span class="polaroid-note">{{ request('note' . ($i + 1), $p['note']) }}</span>
                                 </div>
-                                <div class="polaroid p2" tabindex="0" data-photo="4">
-                                    <div class="polaroid-photo"><span class="photo-icon">✦</span></div>
-                                    <span class="polaroid-note">that day</span>
-                                </div>
-                                <div class="polaroid p3" tabindex="0" data-photo="5">
-                                    <div class="polaroid-photo"><span class="photo-icon">✦</span></div>
-                                    <span class="polaroid-note">forever</span>
-                                </div>
+                                @endforeach
                             </div>
                         </div>
                     </section>
@@ -1410,21 +1441,24 @@
                     <!-- PAGE 5 — Hidden letter -->
                     <section class="page" data-index="4">
                         <div class="page-inner letter-page">
-                            <p class="page-label">A letter for you</p>
+                            <p class="page-label">{{ request('letter_label', 'A letter for you') }}</p>
                             <div class="envelope-wrap" id="envelopeWrap">
                                 <div class="envelope" id="envelope">
                                     <div class="envelope-back"></div>
                                     <div class="envelope-letter" id="envelopeLetter">
-                                        <p class="letter-text">
-                                            Dear Love,<br><br>
-                                            Thank you for making every ordinary day feel special.<br><br>
-                                            I love you.
-                                        </p>
+                                        @php
+                                            $letterText = request(
+                                                'letter',
+                                                "Dear Love,\n\nThank you for making every ordinary day feel special.\n\nI love you."
+                                            );
+                                        @endphp
+                                        <p class="letter-text">{!! nl2br(e($letterText)) !!}</p>
                                     </div>
                                     <div class="envelope-flap"></div>
                                     <div class="envelope-seal">❤</div>
                                 </div>
-                                <p class="tap-hint small" id="envelopeHint">Tap the envelope</p>
+                                <p class="tap-hint small" id="envelopeHint">{{ request('envelope_hint', 'Tap the envelope') }}
+                                </p>
                             </div>
                         </div>
                     </section>
@@ -1432,12 +1466,21 @@
                     <!-- PAGE 6 — Special dates -->
                     <section class="page" data-index="5">
                         <div class="page-inner dates-page">
-                            <p class="page-label">Special Dates</p>
+                            <p class="page-label">{{ request('dates_label', 'Special Dates') }}</p>
+                            @php
+                                $specialDates = ['First Meet', 'First Call', 'First Date', 'Anniversary'];
+                            @endphp
                             <ul class="dates-list">
-                                <li><span class="date-heart">❤</span><span class="date-name">First Meet</span></li>
-                                <li><span class="date-heart">❤</span><span class="date-name">First Call</span></li>
-                                <li><span class="date-heart">❤</span><span class="date-name">First Date</span></li>
-                                <li><span class="date-heart">❤</span><span class="date-name">Anniversary</span></li>
+                                @foreach($specialDates as $i => $dateName)
+                                @php $n = $i + 1; @endphp
+                                <li>
+                                    <span class="date-heart">❤</span>
+                                    <span class="date-name">{{ request('date' . $n . '_name', $dateName) }}</span>
+                                    @if(request('date' . $n . '_value'))
+                                    <span class="date-value">{{ request('date' . $n . '_value') }}</span>
+                                    @endif
+                                </li>
+                                @endforeach
                             </ul>
                         </div>
                     </section>
@@ -1445,13 +1488,26 @@
                     <!-- PAGE 7 — Future dreams checklist -->
                     <section class="page" data-index="6">
                         <div class="page-inner checklist-page">
-                            <p class="page-label">Future Dreams</p>
+                            <p class="page-label">{{ request('dreams_label', 'Future Dreams') }}</p>
+                            @php
+                                $dreams = [
+                                    ['text' => 'First Coffee', 'done' => true],
+                                    ['text' => 'First Selfie', 'done' => true],
+                                    ['text' => 'First Trip', 'done' => true],
+                                    ['text' => 'Endless Laughs', 'done' => true],
+                                    ['text' => 'Grow Old Together', 'done' => false],
+                                ];
+                            @endphp
                             <ul class="checklist" id="checklist">
-                                <li class="checked"><span class="box"></span><span>First Coffee</span></li>
-                                <li class="checked"><span class="box"></span><span>First Selfie</span></li>
-                                <li class="checked"><span class="box"></span><span>First Trip</span></li>
-                                <li class="checked"><span class="box"></span><span>Endless Laughs</span></li>
-                                <li><span class="box"></span><span>Grow Old Together</span></li>
+                                @foreach($dreams as $i => $dream)
+                                @php
+                                    $n = $i + 1;
+                                    $isDone = request()->has('dream' . $n . '_done')
+                                        ? filter_var(request('dream' . $n . '_done'), FILTER_VALIDATE_BOOLEAN)
+                                        : $dream['done'];
+                                @endphp
+                                <li @class(['checked' => $isDone])><span class="box"></span><span>{{ request('dream' . $n, $dream['text']) }}</span></li>
+                                @endforeach
                             </ul>
                         </div>
                     </section>
@@ -1461,8 +1517,8 @@
                         <div class="page-inner quote-page letter-style">
                             <span class="doodle flower quote-f1">✿</span>
                             <p class="quote-mark">“</p>
-                            <p class="handwritten big" id="quoteText">Every love story is beautiful, but ours is my
-                                favorite.</p>
+                            <p class="handwritten big" id="quoteText">{{ request('quote', 'Every love story is beautiful, but ours is my favorite.') }}
+                            </p>
                             <span class="doodle heart quote-h1">♡</span>
                             <span class="floating-heart fh1">♡</span>
                             <span class="floating-heart fh2">❤</span>
@@ -1472,14 +1528,14 @@
                     <!-- PAGE 9 — Secret bookmark -->
                     <section class="page" data-index="8">
                         <div class="page-inner secret-page">
-                            <p class="page-label">Pull the ribbon down</p>
+                            <p class="page-label">{{ request('secret_label', 'Pull the ribbon down') }}</p>
                             <div class="bookmark-track">
                                 <div class="bookmark" id="bookmark">
                                     <span class="bookmark-heart">❤</span>
                                 </div>
                             </div>
                             <div class="secret-message" id="secretMessage">
-                                <p>You found the secret page ❤</p>
+                                <p>{{ request('secret_message', 'You found the secret page ❤') }}</p>
                             </div>
                         </div>
                     </section>
@@ -1488,12 +1544,12 @@
                     <section class="page" data-index="9">
                         <div class="page-inner final-page">
                             <div class="confetti" id="confetti"></div>
-                            <p class="final-text">This isn't the end...</p>
-                            <p class="final-text emphasis">It's just the beginning.</p>
+                            <p class="final-text">{{ request('final_line1', "This isn't the end...") }}</p>
+                            <p class="final-text emphasis">{{ request('final_line2', "It's just the beginning.") }}</p>
                             <span class="floating-heart ff1">❤</span>
                             <span class="floating-heart ff2">♡</span>
                             <span class="floating-heart ff3">❤</span>
-                            <button class="replay-btn" id="replayBtn">Replay Story</button>
+                            <button class="replay-btn" id="replayBtn">{{ request('replay_label', 'Replay Story') }}</button>
                         </div>
                     </section>
 
@@ -1778,6 +1834,43 @@
             confettiLayer.innerHTML = '';
             confettiLaunched = false;
         });
+
+        /* ---------------- Initial page state ---------------- */
+        // The pages are absolutely stacked and only `.current` carries a
+        // z-index, so without this the last page in the DOM paints on top
+        // until the first flip.
+        pages[0].classList.add('current');
+        pages[0].style.zIndex = 10;
+
+        /* ---------------- Dashboard live-preview deep link ---------------- */
+        // ?preview_page=N opens the book straight to book page N, so the
+        // dashboard preview shows the page whose fields are being edited.
+        const previewPageParam = new URLSearchParams(window.location.search).get('preview_page');
+        if (previewPageParam !== null) {
+            const target = Math.min(lastIndex, Math.max(0, (parseInt(previewPageParam, 10) || 1) - 1));
+            book.classList.add('open');
+            nav.classList.add('open');
+            pages.forEach((p, i) => {
+                p.style.transition = 'none';
+                p.classList.remove('current', 'gone-prev', 'gone-next');
+                p.style.zIndex = '';
+                if (i < target) {
+                    p.classList.add('gone-prev');
+                    p.style.zIndex = 15;
+                } else if (i === target) {
+                    p.classList.add('current');
+                    p.style.zIndex = 10;
+                }
+            });
+            void pagesWrap.offsetWidth; // flush, then let transitions run again
+            pages.forEach((p) => {
+                p.style.transition = '';
+            });
+            currentIndex = target;
+            updateDots();
+            updateNavButtons();
+            if (currentIndex === lastIndex) launchConfetti();
+        }
 
         /* ---------------- Init ---------------- */
         updateNavButtons();
