@@ -1,6 +1,6 @@
-# Dashboard Wizard — Steps 3 to 6 (Dynamic Card Builder)
+# Dashboard Wizard — Steps 3 to 7 (Dynamic Card Builder)
 
-Work log for the client dashboard card-builder wizard: making Steps 3, 4, 5 and 6 fully
+Work log for the client dashboard card-builder wizard: making Steps 3 through 7 fully
 dynamic with real live previews, and making the underlying card templates data-driven.
 
 **Scope of this document:** the whole wizard up to and including **Gift 3 (Step 7)**.
@@ -19,7 +19,7 @@ not been started.
 
 ## 1. Database
 
-Two migrations were added.
+Three migrations were added.
 
 ### `2026_08_13_000000_add_heading_and_gift_variant_to_birthday_cards_table.php`
 
