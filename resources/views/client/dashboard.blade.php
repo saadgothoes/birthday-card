@@ -1327,6 +1327,74 @@
         gap: 0.8rem;
     }
 
+    /* Every card design is a fixed layout, so each field shows how much room
+       it has left rather than silently truncating at the maxlength. */
+    .field-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.8rem;
+    }
+
+    .char-count {
+        font-size: 0.7rem;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    .char-count.at-limit {
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    .field-hint {
+        font-size: 0.74rem;
+        color: var(--text-muted);
+        margin: 0.4rem 0 0;
+    }
+
+    .dream-remove {
+        flex: 0 0 auto;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .dream-remove:hover {
+        border-color: #dc2626;
+        color: #dc2626;
+    }
+
+    .dream-add {
+        margin-top: 0.7rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 100px;
+        border: 1px dashed var(--border);
+        background: transparent;
+        color: var(--accent);
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .dream-add:hover {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+    }
+
+    .dream-row {
+        margin-bottom: 0.6rem;
+    }
+
     .checklist-row input[type="text"] {
         flex: 1;
         min-width: 0;
@@ -2671,15 +2739,26 @@
                     <div class="card-body">
                         <div class="welcome-layout">
                             <div>
+                                @php $welcomeLimits = \App\Http\Controllers\Client\BirthdayCardController::WELCOME_LIMITS; @endphp
                                 <div class="form-group">
-                                    <label>Heading</label>
+                                    <div class="field-head">
+                                        <label>Heading</label>
+                                        <span class="char-count" data-for="step3Heading"></span>
+                                    </div>
                                     <input type="text" placeholder="e.g. Happy Birthday My Love" id="step3Heading"
+                                        maxlength="{{ $welcomeLimits['heading'] }}"
                                         oninput="updateStep3LivePreview()" />
                                 </div>
                                 <div class="form-group">
-                                    <label>Message</label>
+                                    <div class="field-head">
+                                        <label>Message</label>
+                                        <span class="char-count" data-for="step3Message"></span>
+                                    </div>
                                     <textarea placeholder="Write a heartfelt message…" id="step3Message"
+                                        maxlength="{{ $welcomeLimits['message'] }}" data-max-lines="4"
                                         oninput="updateStep3LivePreview()"></textarea>
+                                    <p class="field-hint">The welcome screen sets this in a large display face —
+                                        up to 4 short lines.</p>
                                 </div>
                                 <p class="step3-error" id="step3Error"
                                     style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.6rem;"></p>
@@ -2915,15 +2994,24 @@
                                 onchange="onGiftPhotoSelected('gift2',3,this)">
                         </div>
 
+                        @php $gift2Limits = \App\Http\Controllers\Client\BirthdayCardController::GIFT2_LIMITS; @endphp
                         <div class="form-row gift2-field-row" id="gift2NamesRow">
                             <div class="form-group">
-                                <label>Name 1</label>
+                                <div class="field-head">
+                                    <label>Name 1</label>
+                                    <span class="char-count" data-for="gift2NameFirst"></span>
+                                </div>
                                 <input type="text" id="gift2NameFirst" placeholder="e.g. Emma"
+                                    maxlength="{{ $gift2Limits['name_first'] }}"
                                     oninput="updateGift2LivePreview()">
                             </div>
                             <div class="form-group">
-                                <label>Name 2</label>
+                                <div class="field-head">
+                                    <label>Name 2</label>
+                                    <span class="char-count" data-for="gift2NameSecond"></span>
+                                </div>
                                 <input type="text" id="gift2NameSecond" placeholder="e.g. Lucas"
+                                    maxlength="{{ $gift2Limits['name_second'] }}"
                                     oninput="updateGift2LivePreview()">
                             </div>
                         </div>
@@ -2934,14 +3022,25 @@
                         </div>
 
                         <div class="form-group gift2-field-row">
-                            <label>Message</label>
+                            <div class="field-head">
+                                <label>Message</label>
+                                <span class="char-count" data-for="gift2Message"></span>
+                            </div>
+                            {{-- The boy design drops this into a fixed note panel; the girl one
+                                 writes it out on a taller letter sheet. The limit follows the
+                                 chosen theme (see setGift2MessageLimit). --}}
                             <textarea id="gift2Message" placeholder="Write a heartfelt note…"
+                                maxlength="{{ $gift2Limits['message_boy'] }}"
                                 oninput="updateGift2LivePreview()"></textarea>
                         </div>
 
                         <div class="form-group gift2-field-row" id="gift2SignedGroup">
-                            <label>Signed</label>
+                            <div class="field-head">
+                                <label>Signed</label>
+                                <span class="char-count" data-for="gift2Signed"></span>
+                            </div>
                             <input type="text" id="gift2Signed" placeholder="e.g. — always, E"
+                                maxlength="{{ $gift2Limits['signed'] }}"
                                 oninput="updateGift2LivePreview()">
                         </div>
 
@@ -2969,6 +3068,14 @@
                 // Every default is the template's own original text, so a
                 // client who changes nothing still gets a complete book.
                 // (The closed cover is deliberately not editable.)
+                //
+                // Field lengths come from the controller, which derives each
+                // one from the room that slot actually has in the design.
+                $gift3Limits = \App\Http\Controllers\Client\BirthdayCardController::GIFT3_TEXT_LIMITS;
+                $gift3MinDreams = \App\Http\Controllers\Client\BirthdayCardController::GIFT3_MIN_DREAMS;
+                $gift3MaxDreams = \App\Http\Controllers\Client\BirthdayCardController::GIFT3_MAX_DREAMS;
+                $gift3LetterLines = \App\Http\Controllers\Client\BirthdayCardController::GIFT3_LETTER_MAX_LINES;
+
                 $gift3Pages = [
                     [
                         'title' => 'Title Page',
@@ -2989,7 +3096,12 @@
                         'title' => 'A Memory',
                         'fields' => [
                             ['key' => 'photo2', 'type' => 'photo', 'index' => 1, 'label' => 'Photo'],
-                            ['key' => 'memory_text', 'label' => 'Handwritten Note', 'default' => '"I still remember that smile."'],
+                            [
+                                'key' => 'memory_text',
+                                'label' => 'Handwritten Note',
+                                'default' => '"I still remember that smile."',
+                                'hint' => 'Sits in a narrow column beside the photo, so it stays short.',
+                            ],
                         ],
                     ],
                     [
@@ -3008,7 +3120,15 @@
                         'title' => 'The Letter',
                         'fields' => [
                             ['key' => 'letter_label', 'label' => 'Page Title', 'default' => 'A letter for you'],
-                            ['key' => 'letter', 'type' => 'textarea', 'label' => 'Letter', 'default' => "Dear Love,\n\nThank you for making every ordinary day feel special.\n\nI love you."],
+                            [
+                                'key' => 'letter',
+                                'type' => 'textarea',
+                                'label' => 'Letter',
+                                'default' => "Dear Love,\n\nThank you for making every ordinary day feel special.\n\nI love you.",
+                                'rows' => 6,
+                                'maxLines' => $gift3LetterLines,
+                                'hint' => 'Fits the letter paper — up to ' . $gift3LetterLines . ' lines. Longer notes are set in a smaller hand automatically.',
+                            ],
                             ['key' => 'envelope_hint', 'label' => 'Envelope Hint', 'default' => 'Tap the envelope'],
                         ],
                     ],
@@ -3016,37 +3136,50 @@
                         'title' => 'Special Dates',
                         'fields' => [
                             ['key' => 'dates_label', 'label' => 'Page Title', 'default' => 'Special Dates'],
-                            ['key' => 'date1_name', 'label' => 'Date 1', 'default' => 'First Meet'],
-                            ['key' => 'date1_value', 'label' => 'Date 1 — when', 'default' => '', 'placeholder' => 'e.g. 12 March 2020 (optional)'],
-                            ['key' => 'date2_name', 'label' => 'Date 2', 'default' => 'First Call'],
-                            ['key' => 'date2_value', 'label' => 'Date 2 — when', 'default' => '', 'placeholder' => 'e.g. 3 April 2020 (optional)'],
-                            ['key' => 'date3_name', 'label' => 'Date 3', 'default' => 'First Date'],
-                            ['key' => 'date3_value', 'label' => 'Date 3 — when', 'default' => '', 'placeholder' => 'e.g. 21 June 2020 (optional)'],
-                            ['key' => 'date4_name', 'label' => 'Date 4', 'default' => 'Anniversary'],
-                            ['key' => 'date4_value', 'label' => 'Date 4 — when', 'default' => '', 'placeholder' => 'e.g. 14 Feb (optional)'],
+                            ['key' => 'date1_name', 'label' => 'Date 1 Title', 'default' => 'First Meet'],
+                            ['key' => 'date1_value', 'type' => 'date', 'label' => 'Date 1'],
+                            ['key' => 'date2_name', 'label' => 'Date 2 Title', 'default' => 'First Call'],
+                            ['key' => 'date2_value', 'type' => 'date', 'label' => 'Date 2'],
+                            ['key' => 'date3_name', 'label' => 'Date 3 Title', 'default' => 'First Date'],
+                            ['key' => 'date3_value', 'type' => 'date', 'label' => 'Date 3'],
+                            ['key' => 'date4_name', 'label' => 'Date 4 Title', 'default' => 'Anniversary'],
+                            ['key' => 'date4_value', 'type' => 'date', 'label' => 'Date 4'],
                         ],
                     ],
                     [
                         'title' => 'Future Dreams',
                         'fields' => [
                             ['key' => 'dreams_label', 'label' => 'Page Title', 'default' => 'Future Dreams'],
-                            ['key' => 'dream1', 'type' => 'check', 'label' => 'Dream 1', 'default' => 'First Coffee', 'done' => true],
-                            ['key' => 'dream2', 'type' => 'check', 'label' => 'Dream 2', 'default' => 'First Selfie', 'done' => true],
-                            ['key' => 'dream3', 'type' => 'check', 'label' => 'Dream 3', 'default' => 'First Trip', 'done' => true],
-                            ['key' => 'dream4', 'type' => 'check', 'label' => 'Dream 4', 'default' => 'Endless Laughs', 'done' => true],
-                            ['key' => 'dream5', 'type' => 'check', 'label' => 'Dream 5', 'default' => 'Grow Old Together', 'done' => false],
+                            [
+                                'type' => 'dreams',
+                                'label' => 'Dreams',
+                                'defaults' => [
+                                    ['text' => 'First Coffee', 'done' => true],
+                                    ['text' => 'First Selfie', 'done' => true],
+                                    ['text' => 'First Trip', 'done' => true],
+                                    ['text' => 'Grow Old Together', 'done' => false],
+                                ],
+                            ],
                         ],
                     ],
                     [
                         'title' => 'Favourite Quote',
                         'fields' => [
-                            ['key' => 'quote', 'type' => 'textarea', 'label' => 'Quote', 'default' => 'Every love story is beautiful, but ours is my favorite.'],
+                            [
+                                'key' => 'quote',
+                                'type' => 'textarea',
+                                'label' => 'Quote',
+                                'default' => 'Every love story is beautiful, but ours is my favorite.',
+                                'rows' => 3,
+                                'hint' => 'Written out by hand on the page, a letter at a time.',
+                            ],
                         ],
                     ],
                     [
                         'title' => 'The Secret Page',
                         'fields' => [
                             ['key' => 'secret_label', 'label' => 'Ribbon Hint', 'default' => 'Pull the ribbon down'],
+                            ['key' => 'secret_button', 'label' => 'Button Label', 'default' => 'Click to Open'],
                             ['key' => 'secret_message', 'label' => 'Hidden Message', 'default' => 'You found the secret page ❤'],
                         ],
                     ],
@@ -3056,6 +3189,7 @@
                             ['key' => 'final_line1', 'label' => 'Closing Line 1', 'default' => "This isn't the end..."],
                             ['key' => 'final_line2', 'label' => 'Closing Line 2', 'default' => "It's just the beginning."],
                             ['key' => 'replay_label', 'label' => 'Replay Button', 'default' => 'Replay Story'],
+                            ['key' => 'close_label', 'label' => 'Close Button', 'default' => 'Close the Book'],
                         ],
                     ],
                 ];
@@ -3106,7 +3240,12 @@
                                 </div>
 
                                 @foreach ($bookPage['fields'] as $field)
-                                @php $type = $field['type'] ?? 'text'; @endphp
+                                @php
+                                    $type = $field['type'] ?? 'text';
+                                    $key = $field['key'] ?? null;
+                                    $limit = $key ? ($gift3Limits[$key] ?? null) : null;
+                                    $inputId = $key ? 'gift3_' . $key : null;
+                                @endphp
 
                                 @if ($type === 'photo')
                                 <div class="form-group">
@@ -3124,34 +3263,67 @@
                                         onchange="onGiftPhotoSelected('gift3',{{ $field['index'] }},this)">
                                 </div>
 
-                                @elseif ($type === 'textarea')
+                                @elseif ($type === 'date')
                                 <div class="form-group">
                                     <label>{{ $field['label'] }}</label>
-                                    <textarea id="gift3_{{ $field['key'] }}" rows="5"
-                                        oninput="updateGift3LivePreview()">{{ $field['default'] }}</textarea>
+                                    <input type="date" id="{{ $inputId }}" oninput="updateGift3LivePreview()">
+                                    <p class="field-hint">Optional — shown beside the title on the page.</p>
                                 </div>
 
-                                @elseif ($type === 'check')
+                                @elseif ($type === 'dreams')
                                 <div class="form-group">
                                     <label>{{ $field['label'] }}</label>
-                                    <div class="checklist-row">
-                                        <input type="text" id="gift3_{{ $field['key'] }}"
-                                            value="{{ $field['default'] }}" oninput="updateGift3LivePreview()">
-                                        <label class="done-toggle">
-                                            <input type="checkbox" id="gift3_{{ $field['key'] }}_done"
-                                                @checked($field['done']) onchange="updateGift3LivePreview(true)">
-                                            Ticked
-                                        </label>
+                                    <div id="dreamRows">
+                                        @foreach ($field['defaults'] as $d => $dream)
+                                        @php $n = $d + 1; @endphp
+                                        <div class="checklist-row dream-row" id="dreamRow{{ $n }}">
+                                            <input type="text" id="gift3_dream{{ $n }}"
+                                                maxlength="{{ $gift3Limits['dream' . $n] }}"
+                                                value="{{ $dream['text'] }}" oninput="updateGift3LivePreview()">
+                                            <label class="done-toggle">
+                                                <input type="checkbox" id="gift3_dream{{ $n }}_done"
+                                                    @checked($dream['done']) onchange="updateGift3LivePreview(true)">
+                                                Ticked
+                                            </label>
+                                            <button type="button" class="dream-remove"
+                                                onclick="removeDream({{ $n }})" title="Remove this dream"
+                                                aria-label="Remove dream {{ $n }}">✕</button>
+                                        </div>
+                                        @endforeach
                                     </div>
+                                    <button type="button" class="dream-add" id="dreamAddBtn"
+                                        onclick="addDream()">+ Add a dream</button>
+                                    <p class="field-hint" id="dreamHint"></p>
+                                </div>
+
+                                @elseif ($type === 'textarea')
+                                <div class="form-group">
+                                    <div class="field-head">
+                                        <label>{{ $field['label'] }}</label>
+                                        <span class="char-count" data-for="{{ $inputId }}"></span>
+                                    </div>
+                                    <textarea id="{{ $inputId }}" rows="{{ $field['rows'] ?? 5 }}"
+                                        maxlength="{{ $limit }}"
+                                        @isset($field['maxLines']) data-max-lines="{{ $field['maxLines'] }}" @endisset
+                                        oninput="updateGift3LivePreview()">{{ $field['default'] }}</textarea>
+                                    @isset($field['hint'])
+                                    <p class="field-hint">{{ $field['hint'] }}</p>
+                                    @endisset
                                 </div>
 
                                 @else
                                 <div class="form-group">
-                                    <label>{{ $field['label'] }}</label>
-                                    <input type="text" id="gift3_{{ $field['key'] }}"
+                                    <div class="field-head">
+                                        <label>{{ $field['label'] }}</label>
+                                        <span class="char-count" data-for="{{ $inputId }}"></span>
+                                    </div>
+                                    <input type="text" id="{{ $inputId }}" maxlength="{{ $limit }}"
                                         value="{{ $field['default'] }}"
                                         placeholder="{{ $field['placeholder'] ?? $field['default'] }}"
                                         oninput="updateGift3LivePreview()">
+                                    @isset($field['hint'])
+                                    <p class="field-hint">{{ $field['hint'] }}</p>
+                                    @endisset
                                 </div>
                                 @endif
 
@@ -3286,8 +3458,12 @@
     // Single source of truth for the Gift 3 field names — the save endpoint
     // validates against these same two lists, and the book templates read
     // them straight off the query string.
-    const GIFT3_TEXT_KEYS = @json(\App\Http\Controllers\Client\BirthdayCardController::GIFT3_TEXT_KEYS);
+    const GIFT3_TEXT_KEYS = @json(\App\Http\Controllers\Client\BirthdayCardController::gift3TextKeys());
+    const GIFT3_DATE_KEYS = @json(\App\Http\Controllers\Client\BirthdayCardController::GIFT3_DATE_KEYS);
     const GIFT3_FLAG_KEYS = @json(\App\Http\Controllers\Client\BirthdayCardController::GIFT3_FLAG_KEYS);
+    const GIFT3_MIN_DREAMS = {{ $gift3MinDreams }};
+    const GIFT3_MAX_DREAMS = {{ $gift3MaxDreams }};
+    let dreamCount = GIFT3_MAX_DREAMS;
     const GIFT3_SAVED = @json($card->gift3_data ?? null);
     const TOTAL_BOOK_PAGES = {{ $gift3PageCount ?? 10 }};
     let currentBookPage = 1;
@@ -3847,6 +4023,23 @@
         document.getElementById('gift2CalRow').style.display = isBoy ? 'block' : 'none';
         document.getElementById('gift2SignedGroup').style.display = isBoy ? 'block' : 'none';
         document.getElementById('gift2Slot3Wrap').style.display = isBoy ? 'flex' : 'none';
+        setGift2MessageLimit(isBoy);
+    }
+
+    // The note sits in a small fixed panel on the boy designs and on a taller
+    // letter sheet on the girl ones, so its ceiling follows the theme.
+    const GIFT2_MESSAGE_LIMITS = {
+        boy: {{ \App\Http\Controllers\Client\BirthdayCardController::GIFT2_LIMITS['message_boy'] }},
+        girl: {{ \App\Http\Controllers\Client\BirthdayCardController::GIFT2_LIMITS['message_girl'] }},
+    };
+
+    function setGift2MessageLimit(isBoy) {
+        const el = document.getElementById('gift2Message');
+        if (!el) return;
+        const limit = isBoy ? GIFT2_MESSAGE_LIMITS.boy : GIFT2_MESSAGE_LIMITS.girl;
+        el.setAttribute('maxlength', limit);
+        if (el.value.length > limit) el.value = el.value.slice(0, limit);
+        el.dispatchEvent(new Event('input'));
     }
 
     let gift2DebounceTimer = null;
@@ -3972,11 +4165,97 @@
             const el = document.getElementById('gift3_' + key);
             if (el && el.value !== '') params.set(key, el.value);
         });
+        GIFT3_DATE_KEYS.forEach(key => {
+            const el = document.getElementById('gift3_' + key);
+            if (el && el.value !== '') params.set(key, el.value);
+        });
         GIFT3_FLAG_KEYS.forEach(key => {
             const el = document.getElementById('gift3_' + key);
             if (el) params.set(key, el.checked ? '1' : '0');
         });
+        params.set('dream_count', String(dreamCount));
         return params;
+    }
+
+    // ── Step 7: the Future Dreams list (3 or 4 items) ───────
+    function renderDreams() {
+        for (let d = 1; d <= GIFT3_MAX_DREAMS; d++) {
+            const row = document.getElementById('dreamRow' + d);
+            if (row) row.style.display = d <= dreamCount ? 'flex' : 'none';
+        }
+        // Removing is only offered above the minimum, so the client can never
+        // empty the page out.
+        const canRemove = dreamCount > GIFT3_MIN_DREAMS;
+        document.querySelectorAll('.dream-remove').forEach(btn => {
+            btn.style.display = canRemove ? '' : 'none';
+        });
+        const addBtn = document.getElementById('dreamAddBtn');
+        if (addBtn) addBtn.style.display = dreamCount < GIFT3_MAX_DREAMS ? '' : 'none';
+        const hint = document.getElementById('dreamHint');
+        if (hint) {
+            hint.textContent = dreamCount >= GIFT3_MAX_DREAMS ?
+                'The page holds ' + GIFT3_MAX_DREAMS + ' dreams at most.' :
+                'You can add one more — ' + GIFT3_MIN_DREAMS + ' is the minimum.';
+        }
+    }
+
+    function addDream() {
+        if (dreamCount >= GIFT3_MAX_DREAMS) return;
+        dreamCount++;
+        renderDreams();
+        updateGift3LivePreview(true);
+    }
+
+    function removeDream(n) {
+        if (dreamCount <= GIFT3_MIN_DREAMS) return;
+        // Shift the rows below up, so removing the 2nd of 4 doesn't leave a
+        // hole in the middle of the list.
+        for (let i = n; i < dreamCount; i++) {
+            const here = document.getElementById('gift3_dream' + i);
+            const next = document.getElementById('gift3_dream' + (i + 1));
+            here.value = next.value;
+            document.getElementById('gift3_dream' + i + '_done').checked =
+                document.getElementById('gift3_dream' + (i + 1) + '_done').checked;
+        }
+        dreamCount--;
+        renderDreams();
+        updateGift3LivePreview(true);
+    }
+
+    // ── Design-safe field limits ────────────────────────────
+    // Each card design is a fixed layout, so every field carries the
+    // maxlength its own slot can actually show. The counter makes that
+    // budget visible instead of the field just stopping dead.
+    function wireCharCounters(root) {
+        (root || document).querySelectorAll('.char-count[data-for]').forEach(counter => {
+            const el = document.getElementById(counter.getAttribute('data-for'));
+            if (!el || el.dataset.counterWired) return;
+            const max = parseInt(el.getAttribute('maxlength'), 10);
+            if (!max) return;
+            el.dataset.counterWired = '1';
+            const update = () => {
+                counter.textContent = el.value.length + '/' + max;
+                counter.classList.toggle('at-limit', el.value.length >= max);
+            };
+            el.addEventListener('input', update);
+            update();
+        });
+    }
+
+    // The letter is the one field where characters alone don't bound the
+    // height, so extra line breaks are trimmed as they're typed.
+    function wireLineLimits(root) {
+        (root || document).querySelectorAll('textarea[data-max-lines]').forEach(el => {
+            if (el.dataset.lineLimitWired) return;
+            el.dataset.lineLimitWired = '1';
+            const max = parseInt(el.dataset.maxLines, 10);
+            el.addEventListener('input', () => {
+                const lines = el.value.split('\n');
+                if (lines.length > max) {
+                    el.value = lines.slice(0, max).join('\n');
+                }
+            });
+        });
     }
 
     let gift3DebounceTimer = null;
@@ -4043,10 +4322,15 @@
             const el = document.getElementById('gift3_' + key);
             if (el) formData.append(key, el.value);
         });
+        GIFT3_DATE_KEYS.forEach(key => {
+            const el = document.getElementById('gift3_' + key);
+            if (el) formData.append(key, el.value);
+        });
         GIFT3_FLAG_KEYS.forEach(key => {
             const el = document.getElementById('gift3_' + key);
             if (el) formData.append(key, el.checked ? '1' : '0');
         });
+        formData.append('dream_count', String(dreamCount));
 
         fetch(CARD_STEP7_URL, {
                 method: 'POST',
@@ -4482,7 +4766,7 @@
         // Fields render with the book's own default text; anything the client
         // already saved overrides it here.
         if (GIFT3_SAVED) {
-            GIFT3_TEXT_KEYS.forEach(key => {
+            GIFT3_TEXT_KEYS.concat(GIFT3_DATE_KEYS).forEach(key => {
                 const el = document.getElementById('gift3_' + key);
                 if (el && GIFT3_SAVED[key] !== null && GIFT3_SAVED[key] !== undefined) {
                     el.value = GIFT3_SAVED[key];
@@ -4494,7 +4778,14 @@
                     el.checked = !!GIFT3_SAVED[key];
                 }
             });
+            if (GIFT3_SAVED.dream_count) {
+                dreamCount = Math.min(GIFT3_MAX_DREAMS,
+                    Math.max(GIFT3_MIN_DREAMS, parseInt(GIFT3_SAVED.dream_count, 10) || GIFT3_MAX_DREAMS));
+            }
         }
+        renderDreams();
+        wireCharCounters(document);
+        wireLineLimits(document);
         goToBookPage(1);
     });
     </script>

@@ -310,6 +310,38 @@
     .cover-face.back {
         background: linear-gradient(135deg, var(--sand), var(--tan));
         transform: rotateY(180deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* The inside face is visible for the whole 1.4s of the opening and
+   closing swing — leaving it blank read as an unfinished page. */
+    .cover-inside {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        opacity: 0.55;
+        color: var(--leather);
+    }
+
+    .cover-inside .cover-inside-rule {
+        width: 40px;
+        height: 1px;
+        background: currentColor;
+    }
+
+    .cover-inside span {
+        font-family: var(--font-script);
+        font-size: clamp(18px, 5vw, 22px);
+    }
+
+    .cover-inside .cover-inside-mark {
+        font-family: var(--font-display);
+        font-size: clamp(14px, 3.6vw, 17px);
+        letter-spacing: 3px;
+        text-transform: uppercase;
     }
 
     .cover-frame {
@@ -814,6 +846,7 @@
         right: 6%;
         bottom: 4%;
         height: 88%;
+        overflow: hidden;
         background:
             repeating-linear-gradient(180deg,
                 transparent 0px, transparent 22px,
@@ -831,9 +864,31 @@
         font-family: var(--font-script);
         font-size: clamp(15px, 4vw, 18px);
         color: var(--ink);
-        line-height: 1.6;
+        line-height: 1.5;
         opacity: 0;
         transition: opacity 0.8s ease 0.9s;
+    }
+
+    /* A blank line between paragraphs used to cost a full line box, which
+   overflowed the sheet on the default text alone. Paragraphs now carry a
+   small margin instead. */
+    .letter-text p {
+        margin: 0 0 0.45em;
+    }
+
+    .letter-text p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Auto-fit: longer letters step down a size so the sheet still holds
+   them. Paired with the length cap in the dashboard. */
+    .letter-text.sm {
+        font-size: clamp(13px, 3.4vw, 15px);
+    }
+
+    .letter-text.xs {
+        font-size: clamp(11px, 2.9vw, 13px);
+        line-height: 1.45;
     }
 
     .envelope.open .envelope-flap {
@@ -844,8 +899,16 @@
         opacity: 0;
     }
 
+    /* Opened, the sheet lifts clear of the envelope and grows into a real
+   letter page. At its closed height it only ever fitted ~3 lines, which
+   the default text alone already overflowed.
+   Anchored top-and-bottom rather than nudged by a share of its own height,
+   so the sheet lands in the same place whatever size the book is. */
     .envelope.open .envelope-letter {
-        transform: translateY(-46%) scale(1.06);
+        top: -60%;
+        bottom: -40%;
+        height: auto;
+        transform: none;
         z-index: 5;
     }
 
@@ -868,7 +931,8 @@
     .dates-list li {
         display: flex;
         align-items: center;
-        gap: 12px;
+        flex-wrap: wrap;
+        gap: 4px 12px;
         padding: 4% 6%;
         background: rgba(var(--white-rgb), 0.4);
         border: 1px solid rgba(var(--leather-rgb), 0.25);
@@ -884,6 +948,8 @@
         font-family: var(--font-display);
         font-size: clamp(15px, 4vw, 18px);
         color: var(--espresso);
+        min-width: 0;
+        overflow-wrap: anywhere;
     }
 
     /* Only rendered when the client fills a date in — without it the list
@@ -967,6 +1033,29 @@
         gap: 4%;
     }
 
+    /* Typing effect (see the script): the caret only shows while the quote
+   is being written out, and the element keeps the full text's height so
+   the page doesn't shift as characters land. */
+    .handwritten.big.typing::after {
+        content: "|";
+        margin-left: 2px;
+        color: var(--gold);
+        animation: caret-blink 0.75s steps(1, end) infinite;
+    }
+
+    @keyframes caret-blink {
+
+        0%,
+        49% {
+            opacity: 1;
+        }
+
+        50%,
+        100% {
+            opacity: 0;
+        }
+    }
+
     .quote-mark {
         font-family: var(--font-display);
         font-size: clamp(50px, 14vw, 70px);
@@ -1034,14 +1123,17 @@
         top: 0;
         right: 14%;
         width: 14%;
-        height: 60%;
+        height: 80%;
         display: flex;
         justify-content: center;
     }
 
+    /* Shorter than its track on purpose — the leftover height is the pull
+   distance. When these matched, trackHeight() was 0 and dragging did
+   nothing at all. */
     .bookmark {
         width: 100%;
-        height: 100%;
+        height: 58%;
         background: linear-gradient(180deg, var(--leather), var(--tan));
         clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
         cursor: grab;
@@ -1067,11 +1159,44 @@
         font-size: clamp(12px, 3vw, 15px);
     }
 
+    /* Dragging a ribbon is fiddly on a touchscreen and impossible with a
+   keyboard, so the same reveal is one tap away. */
+    .secret-head {
+        width: 70%;
+        margin-right: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ribbon-btn {
+        position: relative;
+        z-index: 3;
+        margin-top: 6%;
+        padding: 2.6% 7%;
+        background: rgba(var(--white-rgb), 0.45);
+        border: 1px solid rgba(var(--leather-rgb), 0.45);
+        color: var(--leather);
+        font-family: var(--font-body);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: clamp(11px, 3vw, 13px);
+        border-radius: 30px;
+        cursor: pointer;
+        transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+    }
+
+    .ribbon-btn:hover,
+    .ribbon-btn:focus-visible {
+        background: var(--leather);
+        color: var(--cream);
+    }
+
     .secret-message {
         position: absolute;
         bottom: 8%;
         left: 8%;
-        right: 8%;
+        right: 20%;
         text-align: center;
         opacity: 0;
         transform: translateY(14px);
@@ -1118,10 +1243,20 @@
         margin-top: 8px;
     }
 
-    .replay-btn {
+    .final-actions {
         position: relative;
         z-index: 2;
         margin-top: 10%;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .replay-btn {
+        position: relative;
+        z-index: 2;
         padding: 3.2% 9%;
         background: transparent;
         border: 1px solid var(--gold);
@@ -1348,7 +1483,13 @@
                         </div>
                         <p class="tap-hint" id="tapHint">Tap to Open</p>
                     </div>
-                    <div class="cover-face back"></div>
+                    <div class="cover-face back">
+                        <div class="cover-inside">
+                            <span class="cover-inside-mark">✦</span>
+                            <span>Our Story</span>
+                            <div class="cover-inside-rule"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="cover-spine"></div>
 
@@ -1447,12 +1588,26 @@
                                     <div class="envelope-back"></div>
                                     <div class="envelope-letter" id="envelopeLetter">
                                         @php
-                                            $letterText = request(
+                                            $letterText = trim((string) request(
                                                 'letter',
                                                 "Dear Love,\n\nThank you for making every ordinary day feel special.\n\nI love you."
+                                            ));
+                                            $letterParagraphs = preg_split('/(?:\r\n|\r|\n){2,}/', $letterText);
+                                            // Auto-fit — the sheet is a fixed size, so a long letter
+                                            // steps down a font size rather than spilling off it.
+                                            // A hard line break costs about a full line of text, so it
+                                            // weighs the same as ~26 characters here.
+                                            $letterWeight = max(
+                                                mb_strlen($letterText),
+                                                (substr_count($letterText, "\n") + 1) * 26
                                             );
+                                            $letterSize = $letterWeight > 200 ? 'xs' : ($letterWeight > 135 ? 'sm' : '');
                                         @endphp
-                                        <p class="letter-text">{!! nl2br(e($letterText)) !!}</p>
+                                        <div class="letter-text {{ $letterSize }}">
+                                            @foreach($letterParagraphs as $letterParagraph)
+                                            <p>{!! nl2br(e($letterParagraph)) !!}</p>
+                                            @endforeach
+                                        </div>
                                     </div>
                                     <div class="envelope-flap"></div>
                                     <div class="envelope-seal">❤</div>
@@ -1476,8 +1631,16 @@
                                 <li>
                                     <span class="date-heart">❤</span>
                                     <span class="date-name">{{ request('date' . $n . '_name', $dateName) }}</span>
-                                    @if(request('date' . $n . '_value'))
-                                    <span class="date-value">{{ request('date' . $n . '_value') }}</span>
+                                    @php
+                                        $dateValue = (string) request('date' . $n . '_value', '');
+                                        // The dashboard sends a date picker's ISO value; anything
+                                        // else (older free-text entries) is shown as typed.
+                                        $shownDate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateValue)
+                                            ? \Illuminate\Support\Carbon::createFromFormat('Y-m-d', $dateValue)->format('j M Y')
+                                            : $dateValue;
+                                    @endphp
+                                    @if($shownDate !== '')
+                                    <span class="date-value">{{ $shownDate }}</span>
                                     @endif
                                 </li>
                                 @endforeach
@@ -1494,20 +1657,22 @@
                                     ['text' => 'First Coffee', 'done' => true],
                                     ['text' => 'First Selfie', 'done' => true],
                                     ['text' => 'First Trip', 'done' => true],
-                                    ['text' => 'Endless Laughs', 'done' => true],
                                     ['text' => 'Grow Old Together', 'done' => false],
                                 ];
+                                // Three rows always, a fourth if the client added one —
+                                // more than four crowds the page off its layout.
+                                $dreamCount = max(3, min(4, (int) request('dream_count', 4)));
                             @endphp
                             <ul class="checklist" id="checklist">
-                                @foreach($dreams as $i => $dream)
+                                @for($n = 1; $n <= $dreamCount; $n++)
                                 @php
-                                    $n = $i + 1;
+                                    $dream = $dreams[$n - 1];
                                     $isDone = request()->has('dream' . $n . '_done')
                                         ? filter_var(request('dream' . $n . '_done'), FILTER_VALIDATE_BOOLEAN)
                                         : $dream['done'];
                                 @endphp
                                 <li @class(['checked' => $isDone])><span class="box"></span><span>{{ request('dream' . $n, $dream['text']) }}</span></li>
-                                @endforeach
+                                @endfor
                             </ul>
                         </div>
                     </section>
@@ -1528,7 +1693,11 @@
                     <!-- PAGE 9 — Secret bookmark -->
                     <section class="page" data-index="8">
                         <div class="page-inner secret-page">
-                            <p class="page-label">{{ request('secret_label', 'Pull the ribbon down') }}</p>
+                            <div class="secret-head">
+                                <p class="page-label">{{ request('secret_label', 'Pull the ribbon down') }}</p>
+                                <button class="ribbon-btn" id="ribbonBtn"
+                                    type="button">{{ request('secret_button', 'Click to Open') }}</button>
+                            </div>
                             <div class="bookmark-track">
                                 <div class="bookmark" id="bookmark">
                                     <span class="bookmark-heart">❤</span>
@@ -1549,7 +1718,12 @@
                             <span class="floating-heart ff1">❤</span>
                             <span class="floating-heart ff2">♡</span>
                             <span class="floating-heart ff3">❤</span>
-                            <button class="replay-btn" id="replayBtn">{{ request('replay_label', 'Replay Story') }}</button>
+                            <div class="final-actions">
+                                <button class="replay-btn" id="replayBtn"
+                                    type="button">{{ request('replay_label', 'Replay Story') }}</button>
+                                <button class="replay-btn close-btn" id="closeBookBtn"
+                                    type="button">{{ request('close_label', 'Close the Book') }}</button>
+                            </div>
                         </div>
                     </section>
 
@@ -1588,6 +1762,9 @@
 
         let currentIndex = 0;
         const lastIndex = pages.length - 1;
+        const QUOTE_PAGE_INDEX = 7; // book page 8
+        const COVER_SWING_MS = 1400; // matches the .cover transition
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         /* ---------------- Add realistic flip-lighting overlay ---------------- */
         pages.forEach((p) => {
@@ -1644,6 +1821,11 @@
             if (currentIndex === lastIndex) {
                 launchConfetti();
             }
+            if (currentIndex === QUOTE_PAGE_INDEX) {
+                typeQuote();
+            } else {
+                resetQuote();
+            }
         }
 
         prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
@@ -1674,8 +1856,7 @@
         /* ---------------- Cover open ---------------- */
         cover.addEventListener('click', () => {
             if (book.classList.contains('open')) return;
-            book.classList.add('open');
-            nav.classList.add('open');
+            openBook();
         });
 
         /* ---------------- Dust particles ---------------- */
@@ -1759,20 +1940,26 @@
             if (!dragging) return;
             dragging = false;
             bookmark.classList.remove('dragging');
-            bookmark.classList.add('released');
             const progress = maxDrag > 0 ? currentY / maxDrag : 0;
-            if (progress > 0.7) {
-                currentY = maxDrag;
-                bookmark.style.transform = `translateY(${maxDrag}px)`;
-                secretMessage.classList.add('show');
-            } else {
-                currentY = 0;
-                bookmark.style.transform = 'translateY(0px)';
-                secretMessage.classList.remove('show');
-            }
+            setRibbonOpen(progress > 0.7);
         }
 
-        bookmark.addEventListener('mousedown', (e) => onDragStart(e.clientY));
+        // Single source of truth for the ribbon's resting state, shared by the
+        // drag, the tap fallback and the story reset.
+        function setRibbonOpen(open, instant) {
+            maxDrag = trackHeight();
+            bookmark.classList.remove('dragging');
+            bookmark.classList.toggle('released', !instant);
+            currentY = open ? maxDrag : 0;
+            bookmark.style.transform = `translateY(${currentY}px)`;
+            secretMessage.classList.toggle('show', !!open);
+            ribbonBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        bookmark.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            onDragStart(e.clientY);
+        });
         window.addEventListener('mousemove', (e) => onDragMove(e.clientY));
         window.addEventListener('mouseup', onDragEnd);
 
@@ -1783,6 +1970,22 @@
             passive: true
         });
         bookmark.addEventListener('touchend', onDragEnd);
+
+        // A pull is easy to miss (and unreachable by keyboard), so the ribbon
+        // also opens on a plain click — of the ribbon itself or of the button.
+        const ribbonBtn = document.getElementById('ribbonBtn');
+
+        function toggleRibbon() {
+            setRibbonOpen(!secretMessage.classList.contains('show'));
+        }
+
+        ribbonBtn.addEventListener('click', toggleRibbon);
+        bookmark.addEventListener('click', (e) => {
+            // Ignore the click that ends a real drag.
+            if (Math.abs(currentY) > 4 && maxDrag > 0) return;
+            e.preventDefault();
+            toggleRibbon();
+        });
 
         /* ---------------- Confetti (Page 10) ---------------- */
         const confettiLayer = document.getElementById('confetti');
@@ -1804,14 +2007,64 @@
             }
         }
 
-        /* ---------------- Replay ---------------- */
-        const replayBtn = document.getElementById('replayBtn');
-        replayBtn.addEventListener('click', () => {
+        /* ---------------- Quote written out by hand (Page 8) ---------------- */
+        const quoteEl = document.getElementById('quoteText');
+        const quoteFullText = quoteEl.textContent.trim();
+        let quoteTimer = null;
+
+        // Reserve the finished text's height up front so the page doesn't
+        // jump around as characters land. Measured once the script font has
+        // actually loaded, otherwise the fallback face gives a wrong height.
+        function lockQuoteHeight() {
+            quoteEl.style.minHeight = '';
+            quoteEl.style.minHeight = quoteEl.getBoundingClientRect().height + 'px';
+        }
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(lockQuoteHeight);
+        } else {
+            lockQuoteHeight();
+        }
+
+        function resetQuote() {
+            clearTimeout(quoteTimer);
+            quoteEl.classList.remove('typing');
+            quoteEl.textContent = quoteFullText;
+        }
+
+        function typeQuote() {
+            clearTimeout(quoteTimer);
+            if (reduceMotion || !quoteFullText) {
+                quoteEl.textContent = quoteFullText;
+                return;
+            }
+            quoteEl.classList.add('typing');
+            quoteEl.textContent = '';
+            let i = 0;
+            const step = () => {
+                quoteEl.textContent = quoteFullText.slice(0, i);
+                if (i >= quoteFullText.length) {
+                    quoteEl.classList.remove('typing');
+                    return;
+                }
+                // Pause a beat longer on punctuation so it reads as writing
+                // rather than a ticker.
+                const justTyped = quoteFullText.charAt(i - 1);
+                i++;
+                quoteTimer = setTimeout(step, ',.;:!?'.includes(justTyped) ? 260 : 42);
+            };
+            step();
+        }
+
+        /* ---------------- Story reset (shared by replay + close) ---------------- */
+        function resetStory() {
             pages.forEach((p, i) => {
                 p.style.transition = 'none';
                 p.classList.remove('current', 'gone-prev', 'gone-next');
                 p.style.zIndex = '';
-                if (i === 0) p.classList.add('current');
+                if (i === 0) {
+                    p.classList.add('current');
+                    p.style.zIndex = 10;
+                }
             });
             // force reflow then restore transitions
             void pagesWrap.offsetWidth;
@@ -1823,16 +2076,55 @@
             updateDots();
             updateNavButtons();
 
-            // reset envelope, polaroids, bookmark, confetti
+            // put every interactive page back to its untouched state
             envelope.classList.remove('open');
             envelopeHint.style.opacity = '0.75';
             polaroids.forEach((p) => p.classList.remove('active'));
-            bookmark.style.transform = 'translateY(0px)';
-            bookmark.classList.remove('released');
-            currentY = 0;
-            secretMessage.classList.remove('show');
+            document.querySelectorAll('.photo-placeholder.tapped')
+                .forEach((ph) => ph.classList.remove('tapped'));
+            setRibbonOpen(false, true);
             confettiLayer.innerHTML = '';
             confettiLaunched = false;
+            resetQuote();
+        }
+
+        /* ---------------- Closing the book ---------------- */
+        // Removing .open lets the same 1.4s cover transition run backwards,
+        // so closing reads as the opening in reverse.
+        function closeBook() {
+            resetStory();
+            book.classList.remove('open');
+            nav.classList.remove('open');
+        }
+
+        function openBook() {
+            book.classList.add('open');
+            nav.classList.add('open');
+        }
+
+        const closeBookBtn = document.getElementById('closeBookBtn');
+        closeBookBtn.addEventListener('click', closeBook);
+
+        /* ---------------- Replay ---------------- */
+        // Back to where the story was first opened: the cover swings shut,
+        // then opens again on page one, replaying the whole thing.
+        const replayBtn = document.getElementById('replayBtn');
+        let replaying = false;
+
+        replayBtn.addEventListener('click', () => {
+            if (replaying) return;
+            replaying = true;
+            replayBtn.disabled = true;
+            closeBook();
+
+            const reopen = () => {
+                openBook();
+                replaying = false;
+                replayBtn.disabled = false;
+            };
+
+            if (reduceMotion) reopen();
+            else setTimeout(reopen, COVER_SWING_MS + 200);
         });
 
         /* ---------------- Initial page state ---------------- */
@@ -1870,6 +2162,7 @@
             updateDots();
             updateNavButtons();
             if (currentIndex === lastIndex) launchConfetti();
+            if (currentIndex === QUOTE_PAGE_INDEX) typeQuote();
         }
 
         /* ---------------- Init ---------------- */

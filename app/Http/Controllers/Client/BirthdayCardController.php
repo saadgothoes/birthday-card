@@ -7,6 +7,7 @@ use App\Models\BirthdayCard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class BirthdayCardController extends Controller
 {
@@ -23,6 +24,16 @@ class BirthdayCardController extends Controller
         }
 
         return $card;
+    }
+
+    /**
+     * Browsers submit textareas with CRLF. Normalising on the way in keeps
+     * one convention in the stored JSON, so the templates' line handling and
+     * the line counts here agree with what the client actually typed.
+     */
+    protected function normaliseNewlines(?string $value): ?string
+    {
+        return $value === null ? null : str_replace(["\r\n", "\r"], "\n", $value);
     }
 
     // Step 1 — save theme + variant selection
@@ -81,13 +92,13 @@ class BirthdayCardController extends Controller
     public function saveStep3(Request $request)
     {
         $data = $request->validate([
-            'heading' => 'nullable|string|max:255',
-            'message' => 'nullable|string|max:2000',
+            'heading' => 'nullable|string|max:' . self::WELCOME_LIMITS['heading'],
+            'message' => 'nullable|string|max:' . self::WELCOME_LIMITS['message'],
         ]);
 
         $card = $this->currentDraft();
         $card->heading = $data['heading'] ?? null;
-        $card->welcome_message = $data['message'] ?? null;
+        $card->welcome_message = $this->normaliseNewlines($data['message'] ?? null);
         $card->current_step = max($card->current_step, 4);
         $card->save();
 
@@ -155,18 +166,22 @@ class BirthdayCardController extends Controller
     // Step 6 — Gift 2: theme choice (1-4) + up to 4 photos + names + date + note
     public function saveStep6(Request $request)
     {
+        $card = $this->currentDraft();
+        $messageLimit = $card->theme === 'girl'
+            ? self::GIFT2_LIMITS['message_girl']
+            : self::GIFT2_LIMITS['message_boy'];
+
         $data = $request->validate([
             'theme' => 'required|integer|in:1,2,3,4',
             'photos' => 'nullable|array|max:4',
             'photos.*' => 'nullable|image|max:5120',
-            'name_first' => 'nullable|string|max:100',
-            'name_second' => 'nullable|string|max:100',
+            'name_first' => 'nullable|string|max:' . self::GIFT2_LIMITS['name_first'],
+            'name_second' => 'nullable|string|max:' . self::GIFT2_LIMITS['name_second'],
             'cal_date' => 'nullable|date',
-            'message' => 'nullable|string|max:2000',
-            'signed' => 'nullable|string|max:100',
+            'message' => 'nullable|string|max:' . $messageLimit,
+            'signed' => 'nullable|string|max:' . self::GIFT2_LIMITS['signed'],
         ]);
 
-        $card = $this->currentDraft();
         $existing = $card->gift2_data ?? [];
         $photos = $existing['photos'] ?? [null, null, null, null];
 
@@ -186,7 +201,7 @@ class BirthdayCardController extends Controller
             'name_first' => $data['name_first'] ?? null,
             'name_second' => $data['name_second'] ?? null,
             'cal_date' => $data['cal_date'] ?? null,
-            'message' => $data['message'] ?? null,
+            'message' => $this->normaliseNewlines($data['message'] ?? null),
             'signed' => $data['signed'] ?? null,
         ];
         $card->current_step = max($card->current_step, 7);
@@ -200,40 +215,108 @@ class BirthdayCardController extends Controller
     }
 
     /**
-     * Every text slot in the Gift 3 book, in book-page order. Whitelisted so
-     * the stored JSON keeps a known shape, and so the dashboard, the save
-     * endpoint and the template all agree on one set of keys.
+     * Design-safe text limits, in characters.
+     *
+     * These cards are fixed layouts, not documents: every slot has only the
+     * room its own design gives it, so each ceiling is derived from the space
+     * that slot actually has at the smallest size the page renders at
+     * (measured in a browser — see DASHBOARD_WIZARD_DOCUMENTATION.md).
+     * The dashboard reads the same numbers for its `maxlength` and counters,
+     * so the field cannot accept what the design cannot show.
      */
-    public const GIFT3_TEXT_KEYS = [
+
+    /** Step 3 — the welcome screen. */
+    public const WELCOME_LIMITS = [
+        'heading' => 40,   // display face, ~16 chars a line, wraps to 2-3
+        'message' => 160,  // ~40 chars a line, room for 4
+    ];
+
+    /** Step 6 — Gift 2. The note lives in a different box per theme. */
+    public const GIFT2_LIMITS = [
+        'name_first' => 14,
+        'name_second' => 14,
+        'signed' => 30,
+        // Boy: a fixed note panel under the calendar. Girl: a letter sheet
+        // that is both taller and scrollable.
+        'message_boy' => 180,
+        'message_girl' => 300,
+    ];
+
+    /**
+     * Step 7 — every text slot in the Gift 3 book, in book-page order, with
+     * its limit. Whitelisted so the stored JSON keeps a known shape, and so
+     * the dashboard, the save endpoint and the template all agree on one set
+     * of keys.
+     */
+    public const GIFT3_TEXT_LIMITS = [
         // Book page 1 — title
-        'eyebrow', 'from_name', 'to_name',
+        'eyebrow' => 28,
+        'from_name' => 18,        // script face at up to 42px
+        'to_name' => 18,
         // Book page 2 — big photo
-        'caption',
+        'caption' => 45,
         // Book page 3 — memory
-        'memory_text',
+        'memory_text' => 70,      // narrow half-width column beside the photo
         // Book page 4 — polaroids
-        'polaroid_label', 'note1', 'note2', 'note3',
+        'polaroid_label' => 32,
+        'note1' => 18,            // handwritten strip under a polaroid
+        'note2' => 18,
+        'note3' => 18,
         // Book page 5 — letter
-        'letter_label', 'letter', 'envelope_hint',
+        'letter_label' => 32,
+        'letter' => 280,          // see GIFT3_LETTER_MAX_LINES as well
+        'envelope_hint' => 28,
         // Book page 6 — special dates
-        'dates_label',
-        'date1_name', 'date1_value', 'date2_name', 'date2_value',
-        'date3_name', 'date3_value', 'date4_name', 'date4_value',
+        'dates_label' => 32,
+        'date1_name' => 22,       // shares its row with the date itself
+        'date2_name' => 22,
+        'date3_name' => 22,
+        'date4_name' => 22,
         // Book page 7 — future dreams
-        'dreams_label',
-        'dream1', 'dream2', 'dream3', 'dream4', 'dream5',
+        'dreams_label' => 32,
+        'dream1' => 24,
+        'dream2' => 24,
+        'dream3' => 24,
+        'dream4' => 24,
         // Book page 8 — quote
-        'quote',
+        'quote' => 120,
         // Book page 9 — secret
-        'secret_label', 'secret_message',
+        'secret_label' => 32,
+        'secret_button' => 20,
+        'secret_message' => 48,
         // Book page 10 — final
-        'final_line1', 'final_line2', 'replay_label',
+        'final_line1' => 42,
+        'final_line2' => 42,
+        'replay_label' => 20,
+        'close_label' => 20,
+    ];
+
+    /**
+     * The letter is the one multi-line slot, so it needs a line ceiling too —
+     * 280 characters of "a\n" would still walk off the paper.
+     */
+    public const GIFT3_LETTER_MAX_LINES = 10;
+
+    /** Book page 6 — the date pickers, stored as ISO so they can be restored. */
+    public const GIFT3_DATE_KEYS = [
+        'date1_value', 'date2_value', 'date3_value', 'date4_value',
     ];
 
     /** Checked/unchecked state of the "Future Dreams" checklist items. */
     public const GIFT3_FLAG_KEYS = [
-        'dream1_done', 'dream2_done', 'dream3_done', 'dream4_done', 'dream5_done',
+        'dream1_done', 'dream2_done', 'dream3_done', 'dream4_done',
     ];
+
+    /** The checklist page holds three rows, or four if the client adds one. */
+    public const GIFT3_MIN_DREAMS = 3;
+
+    public const GIFT3_MAX_DREAMS = 4;
+
+    /** Key order for the Gift 3 text slots. */
+    public static function gift3TextKeys(): array
+    {
+        return array_keys(self::GIFT3_TEXT_LIMITS);
+    }
 
     /**
      * Step 7 — Gift 3: the "Our Story" book.
@@ -247,20 +330,34 @@ class BirthdayCardController extends Controller
             'theme' => 'required|integer|in:1,2,3,4',
             'photos' => 'nullable|array|max:5',
             'photos.*' => 'nullable|image|max:5120',
-            'letter' => 'nullable|string|max:2000',
+            'dream_count' => 'required|integer|between:' . self::GIFT3_MIN_DREAMS . ',' . self::GIFT3_MAX_DREAMS,
         ];
 
-        foreach (self::GIFT3_TEXT_KEYS as $key) {
-            if ($key === 'letter') {
-                continue; // already given a longer limit above
-            }
-            $rules[$key] = 'nullable|string|max:255';
+        foreach (self::GIFT3_TEXT_LIMITS as $key => $limit) {
+            $rules[$key] = 'nullable|string|max:' . $limit;
+        }
+        foreach (self::GIFT3_DATE_KEYS as $key) {
+            $rules[$key] = 'nullable|date_format:Y-m-d';
         }
         foreach (self::GIFT3_FLAG_KEYS as $key) {
             $rules[$key] = 'nullable|boolean';
         }
 
-        $data = $request->validate($rules);
+        $validator = Validator::make($request->all(), $rules);
+
+        // The letter is the one field where the character count alone doesn't
+        // bound the height.
+        $validator->after(function ($validator) use ($request) {
+            $lines = substr_count($this->normaliseNewlines((string) $request->input('letter')), "\n") + 1;
+            if ($lines > self::GIFT3_LETTER_MAX_LINES) {
+                $validator->errors()->add(
+                    'letter',
+                    'The letter cannot be more than ' . self::GIFT3_LETTER_MAX_LINES . ' lines long.'
+                );
+            }
+        });
+
+        $data = $validator->validate();
 
         $card = $this->currentDraft();
         $existing = $card->gift3_data ?? [];
@@ -279,8 +376,13 @@ class BirthdayCardController extends Controller
         $gift3 = [
             'theme' => (int) $data['theme'],
             'photos' => $photos,
+            'dream_count' => (int) $data['dream_count'],
         ];
-        foreach (self::GIFT3_TEXT_KEYS as $key) {
+        foreach (self::GIFT3_TEXT_LIMITS as $key => $limit) {
+            $gift3[$key] = $data[$key] ?? null;
+        }
+        $gift3['letter'] = $this->normaliseNewlines($gift3['letter']);
+        foreach (self::GIFT3_DATE_KEYS as $key) {
             $gift3[$key] = $data[$key] ?? null;
         }
         foreach (self::GIFT3_FLAG_KEYS as $key) {
