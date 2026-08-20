@@ -732,11 +732,6 @@
             <!-- Quote -->
             <p class="quote">"You make every moment beautiful."</p>
 
-            <!-- Next button -->
-            <div class="next-wrap">
-                <button class="next-btn" id="nextBtn">Next <span>→</span></button>
-            </div>
-
         </section>
     </main>
 
@@ -767,7 +762,7 @@
 
         /* ---------------- Mini calendar ---------------- */
         const calGrid = document.getElementById('calGrid');
-        const DAYS_IN_MONTH = 31;
+        const DAYS_IN_MONTH = {{ (int) request('cal_days', 31) }};
         const HIGHLIGHT_DAY = {{ (int) request('cal_day', 14) }}; // change this to your special date
         for (let d = 1; d <= DAYS_IN_MONTH; d++) {
             const cell = document.createElement('span');
@@ -807,16 +802,6 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeLightbox();
-        });
-
-        /* ---------------- Next button ---------------- */
-        const nextBtn = document.getElementById('nextBtn');
-        nextBtn.addEventListener('click', () => {
-            // Hook this up to navigate to a second card/page if you add one.
-            nextBtn.style.transform = 'scale(0.94)';
-            setTimeout(() => {
-                nextBtn.style.transform = '';
-            }, 150);
         });
 
     })();

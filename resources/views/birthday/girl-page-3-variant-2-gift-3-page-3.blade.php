@@ -640,9 +640,14 @@
         color: var(--text);
         font-family: var(--font-heading);
         font-style: italic;
-        white-space: nowrap;
+        /* Was a single ellipsised line, which silently ate the back half of any
+           caption past ~20 characters. It now runs to two lines, so a caption of
+           the length the design's own defaults use is shown in full. */
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
         overflow: hidden;
-        text-overflow: ellipsis;
+        overflow-wrap: break-word;
     }
 
     .meta-loc {
@@ -756,6 +761,13 @@
     }
 
     /* ---- Chat screenshot card (native iMessage look) ---- */
+    .chat-shot {
+        display: block;
+        width: 100%;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
     .chat-wrap {
         padding: 16px 16px 4px;
     }
@@ -1261,8 +1273,8 @@
                             <path d="M8 6l1.4-2.2h5.2L16 6"></path>
                         </svg>
                     </div>
-                    <h1 class="cover-title">Our Camera Roll</h1>
-                    <p class="cover-sub">Every memory has a story.</p>
+                    <h1 class="cover-title">{{ request('cover_title', 'Our Camera Roll') }}</h1>
+                    <p class="cover-sub">{{ request('cover_sub', 'Every memory has a story.') }}</p>
                     <div class="cover-tap">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round">
@@ -1272,7 +1284,7 @@
                                 d="M17 8.5a2 2 0 1 1 4 0V14a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3.4L4.7 13a1.8 1.8 0 0 1 2.9-2.1L9 13">
                             </path>
                         </svg>
-                        Tap to Open
+                        {{ request('cover_tap', 'Tap to Open') }}
                     </div>
                 </div>
             </div>
@@ -1280,7 +1292,7 @@
             <!-- ============ MAIN GALLERY (memory reel) ============ -->
             <div class="gallery" id="gallery">
                 <div class="gallery-header">
-                    <h2>Our Camera Roll</h2>
+                    <h2>{{ request('gallery_title', 'Our Camera Roll') }}</h2>
                     <span id="counter">0 / 0 memories</span>
                 </div>
 
@@ -1325,7 +1337,7 @@
         </button>
         <div class="letter-paper">
             <div class="letter-body" id="letterBody"><span class="pen-caret"></span></div>
-            <div class="letter-signoff" id="letterSignoff">— with love</div>
+            <div class="letter-signoff" id="letterSignoff">{{ request('signoff', '— with love') }}</div>
         </div>
     </div>
 
@@ -1335,75 +1347,59 @@
    Replace src / text values with real user uploads.
    type: "photo" | "video" | "chat" | "note" | "letter"
    ================================================== */
-    const MEMORY_DATA = [{
-            type: 'photo',
-            src: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=800&auto=format&fit=crop',
-            date: 'March 14',
-            location: 'Rooftop Cafe',
-            caption: 'The evening the sky turned gold.',
-            live: true
-        },
-        {
-            type: 'video',
-            poster: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop',
-            src: '',
-            duration: '0:18',
-            date: 'April 2',
-            location: 'Home',
-            caption: 'That laugh I never get tired of.'
-        },
-        {
-            type: 'chat',
-            name: 'My Person',
-            bubbles: [{
-                    from: 'them',
-                    text: 'guess where I am rn 👀'
-                },
-                {
-                    from: 'me',
-                    text: 'no way. tell me you didn\'t'
-                },
-                {
-                    from: 'them',
-                    text: 'i did. saved us seats already 🎬'
-                },
+    @php
+        // ── Girl Gift 3 — the camera roll ────────────────────────────────
+        // Five cards: a photo with its date, one video clip, the chat, a second
+        // photo, and the letter. Every card is built here so the dashboard drives
+        // the whole thing through query parameters, and each default is the
+        // design's own original content — with no parameters the page renders
+        // exactly as it did before.
+        $memoryData = [
+            [
+                'type' => 'photo',
+                'src' => request('photo1', 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=800&auto=format&fit=crop'),
+                'date' => request('p1_date', 'March 14'),
+                'location' => request('p1_place', 'Rooftop Cafe'),
+                'caption' => request('p1_caption', 'The evening the sky turned gold.'),
+                'live' => true,
             ],
-            date: 'April 9',
-            caption: 'My favorite conversation.'
-        },
-        {
-            type: 'photo',
-            src: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=800&auto=format&fit=crop',
-            date: 'May 21',
-            location: 'Coastline Drive',
-            caption: 'Windows down, nowhere to be.'
-        },
-        {
-            type: 'note',
-            date: 'June 3',
-            text: '"i keep this one in my head\non the hard days."'
-        },
-        {
-            type: 'video',
-            poster: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?q=80&w=800&auto=format&fit=crop',
-            src: '',
-            duration: '0:24',
-            date: 'June 30',
-            location: 'The Old Pier',
-            caption: 'Right before the fireworks.'
-        },
-        {
-            type: 'photo',
-            src: 'https://images.unsplash.com/photo-1500336624523-d727130c3328?q=80&w=800&auto=format&fit=crop',
-            date: 'July 12',
-            location: 'Mountain Trail',
-            caption: 'We got so lost, and I didn\'t mind.'
-        },
-        {
-            type: 'letter',
-            text: 'Thank you for every smile.\n\nEvery photo here reminds me how lucky I am to have you.\n\nHere\'s to a thousand more memories, and to you — always, endlessly, you.\n\nHappy birthday. I love you.'
-        }
-    ];
+            [
+                'type' => 'video',
+                'poster' => request('poster1', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop'),
+                'src' => request('video1', ''),
+                'duration' => request('v1_duration', '0:18'),
+                'date' => request('v1_date', 'April 2'),
+                'location' => request('v1_place', 'Home'),
+                'caption' => request('v1_caption', 'That laugh I never get tired of.'),
+            ],
+            [
+                'type' => 'chat',
+                // A real screenshot if the client uploaded one, otherwise the chat
+                // is drawn from their own three lines.
+                'shot' => request('chat_shot', ''),
+                'name' => request('chat_name', 'My Person'),
+                'bubbles' => [
+                    ['from' => 'them', 'text' => request('chat1', 'guess where I am rn 👀')],
+                    ['from' => 'me', 'text' => request('chat2', "no way. tell me you didn't")],
+                    ['from' => 'them', 'text' => request('chat3', 'i did. saved us seats already 🎬')],
+                ],
+                'date' => request('chat_date', 'April 9'),
+                'caption' => request('chat_caption', 'My favorite conversation.'),
+            ],
+            [
+                'type' => 'photo',
+                'src' => request('photo2', 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=800&auto=format&fit=crop'),
+                'date' => request('p2_date', 'May 21'),
+                'location' => request('p2_place', 'Coastline Drive'),
+                'caption' => request('p2_caption', 'Windows down, nowhere to be.'),
+            ],
+            [
+                'type' => 'letter',
+                'text' => request('letter', "Thank you for every smile.\n\nEvery photo here reminds me how lucky I am to have you.\n\nHere's to a thousand more memories, and to you \u{2014} always, endlessly, you.\n\nHappy birthday. I love you."),
+            ],
+        ];
+    @endphp
+    const MEMORY_DATA = @json($memoryData);
 
     /* ==================================================
        LIVE CLOCK for status bar (feels real, not stuck at 9:41)
@@ -1505,6 +1501,18 @@
     const reel = document.getElementById('reel');
     const counterEl = document.getElementById('counter');
 
+    // Cards are built with innerHTML, so anything the client typed is escaped
+    // on the way in. Without this a quote in a caption would break the attribute
+    // it sits in and a stray angle bracket could rewrite the card.
+    function esc(value) {
+        return String(value === null || value === undefined ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     function svgLocationIcon() {
         return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
     }
@@ -1521,16 +1529,16 @@
         const el = document.createElement('div');
         el.innerHTML = `
         <div class="card-shell" data-tilt>
-            <div class="media-frame" data-open="photo" data-src="${m.src}">
-                <img src="${m.src}" alt="${m.caption || ''}" loading="lazy">
+            <div class="media-frame" data-open="photo" data-src="${esc(m.src)}">
+                <img src="${esc(m.src)}" alt="${esc(m.caption)}" loading="lazy">
                 ${m.live ? `<div class="live-badge">${svgLiveIcon()}LIVE</div>` : ''}
             </div>
             <div class="meta-row">
                 <div class="meta-left">
-                    <span class="meta-date">${m.date || ''}</span>
-                    <span class="meta-caption">${m.caption || ''}</span>
+                    <span class="meta-date">${esc(m.date)}</span>
+                    <span class="meta-caption">${esc(m.caption)}</span>
                 </div>
-                ${m.location ? `<div class="meta-loc">${svgLocationIcon()}${m.location}</div>` : ''}
+                ${m.location ? `<div class="meta-loc">${svgLocationIcon()}${esc(m.location)}</div>` : ''}
             </div>
         </div>`;
         return el.firstElementChild;
@@ -1540,315 +1548,56 @@
         const el = document.createElement('div');
         el.innerHTML = `
         <div class="card-shell" data-tilt>
-            <div class="media-frame" data-open="video" data-src="${m.src}">
-                <img src="${m.poster}" alt="${m.caption || ''}" loading="lazy">
+            <div class="media-frame" data-open="video" data-src="${esc(m.src)}">
+                <img src="${esc(m.poster)}" alt="${esc(m.caption)}" loading="lazy">
                 <div class="play-btn"><div class="circle">${svgPlayIcon()}</div></div>
-                ${m.duration ? `<div class="video-duration">${m.duration}</div>` : ''}
+                ${m.duration ? `<div class="video-duration">${esc(m.duration)}</div>` : ''}
             </div>
             <div class="meta-row">
                 <div class="meta-left">
-                    <span class="meta-date">${m.date || ''}</span>
-                    <span class="meta-caption">${m.caption || ''}</span>
+                    <span class="meta-date">${esc(m.date)}</span>
+                    <span class="meta-caption">${esc(m.caption)}</span>
                 </div>
-                ${m.location ? `<div class="meta-loc">${svgLocationIcon()}${m.location}</div>` : ''}
+                ${m.location ? `<div class="meta-loc">${svgLocationIcon()}${esc(m.location)}</div>` : ''}
             </div>
         </div>`;
         return el.firstElementChild;
     }
 
     function createChatCard(m) {
-        const bubbles = (m.bubbles || []).map(b =>
-            `<div class="bubble ${b.from === 'me' ? 'me' : 'them'}">${b.text}</div>`).join('');
+        const bubbles = (m.bubbles || []).map(b => `<div class="bubble ${b.from === 'me' ? 'me' : 'them'}">${esc(b.text)}</div>`).join('');
         const initial = (m.name || '?').trim().charAt(0).toUpperCase();
+        // An uploaded screenshot stands in for the drawn conversation; without
+        // one the client's own three lines are rendered as the chat instead.
+        const inner = m.shot
+            ? `<img class="chat-shot" src="${esc(m.shot)}" alt="${esc(m.caption)}" loading="lazy">`
+            : `<div class="chat-frame" data-open="chat">
+                        <div class="chat-topbar">
+                            <div class="chat-avatar">${esc(initial)}</div>
+                            <div class="chat-name">${esc(m.name)}</div>
+                        </div>
+                        <div class="chat-bubbles">
+                            <div class="chat-time">${esc(m.date)}</div>
+                            ${bubbles}
+                        </div>
+                    </div>`;
         const el = document.createElement('div');
         el.innerHTML = `
-        <div class="card-shell" data-tilt>
-            <div class="chat-wrap">
-                <div class="chat-frame" data-open="chat">
-                    <div class="chat-topbar">
-                        <div class="chat-avatar">${initial}</div>
-                        <div class="chat-name">${m.name || ''}</div>
+            <div class="card-shell" data-tilt>
+                <div class="chat-wrap">
+                    ${inner}
+                </div>
+                <div class="meta-row">
+                    <div class="meta-left">
+                        <span class="meta-date">${esc(m.date)}</span>
+                        <span class="meta-caption">${esc(m.caption)}</span>
                     </div>
-                    <div class="chat-bubbles">
-                        <div class="chat-time">${m.date || ''}</div>
-                        ${bubbles}
-                    </div>
                 </div>
-            </div>
-            <div class="meta-row">
-                <div class="meta-left">
-                    <span class="meta-date">${m.date || ''}</span>
-                    <span class="meta-caption">${m.caption || ''}</span>
-                </div>
-            </div>
-        </div>`;
+            </div>`;
         return el.firstElementChild;
-    }
+    @include('birthday.partials.girl-gift3-camera-roll-runtime')
 
-    function createNoteCard(m) {
-        const el = document.createElement('div');
-        el.innerHTML = `
-        <div class="card-shell">
-            <div class="note">
-                <div class="tape"></div>
-                <div class="note-text">${(m.text || '').replace(/\n/g, '<br>')}</div>
-            </div>
-            <div class="meta-row">
-                <div class="meta-left"><span class="meta-date">${m.date || ''}</span></div>
-            </div>
-        </div>`;
-        return el.firstElementChild;
-    }
-
-    function createLetterCard(m) {
-        const el = document.createElement('div');
-        el.innerHTML = `
-        <div class="letter-card" id="letterTrigger" data-letter="${encodeURIComponent(m.text || '')}">
-            <div class="letter-fold">
-                <div class="letter-seal">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 21s-7-4.6-9.6-9.1C.6 8.4 2.4 5 6 5c2 0 3.5 1.1 4.3 2.4a1 1 0 0 0 1.4 0C12.5 6.1 14 5 16 5c3.6 0 5.4 3.4 3.6 6.9C19 16.4 12 21 12 21Z"></path>
-                    </svg>
-                </div>
-                <p>A letter, just for you.</p>
-                <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.7;">Tap to open</p>
-            </div>
-        </div>`;
-        return el.firstElementChild;
-    }
-
-    function buildCard(m) {
-        switch (m.type) {
-            case 'photo':
-                return createPhotoCard(m);
-            case 'video':
-                return createVideoCard(m);
-            case 'chat':
-                return createChatCard(m);
-            case 'note':
-                return createNoteCard(m);
-            case 'letter':
-                return createLetterCard(m);
-            default:
-                return document.createElement('div');
-        }
-    }
-
-    MEMORY_DATA.forEach(m => {
-        const wrap = document.createElement('div');
-        wrap.className = 'memory';
-        wrap.appendChild(buildCard(m));
-        reel.appendChild(wrap);
-    });
-
-    const endMark = document.createElement('div');
-    endMark.className = 'end-mark';
-    endMark.textContent = '— end of roll —';
-    reel.appendChild(endMark);
-
-    /* ==================================================
-       OPENING: cover tap -> gallery reveal -> staged cards
-       ================================================== */
-    const cover = document.getElementById('cover');
-    const gallery = document.getElementById('gallery');
-    const memories = Array.from(document.querySelectorAll('.memory'));
-
-    function updateCounter(shown) {
-        counterEl.textContent = shown + ' / ' + memories.length + ' memories';
-    }
-
-    function revealMemoriesSequentially() {
-        let i = 0;
-        updateCounter(0);
-        const step = () => {
-            if (i >= memories.length) return;
-            memories[i].classList.add('show');
-            i++;
-            updateCounter(i);
-            if (i < memories.length) {
-                setTimeout(step, 420);
-            }
-        };
-        setTimeout(step, 250);
-    }
-
-    function openGallery() {
-        cover.classList.add('hidden');
-        gallery.classList.add('active');
-        revealMemoriesSequentially();
-    }
-
-    cover.addEventListener('click', openGallery);
-    cover.addEventListener('keyup', e => {
-        if (e.key === 'Enter' || e.key === ' ') openGallery();
-    });
-
-    /* ==================================================
-       RIPPLE micro-interaction on tap
-       ================================================== */
-    document.addEventListener('pointerdown', (e) => {
-        const target = e.target.closest('.card-shell, .cover-card, .letter-card');
-        if (!target) return;
-        const rect = target.getBoundingClientRect();
-        const r = document.createElement('span');
-        const size = Math.max(rect.width, rect.height);
-        r.className = 'ripple';
-        r.style.width = r.style.height = size + 'px';
-        r.style.left = (e.clientX - rect.left - size / 2) + 'px';
-        r.style.top = (e.clientY - rect.top - size / 2) + 'px';
-        target.style.position = target.style.position || 'relative';
-        target.style.overflow = target.style.overflow || 'hidden';
-        target.appendChild(r);
-        setTimeout(() => r.remove(), 650);
-    });
-
-    /* subtle desktop tilt */
-    document.addEventListener('pointermove', (e) => {
-        const el = e.target.closest('[data-tilt]');
-        document.querySelectorAll('.card-shell.tilt').forEach(c => {
-            if (c !== el) {
-                c.style.setProperty('--rx', '0deg');
-                c.style.setProperty('--ry', '0deg');
-                c.classList.remove('tilt');
-            }
-        });
-        if (!el || window.innerWidth < 1024) return;
-        const rect = el.getBoundingClientRect();
-        const px = (e.clientX - rect.left) / rect.width - .5;
-        const py = (e.clientY - rect.top) / rect.height - .5;
-        el.classList.add('tilt');
-        el.style.setProperty('--ry', (px * 6) + 'deg');
-        el.style.setProperty('--rx', (py * -6) + 'deg');
-    });
-
-    /* ==================================================
-       PHOTO / CHAT FULLSCREEN VIEWER
-       ================================================== */
-    const viewer = document.getElementById('viewer');
-    const viewerInner = document.getElementById('viewerInner');
-    const viewerClose = document.getElementById('viewerClose');
-
-    function openViewer(kind, sourceEl) {
-        viewerInner.innerHTML = '';
-        if (kind === 'photo') {
-            const img = document.createElement('img');
-            img.src = sourceEl.dataset.src;
-            viewerInner.appendChild(img);
-        } else if (kind === 'chat') {
-            viewerInner.appendChild(sourceEl.cloneNode(true));
-        }
-        viewer.classList.add('open');
-    }
-
-    function closeViewer() {
-        viewer.classList.remove('open');
-    }
-
-    reel.addEventListener('click', (e) => {
-        const openTarget = e.target.closest('[data-open]');
-        if (!openTarget) return;
-        const kind = openTarget.dataset.open;
-        if (kind === 'photo') openViewer('photo', openTarget);
-        if (kind === 'chat') openViewer('chat', openTarget);
-        if (kind === 'video') openVideo(openTarget.dataset.src, openTarget.querySelector('img')?.src);
-    });
-
-    viewerClose.addEventListener('click', closeViewer);
-    viewer.addEventListener('click', (e) => {
-        if (e.target === viewer) closeViewer();
-    });
-
-    /* ==================================================
-       VIDEO POPUP
-       ================================================== */
-    const videoModal = document.getElementById('videoModal');
-    const modalVideo = document.getElementById('modalVideo');
-    const videoClose = document.getElementById('videoClose');
-
-    function openVideo(src, poster) {
-        modalVideo.pause();
-        modalVideo.src = src || '';
-        if (poster) modalVideo.poster = poster;
-        videoModal.classList.add('open');
-        if (src) modalVideo.play().catch(() => {});
-    }
-
-    function closeVideo() {
-        videoModal.classList.remove('open');
-        modalVideo.pause();
-    }
-
-    videoClose.addEventListener('click', closeVideo);
-    videoModal.addEventListener('click', (e) => {
-        if (e.target === videoModal) closeVideo();
-    });
-
-    /* ==================================================
-       FINAL LETTER — unfold + pen handwriting animation
-       ================================================== */
-    const letterOverlay = document.getElementById('letterOverlay');
-    const letterBody = document.getElementById('letterBody');
-    const letterSignoff = document.getElementById('letterSignoff');
-    const letterClose = document.getElementById('letterClose');
-    let letterTyped = false;
-
-    function typewriteHandwriting(text) {
-        letterBody.innerHTML = '';
-        const caret = document.createElement('span');
-        caret.className = 'pen-caret';
-
-        let i = 0;
-        const textNode = document.createTextNode('');
-        letterBody.appendChild(textNode);
-        letterBody.appendChild(caret);
-
-        function tick() {
-            if (i >= text.length) {
-                caret.remove();
-                letterSignoff.classList.add('show');
-                return;
-            }
-            textNode.textContent += text[i];
-            i++;
-            // irregular pen-like timing: pauses on punctuation & line breaks
-            const ch = text[i - 1];
-            let delay = 34 + Math.random() * 26;
-            if (ch === ',') delay += 140;
-            if (ch === '.') delay += 260;
-            if (ch === '\n') delay += 420;
-            setTimeout(tick, delay);
-        }
-        tick();
-    }
-
-    reel.addEventListener('click', (e) => {
-        const trigger = e.target.closest('#letterTrigger, [data-letter]');
-        if (!trigger) return;
-        const text = decodeURIComponent(trigger.dataset.letter || '');
-        letterOverlay.classList.add('open');
-        letterSignoff.classList.remove('show');
-        if (!letterTyped) {
-            letterTyped = true;
-            setTimeout(() => typewriteHandwriting(text), 500);
-        } else {
-            letterBody.textContent = text;
-            letterSignoff.classList.add('show');
-        }
-    });
-
-    letterClose.addEventListener('click', () => letterOverlay.classList.remove('open'));
-    letterOverlay.addEventListener('click', (e) => {
-        if (e.target === letterOverlay) letterOverlay.classList.remove('open');
-    });
-
-    /* Escape key closes any open overlay */
-    document.addEventListener('keydown', (e) => {
-        if (e.key !== 'Escape') return;
-        closeViewer();
-        closeVideo();
-        letterOverlay.classList.remove('open');
-    });
-    </script>
+</script>
 
 </body>
 

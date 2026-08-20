@@ -1,3 +1,19 @@
+@php
+    // The letter is the one slot whose length the client controls freely, and
+    // the paper is a fixed sheet. Its text and its auto-fit size are worked out
+    // here, above the markup, so both the sheet and the script below read the
+    // same value.
+    $endingLetterDefault = "Happy birthday, my love.\n\nWe reached the last page, but this isn't really the end \u{2014} it's just where the words stop and the feeling keeps going.\n\nThank you for being exactly who you are \u{2014} for every laugh, every little moment, every reason you give me to smile.\n\nHere's to you, and to every birthday still ahead of us.\n\nI love you, always.";
+    $endingLetter = request('letter', $endingLetterDefault);
+
+    // A hard line break costs a whole line on this sheet, so it weighs about
+    // as much as a line's worth of characters.
+    $endingLetterWeight = max(
+        mb_strlen($endingLetter),
+        (substr_count($endingLetter, "\n") + 1) * 26
+    );
+    $endingLetterSize = $endingLetterWeight > 300 ? 'xs' : ($endingLetterWeight > 200 ? 'sm' : '');
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -465,6 +481,19 @@
         min-height: 220px;
     }
 
+    /* Auto-fit: the sheet is a fixed height, so a longer letter steps down a
+   size rather than running off the bottom of it. Paired with the length and
+   line caps in the dashboard. */
+    .letter-body.sm {
+        font-size: clamp(17px, 5vw, 21px);
+        line-height: 1.6;
+    }
+
+    .letter-body.xs {
+        font-size: clamp(15px, 4.2vw, 18px);
+        line-height: 1.5;
+    }
+
     .pen-caret {
         display: inline-block;
         width: 2px;
@@ -618,8 +647,8 @@
                     </div>
                 </div>
                 <div class="envelope-caption">
-                    <h1>One Last Thing</h1>
-                    <p>Before you go, read this.</p>
+                    <h1>{{ request('title', 'One Last Thing') }}</h1>
+                    <p>{{ request('subtitle', 'Before you go, read this.') }}</p>
                     <div class="envelope-tap">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round">
@@ -629,7 +658,7 @@
                                 d="M17 8.5a2 2 0 1 1 4 0V14a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3.4L4.7 13a1.8 1.8 0 0 1 2.9-2.1L9 13">
                             </path>
                         </svg>
-                        Tap to Open
+                        {{ request('tap_label', 'Tap to Open') }}
                     </div>
                 </div>
             </div>
@@ -646,10 +675,10 @@
                         </path>
                     </svg>
                 </div>
-                <div class="letter-heading"><span>A Letter For You</span></div>
-                <div class="letter-body" id="letterBody"><span class="pen-caret"></span></div>
-                <div class="letter-signoff" id="letterSignoff">— always yours</div>
-                <div class="the-end" id="theEnd"><span>The End</span></div>
+                <div class="letter-heading"><span>{{ request('letter_heading', 'A Letter For You') }}</span></div>
+                <div class="letter-body {{ $endingLetterSize }}" id="letterBody"><span class="pen-caret"></span></div>
+                <div class="letter-signoff" id="letterSignoff">{{ request('signoff', '— always yours') }}</div>
+                <div class="the-end" id="theEnd"><span>{{ request('end_label', 'The End') }}</span></div>
             </div>
         </div>
     </div>
@@ -658,8 +687,7 @@
     /* ==================================================
    REUSABLE LETTER TEXT — replace this to customize
    ================================================== */
-    const LETTER_TEXT =
-        'Happy birthday, my love.\n\nWe reached the last page, but this isn\'t really the end — it\'s just where the words stop and the feeling keeps going.\n\nThank you for being exactly who you are — for every laugh, every little moment, every reason you give me to smile.\n\nHere\'s to you, and to every birthday still ahead of us.\n\nI love you, always.';
+    const LETTER_TEXT = @json($endingLetter);
 
     /* ==================================================
        BACKGROUND LOVE WORDS + EMOJIS
@@ -746,6 +774,8 @@
     const letterStamp = document.getElementById('letterStamp');
     const theEnd = document.getElementById('theEnd');
 
+    const paper = letterBody.closest('.letter-paper');
+
     function typewriteHandwriting(text) {
         letterBody.innerHTML = '';
         const caret = document.createElement('span');
@@ -765,6 +795,11 @@
             }
             textNode.textContent += text[i];
             i++;
+            // The sheet scrolls, so a letter longer than the paper would
+            // otherwise be written below the fold.
+            if (paper && paper.scrollHeight > paper.clientHeight) {
+                paper.scrollTop = paper.scrollHeight;
+            }
             const ch = text[i - 1];
             let delay = 34 + Math.random() * 26;
             if (ch === ',') delay += 140;
@@ -786,6 +821,21 @@
     envelope.addEventListener('keyup', e => {
         if (e.key === 'Enter' || e.key === ' ') openLetter();
     });
+
+    /* ==================================================
+       DASHBOARD PREVIEW
+       ?preview_stage=letter skips the envelope and prints the letter in full,
+       so the client can see the text they are typing without waiting out the
+       handwriting animation.
+       ================================================== */
+    if (@json(request('preview_stage')) === 'letter') {
+        envelopeWrap.classList.add('hidden');
+        letterWrap.classList.add('open');
+        letterStamp.classList.add('show');
+        letterBody.textContent = LETTER_TEXT;
+        letterSignoff.classList.add('show');
+        theEnd.classList.add('show');
+    }
 
     /* ripple micro-interaction */
     document.addEventListener('pointerdown', (e) => {

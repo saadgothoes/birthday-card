@@ -638,9 +638,14 @@ button {
     color: var(--text);
     font-family: var(--font-heading);
     font-style: italic;
-    white-space: nowrap;
+    /* Was a single ellipsised line, which silently ate the back half of any
+       caption past ~20 characters. It now runs to two lines, so a caption of
+       the length the design's own defaults use is shown in full. */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: break-word;
 }
 
 .meta-loc {
@@ -754,6 +759,13 @@ button {
 }
 
 /* ---- Chat screenshot card (native iMessage look) ---- */
+.chat-shot {
+    display: block;
+    width: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
 .chat-wrap {
     padding: 16px 16px 4px;
 }
@@ -1244,15 +1256,15 @@ button {
                         <path d="M8 6l1.4-2.2h5.2L16 6"></path>
                     </svg>
                 </div>
-                <h1 class="cover-title">Our Camera Roll</h1>
-                <p class="cover-sub">Every memory has a story.</p>
+                <h1 class="cover-title">{{ request('cover_title', 'Our Camera Roll') }}</h1>
+                <p class="cover-sub">{{ request('cover_sub', 'Every memory has a story.') }}</p>
                 <div class="cover-tap">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 11.5V6a2 2 0 1 1 4 0v5"></path>
                         <path d="M13 6a2 2 0 1 1 4 0v6"></path>
                         <path d="M17 8.5a2 2 0 1 1 4 0V14a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3.4L4.7 13a1.8 1.8 0 0 1 2.9-2.1L9 13"></path>
                     </svg>
-                    Tap to Open
+                    {{ request('cover_tap', 'Tap to Open') }}
                 </div>
             </div>
         </div>
@@ -1260,7 +1272,7 @@ button {
         <!-- ============ MAIN GALLERY (memory reel) ============ -->
         <div class="gallery" id="gallery">
             <div class="gallery-header">
-                <h2>Our Camera Roll</h2>
+                <h2>{{ request('gallery_title', 'Our Camera Roll') }}</h2>
                 <span id="counter">0 / 0 memories</span>
             </div>
 
@@ -1305,7 +1317,7 @@ button {
     </button>
     <div class="letter-paper">
         <div class="letter-body" id="letterBody"><span class="pen-caret"></span></div>
-        <div class="letter-signoff" id="letterSignoff">— with love</div>
+        <div class="letter-signoff" id="letterSignoff">{{ request('signoff', '— with love') }}</div>
     </div>
 </div>
 
@@ -1315,68 +1327,59 @@ button {
    Replace src / text values with real user uploads.
    type: "photo" | "video" | "chat" | "note" | "letter"
    ================================================== */
-const MEMORY_DATA = [
-    {
-        type: 'photo',
-        src: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=800&auto=format&fit=crop',
-        date: 'March 14',
-        location: 'Rooftop Cafe',
-        caption: 'The evening the sky turned gold.',
-        live: true
-    },
-    {
-        type: 'video',
-        poster: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop',
-        src: '',
-        duration: '0:18',
-        date: 'April 2',
-        location: 'Home',
-        caption: 'That laugh I never get tired of.'
-    },
-    {
-        type: 'chat',
-        name: 'My Person',
-        bubbles: [
-            { from: 'them', text: 'guess where I am rn 👀' },
-            { from: 'me', text: 'no way. tell me you didn\'t' },
-            { from: 'them', text: 'i did. saved us seats already 🎬' },
+@php
+    // ── Girl Gift 3 — the camera roll ────────────────────────────────
+    // Five cards: a photo with its date, one video clip, the chat, a second
+    // photo, and the letter. Every card is built here so the dashboard drives
+    // the whole thing through query parameters, and each default is the
+    // design's own original content — with no parameters the page renders
+    // exactly as it did before.
+    $memoryData = [
+        [
+            'type' => 'photo',
+            'src' => request('photo1', 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=800&auto=format&fit=crop'),
+            'date' => request('p1_date', 'March 14'),
+            'location' => request('p1_place', 'Rooftop Cafe'),
+            'caption' => request('p1_caption', 'The evening the sky turned gold.'),
+            'live' => true,
         ],
-        date: 'April 9',
-        caption: 'My favorite conversation.'
-    },
-    {
-        type: 'photo',
-        src: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=800&auto=format&fit=crop',
-        date: 'May 21',
-        location: 'Coastline Drive',
-        caption: 'Windows down, nowhere to be.'
-    },
-    {
-        type: 'note',
-        date: 'June 3',
-        text: '"i keep this one in my head\non the hard days."'
-    },
-    {
-        type: 'video',
-        poster: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?q=80&w=800&auto=format&fit=crop',
-        src: '',
-        duration: '0:24',
-        date: 'June 30',
-        location: 'The Old Pier',
-        caption: 'Right before the fireworks.'
-    },
-    {
-        type: 'photo',
-        src: 'https://images.unsplash.com/photo-1500336624523-d727130c3328?q=80&w=800&auto=format&fit=crop',
-        date: 'July 12',
-        location: 'Mountain Trail',
-        caption: 'We got so lost, and I didn\'t mind.'
-    },
-    {
-        type: 'letter',
-        text: 'Thank you for every smile.\n\nEvery photo here reminds me how lucky I am to have you.\n\nHere\'s to a thousand more memories, and to you — always, endlessly, you.\n\nHappy birthday. I love you.'
-    }
-];
+        [
+            'type' => 'video',
+            'poster' => request('poster1', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop'),
+            'src' => request('video1', ''),
+            'duration' => request('v1_duration', '0:18'),
+            'date' => request('v1_date', 'April 2'),
+            'location' => request('v1_place', 'Home'),
+            'caption' => request('v1_caption', 'That laugh I never get tired of.'),
+        ],
+        [
+            'type' => 'chat',
+            // A real screenshot if the client uploaded one, otherwise the chat
+            // is drawn from their own three lines.
+            'shot' => request('chat_shot', ''),
+            'name' => request('chat_name', 'My Person'),
+            'bubbles' => [
+                ['from' => 'them', 'text' => request('chat1', 'guess where I am rn 👀')],
+                ['from' => 'me', 'text' => request('chat2', "no way. tell me you didn't")],
+                ['from' => 'them', 'text' => request('chat3', 'i did. saved us seats already 🎬')],
+            ],
+            'date' => request('chat_date', 'April 9'),
+            'caption' => request('chat_caption', 'My favorite conversation.'),
+        ],
+        [
+            'type' => 'photo',
+            'src' => request('photo2', 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=800&auto=format&fit=crop'),
+            'date' => request('p2_date', 'May 21'),
+            'location' => request('p2_place', 'Coastline Drive'),
+            'caption' => request('p2_caption', 'Windows down, nowhere to be.'),
+        ],
+        [
+            'type' => 'letter',
+            'text' => request('letter', "Thank you for every smile.\n\nEvery photo here reminds me how lucky I am to have you.\n\nHere's to a thousand more memories, and to you \u{2014} always, endlessly, you.\n\nHappy birthday. I love you."),
+        ],
+    ];
+@endphp
+const MEMORY_DATA = @json($memoryData);
 
 /* ==================================================
    LIVE CLOCK for status bar (feels real, not stuck at 9:41)
@@ -1477,6 +1480,18 @@ const MEMORY_DATA = [
 const reel = document.getElementById('reel');
 const counterEl = document.getElementById('counter');
 
+// Cards are built with innerHTML, so anything the client typed is escaped
+// on the way in. Without this a quote in a caption would break the attribute
+// it sits in and a stray angle bracket could rewrite the card.
+function esc(value) {
+    return String(value === null || value === undefined ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function svgLocationIcon() {
     return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
 }
@@ -1493,16 +1508,16 @@ function createPhotoCard(m) {
     const el = document.createElement('div');
     el.innerHTML = `
         <div class="card-shell" data-tilt>
-            <div class="media-frame" data-open="photo" data-src="${m.src}">
-                <img src="${m.src}" alt="${m.caption || ''}" loading="lazy">
+            <div class="media-frame" data-open="photo" data-src="${esc(m.src)}">
+                <img src="${esc(m.src)}" alt="${esc(m.caption)}" loading="lazy">
                 ${m.live ? `<div class="live-badge">${svgLiveIcon()}LIVE</div>` : ''}
             </div>
             <div class="meta-row">
                 <div class="meta-left">
-                    <span class="meta-date">${m.date || ''}</span>
-                    <span class="meta-caption">${m.caption || ''}</span>
+                    <span class="meta-date">${esc(m.date)}</span>
+                    <span class="meta-caption">${esc(m.caption)}</span>
                 </div>
-                ${m.location ? `<div class="meta-loc">${svgLocationIcon()}${m.location}</div>` : ''}
+                ${m.location ? `<div class="meta-loc">${svgLocationIcon()}${esc(m.location)}</div>` : ''}
             </div>
         </div>`;
     return el.firstElementChild;
@@ -1512,44 +1527,49 @@ function createVideoCard(m) {
     const el = document.createElement('div');
     el.innerHTML = `
         <div class="card-shell" data-tilt>
-            <div class="media-frame" data-open="video" data-src="${m.src}">
-                <img src="${m.poster}" alt="${m.caption || ''}" loading="lazy">
+            <div class="media-frame" data-open="video" data-src="${esc(m.src)}">
+                <img src="${esc(m.poster)}" alt="${esc(m.caption)}" loading="lazy">
                 <div class="play-btn"><div class="circle">${svgPlayIcon()}</div></div>
-                ${m.duration ? `<div class="video-duration">${m.duration}</div>` : ''}
+                ${m.duration ? `<div class="video-duration">${esc(m.duration)}</div>` : ''}
             </div>
             <div class="meta-row">
                 <div class="meta-left">
-                    <span class="meta-date">${m.date || ''}</span>
-                    <span class="meta-caption">${m.caption || ''}</span>
+                    <span class="meta-date">${esc(m.date)}</span>
+                    <span class="meta-caption">${esc(m.caption)}</span>
                 </div>
-                ${m.location ? `<div class="meta-loc">${svgLocationIcon()}${m.location}</div>` : ''}
+                ${m.location ? `<div class="meta-loc">${svgLocationIcon()}${esc(m.location)}</div>` : ''}
             </div>
         </div>`;
     return el.firstElementChild;
 }
 
 function createChatCard(m) {
-    const bubbles = (m.bubbles || []).map(b => `<div class="bubble ${b.from === 'me' ? 'me' : 'them'}">${b.text}</div>`).join('');
+    const bubbles = (m.bubbles || []).map(b => `<div class="bubble ${b.from === 'me' ? 'me' : 'them'}">${esc(b.text)}</div>`).join('');
     const initial = (m.name || '?').trim().charAt(0).toUpperCase();
+    // An uploaded screenshot stands in for the drawn conversation; without
+    // one the client's own three lines are rendered as the chat instead.
+    const inner = m.shot
+        ? `<img class="chat-shot" src="${esc(m.shot)}" alt="${esc(m.caption)}" loading="lazy">`
+        : `<div class="chat-frame" data-open="chat">
+                    <div class="chat-topbar">
+                        <div class="chat-avatar">${esc(initial)}</div>
+                        <div class="chat-name">${esc(m.name)}</div>
+                    </div>
+                    <div class="chat-bubbles">
+                        <div class="chat-time">${esc(m.date)}</div>
+                        ${bubbles}
+                    </div>
+                </div>`;
     const el = document.createElement('div');
     el.innerHTML = `
         <div class="card-shell" data-tilt>
             <div class="chat-wrap">
-                <div class="chat-frame" data-open="chat">
-                    <div class="chat-topbar">
-                        <div class="chat-avatar">${initial}</div>
-                        <div class="chat-name">${m.name || ''}</div>
-                    </div>
-                    <div class="chat-bubbles">
-                        <div class="chat-time">${m.date || ''}</div>
-                        ${bubbles}
-                    </div>
-                </div>
+                ${inner}
             </div>
             <div class="meta-row">
                 <div class="meta-left">
-                    <span class="meta-date">${m.date || ''}</span>
-                    <span class="meta-caption">${m.caption || ''}</span>
+                    <span class="meta-date">${esc(m.date)}</span>
+                    <span class="meta-caption">${esc(m.caption)}</span>
                 </div>
             </div>
         </div>`;
@@ -1562,10 +1582,10 @@ function createNoteCard(m) {
         <div class="card-shell">
             <div class="note">
                 <div class="tape"></div>
-                <div class="note-text">${(m.text || '').replace(/\n/g, '<br>')}</div>
+                <div class="note-text">${esc(m.text).replace(/\n/g, '<br>')}</div>
             </div>
             <div class="meta-row">
-                <div class="meta-left"><span class="meta-date">${m.date || ''}</span></div>
+                <div class="meta-left"><span class="meta-date">${esc(m.date)}</span></div>
             </div>
         </div>`;
     return el.firstElementChild;
@@ -1799,6 +1819,30 @@ document.addEventListener('keydown', (e) => {
     closeVideo();
     letterOverlay.classList.remove('open');
 });
+
+/* ==================================================
+   DASHBOARD PREVIEW
+   The roll opens on its cover and stages the cards in one at a time, so
+   ?preview_card=N skips both and scrolls straight to the card being edited.
+   Card 0 is the cover itself.
+   ================================================== */
+(function previewCard() {
+    const raw = @json(request('preview_card'));
+    if (raw === null || raw === undefined || raw === '') return;
+    const index = parseInt(raw, 10);
+    if (isNaN(index) || index < 0) return;
+
+    cover.classList.add('hidden');
+    gallery.classList.add('active');
+    memories.forEach(m => m.classList.add('show'));
+    updateCounter(memories.length);
+
+    const target = memories[Math.min(index, memories.length - 1)];
+    if (target) {
+        requestAnimationFrame(() => target.scrollIntoView({ block: 'center' }));
+    }
+})();
+
 </script>
 
 </body>

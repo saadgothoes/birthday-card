@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Model;
     'gift1_data',
     'gift2_data',
     'gift3_data',
+    'ending_data',
+    'qr_data',
     'current_step',
     'slug',
     'is_published',
@@ -36,6 +38,8 @@ class BirthdayCard extends Model
             'gift1_data' => 'array',
             'gift2_data' => 'array',
             'gift3_data' => 'array',
+            'ending_data' => 'array',
+            'qr_data' => 'array',
             'is_published' => 'boolean',
         ];
     }

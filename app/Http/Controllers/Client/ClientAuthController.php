@@ -51,6 +51,14 @@ class ClientAuthController extends Controller
             ->latest()
             ->first();
 
+        // The QR step previews the four designs against the card's own share
+        // link, so the address has to be settled before that step is reached,
+        // not at publish time — otherwise the previews would encode one URL
+        // and the generated code another.
+        if ($card) {
+            BirthdayCardController::ensureSlug($card);
+        }
+
         return view('client.dashboard', ['card' => $card]);
     }
 

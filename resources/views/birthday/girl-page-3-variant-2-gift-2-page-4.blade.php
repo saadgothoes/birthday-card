@@ -635,6 +635,63 @@
             opacity: 0;
         }
 
+        .gift2-help-button {
+            position: absolute;
+            top: 5%;
+            right: 5%;
+            z-index: 20;
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(var(--gold-rgb), .55);
+            border-radius: 50%;
+            background: rgba(var(--bg-dark-rgb), .55);
+            color: var(--gold);
+            font-family: var(--font-heading);
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(var(--shadow-rgb), .25);
+        }
+
+        .gift2-help-button:hover,
+        .gift2-help-button:focus-visible {
+            background: var(--primary);
+            color: var(--text-light);
+            outline: none;
+        }
+
+        .gift2-help-dialog {
+            position: absolute;
+            top: 11%;
+            left: 8%;
+            right: 8%;
+            z-index: 30;
+            display: none;
+            padding: 1rem 1.1rem;
+            border: 1px solid rgba(var(--gold-rgb), .55);
+            border-radius: var(--radius-sm);
+            background: rgba(var(--bg-dark-rgb), .94);
+            color: var(--text-light);
+            text-align: left;
+            box-shadow: var(--shadow);
+        }
+
+        .gift2-help-dialog.is-visible {
+            display: block;
+        }
+
+        .gift2-help-dialog strong {
+            display: block;
+            margin-bottom: .35rem;
+            color: var(--gold);
+            font-family: var(--font-heading);
+            font-size: 1rem;
+        }
+
+        .gift2-help-dialog p {
+            font-size: .95rem;
+            line-height: 1.35;
+        }
+
         .stage-helper {
             position: absolute;
             left: 0;
@@ -1128,6 +1185,11 @@
     <div class="stage-outer">
         <div class="app-frame" id="appFrame">
 
+            <button class="gift2-help-button" id="gift2HelpButton" type="button" aria-label="How to open this gift" aria-expanded="false">ⓘ</button>
+            <div class="gift2-help-dialog" id="gift2HelpDialog" role="dialog" aria-label="How to open this gift"><strong>How to open this gift</strong>
+                <p>Tap the ribbon once. Then tap the gift box three times to open it.</p>
+            </div>
+
             <!-- ============== AMBIENT BACKGROUND ============== -->
             <div class="bg-layer">
                 <div class="bg-glow g1"></div>
@@ -1166,8 +1228,8 @@
                 </div>
 
                 <p class="helper-text" id="helperText">
-                    A little surprise is waiting…
-                    <span class="helper-sub" id="helperSub">Tap the ribbon</span>
+                    {{ request('box_title', 'A little surprise is waiting…') }}
+                    <span class="helper-sub" id="helperSub">{{ request('box_hint', 'Tap the ribbon') }}</span>
                 </p>
             </div>
 
@@ -1179,19 +1241,19 @@
                     data-src="{{ request('photo1', 'https://picsum.photos/seed/giftphoto1/500/560') }}" tabindex="0" role="button"
                     aria-label="View memory one">
                     <img src="{{ request('photo1', 'https://picsum.photos/seed/giftphoto1/500/560') }}" alt="A cherished memory">
-                    <p class="polaroid-cap">memory one</p>
+                    <p class="polaroid-cap">{{ request('cap1', 'memory one') }}</p>
                 </div>
                 <div class="polaroid" id="photo1" style="--tilt:5deg"
                     data-src="{{ request('photo2', 'https://picsum.photos/seed/giftphoto2/500/560') }}" tabindex="0" role="button"
                     aria-label="View memory two">
                     <img src="{{ request('photo2', 'https://picsum.photos/seed/giftphoto2/500/560') }}" alt="A cherished memory">
-                    <p class="polaroid-cap">memory two</p>
+                    <p class="polaroid-cap">{{ request('cap2', 'memory two') }}</p>
                 </div>
                 <div class="polaroid" id="photo2" style="--tilt:-4deg"
                     data-src="{{ request('photo3', 'https://picsum.photos/seed/giftphoto3/500/560') }}" tabindex="0" role="button"
                     aria-label="View memory three">
                     <img src="{{ request('photo3', 'https://picsum.photos/seed/giftphoto3/500/560') }}" alt="A cherished memory">
-                    <p class="polaroid-cap">memory three</p>
+                    <p class="polaroid-cap">{{ request('cap3', 'memory three') }}</p>
                 </div>
 
                 <div class="envelope" id="envelope" tabindex="0" role="button" aria-label="Open the envelope">
@@ -1243,6 +1305,13 @@
             =================================================================================== */
             const $ = (id) => document.getElementById(id);
             const rand = (min, max) => Math.random() * (max - min) + min;
+
+            const gift2HelpButton = $('gift2HelpButton');
+            const gift2HelpDialog = $('gift2HelpDialog');
+            gift2HelpButton.addEventListener('click', () => {
+                const visible = gift2HelpDialog.classList.toggle('is-visible');
+                gift2HelpButton.setAttribute('aria-expanded', String(visible));
+            });
 
             function createEl(tag, className, parent) {
                 const el = document.createElement(tag);
@@ -1499,9 +1568,9 @@
                HANDWRITING ENGINE — pen-style character reveal, not a typewriter
             =================================================================================== */
             @php
-                $letterLines = request('message')
-                    ? preg_split('/\r\n|\r|\n/', request('message'))
-                    : ['Dear Love,', '', 'Every day with you makes my life more beautiful.', '', 'Thank you for every smile,', 'every memory,', 'every moment.', '', 'You are my favorite chapter.', '', "\u{2764}"];
+            $letterLines = request('message') ?
+                preg_split('/\r\n|\r|\n/', request('message')) :
+                ['Dear Love,', '', 'Every day with you makes my life more beautiful.', '', 'Thank you for every smile,', 'every memory,', 'every moment.', '', 'You are my favorite chapter.', '', "\u{2764}"];
             @endphp
             const LETTER_TEXT = @json($letterLines);
 
@@ -1693,6 +1762,49 @@
                 heartsLayer.innerHTML = '';
             }
             replayBtn.addEventListener('click', resetExperience);
+
+            /* ===================================================================================
+               DASHBOARD PREVIEW
+               The scene opens on a wrapped box and only reveals the photos and the
+               letter as the recipient taps through it. That is no use while the
+               client is choosing which photo goes where, so ?preview_stage lets the
+               dashboard jump straight to the beat being edited.
+            =================================================================================== */
+            (function previewStage() {
+                const stage = @json(request('preview_stage'));
+                if (stage !== 'photos' && stage !== 'letter') return;
+
+                ribbonWrap.classList.add('is-untied');
+                giftBox.classList.add('is-open');
+                giftScene.classList.add('is-hidden');
+                revealStage.classList.add('is-active');
+                setStageHelper('');
+
+                // All three polaroids at once, spread across the stage. The live
+                // scene shows them one at a time; the client needs to see the set.
+                const spread = ['26%', '50%', '74%'];
+                photos.forEach((p, i) => {
+                    p.style.left = spread[i];
+                    p.style.top = '36%';
+                    p.style.scale = '0.62';
+                    p.classList.add('enter');
+                });
+
+                if (stage !== 'letter') return;
+
+                current = State.LETTER;
+                envelope.classList.add('enter', 'breaking', 'opened');
+                letter.classList.add('enter');
+                letterPaper.innerHTML = '';
+                LETTER_TEXT.forEach((lineText) => {
+                    const lineEl = createEl('div', lineText === '' ? 'hand-line spacer' : 'hand-line', letterPaper);
+                    if (lineText === '') return;
+                    for (const ch of lineText) {
+                        const span = createEl('span', 'ink-char is-inked', lineEl);
+                        span.textContent = ch === ' ' ? '\u00A0' : ch;
+                    }
+                });
+            })();
 
         })();
     </script>

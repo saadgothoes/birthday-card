@@ -70,6 +70,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            /* Decoration only. Without this the glow — a 420px circle centred
+               on the card — sits over the NEXT button and swallows its clicks. */
+            pointer-events: none;
         }
 
         /* floating particles */
@@ -79,6 +82,7 @@
             background: radial-gradient(circle, #7fb6ff, #4f8dff);
             opacity: 0;
             animation: rise linear infinite;
+            pointer-events: none;
         }
 
         @keyframes rise {
@@ -104,6 +108,7 @@
             height: 50px;
             opacity: 0.25;
             border-color: #6fa8ff;
+            pointer-events: none;
         }
 
         .tl {

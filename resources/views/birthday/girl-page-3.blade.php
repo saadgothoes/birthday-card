@@ -476,13 +476,13 @@
                 onclick="openGiftPage(1)">
             </div>
 
-            <!-- Gift 2 - Top Right -->
-            <div class="gift-area" id="gift2" style="top: 25%; right: 13%; width: 20%; height: 40%;"
+            <!-- Gift 2 - Centre -->
+            <div class="gift-area" id="gift2" style="top: 25%; left: 40%; width: 20%; height: 40%;"
                 onclick="openGiftPage(2)">
             </div>
 
-            <!-- Gift 3 - Bottom Center -->
-            <div class="gift-area" id="gift3" style="bottom: 35%; left: 40%; width: 20%; height: 40%;"
+            <!-- Gift 3 - Right -->
+            <div class="gift-area" id="gift3" style="top: 25%; right: 13%; width: 20%; height: 40%;"
                 onclick="openGiftPage(3)">
             </div>
         </div>

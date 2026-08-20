@@ -109,9 +109,15 @@
         justify-content: center;
     }
 
-    .oval-photo svg {
+    .oval-photo svg,
+    .oval-photo img {
         width: 100%;
         height: 100%;
+    }
+
+    .oval-photo img {
+        object-fit: cover;
+        display: block;
     }
 
     .rose-accent {
@@ -334,6 +340,9 @@
             <div class="oval-frame">
                 <span class="rose-accent" style="top:-18px;left:50%;transform:translateX(-50%)">🌸</span>
                 <div class="oval-photo">
+                    @if(request('photo'))
+                    <img src="{{ request('photo') }}" alt="Birthday photo">
+                    @else
                     <svg viewBox="0 0 175 248" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="gsky" x1="0" y1="0" x2="0" y2="1">
@@ -355,6 +364,7 @@
                         <circle cx="30" cy="30" r="8" fill="rgba(255,255,255,0.2)" clip-path="url(#oval)" />
                         <circle cx="145" cy="50" r="5" fill="rgba(255,255,255,0.15)" clip-path="url(#oval)" />
                     </svg>
+                    @endif
                 </div>
             </div>
         </div>
