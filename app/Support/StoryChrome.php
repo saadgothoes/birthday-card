@@ -28,8 +28,8 @@ final class StoryChrome
         $position = strripos($html, '</body>');
 
         return $position === false
-            ? $html.$chrome
-            : substr($html, 0, $position).$chrome.substr($html, $position);
+            ? $html . $chrome
+            : substr($html, 0, $position) . $chrome . substr($html, $position);
     }
 
     /** Styles shared by the floating buttons the designs don't already have. */
@@ -98,13 +98,14 @@ final class StoryChrome
      * source. `✱` clears the last digit, `#` submits, and a fourth digit
      * submits on its own. The keyboard works too.
      */
-    public static function lock(string $postUrl, string $csrf, ?string $photo, ?string $error): string
+    public static function lock(string $postUrl, string $csrf, ?string $photo, ?string $error, string $theme): string
     {
         $config = json_encode([
             'url' => $postUrl,
             'csrf' => $csrf,
             'photo' => $photo,
             'error' => $error,
+            'theme' => $theme,
         ], JSON_UNESCAPED_SLASHES);
 
         return <<<HTML
@@ -129,6 +130,89 @@ final class StoryChrome
         .story-shake {
             animation: story-shake 0.42s ease;
         }
+
+        .story-lock-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: rgba(5, 8, 18, 0.64);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.24s ease;
+        }
+
+        .story-lock-modal-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .story-lock-modal {
+            width: min(100%, 330px);
+            padding: 28px 24px 24px;
+            border: 1px solid var(--story-modal-border);
+            border-radius: 22px;
+            color: var(--story-modal-text);
+            background: var(--story-modal-bg);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42), 0 0 35px var(--story-modal-glow);
+            text-align: center;
+            font-family: 'DM Sans', system-ui, sans-serif;
+            transform: translateY(16px) scale(.96);
+            transition: transform 0.28s cubic-bezier(.22, 1, .36, 1);
+        }
+
+        .story-lock-modal-backdrop.show .story-lock-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .story-lock-modal.theme-boy-1 { --story-modal-bg: linear-gradient(145deg, #351709, #160804); --story-modal-border: rgba(255, 193, 66, .55); --story-modal-text: #fff4d5; --story-modal-accent: #ffc342; --story-modal-glow: rgba(255, 154, 35, .22); }
+        .story-lock-modal.theme-boy-2 { --story-modal-bg: linear-gradient(145deg, #182d52, #0b1428); --story-modal-border: rgba(119, 178, 255, .58); --story-modal-text: #eef6ff; --story-modal-accent: #8dc5ff; --story-modal-glow: rgba(80, 145, 255, .24); }
+        .story-lock-modal.theme-girl-1 { --story-modal-bg: linear-gradient(145deg, #fff2f7, #f5d9e6); --story-modal-border: rgba(220, 83, 139, .38); --story-modal-text: #5a2640; --story-modal-accent: #d9558f; --story-modal-glow: rgba(217, 85, 143, .2); }
+        .story-lock-modal.theme-girl-2 { --story-modal-bg: linear-gradient(145deg, #332044, #170e26); --story-modal-border: rgba(201, 155, 255, .58); --story-modal-text: #fbf4ff; --story-modal-accent: #d1aaff; --story-modal-glow: rgba(174, 112, 255, .24); }
+
+        .story-lock-modal-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 14px;
+            display: grid;
+            place-items: center;
+            border: 2px solid var(--story-modal-accent);
+            border-radius: 50%;
+            color: var(--story-modal-accent);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .story-lock-modal h2 { margin: 0; font-size: 21px; }
+        .story-lock-modal p { margin: 9px 0 0; font-size: 14px; line-height: 1.5; opacity: .82; }
+        .story-lock-modal-close {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid var(--story-modal-border);
+            border-radius: 999px;
+            color: var(--story-modal-text);
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .story-lock-success-icon { position: relative; border-color: var(--story-modal-accent); }
+        .story-lock-spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid color-mix(in srgb, var(--story-modal-accent) 28%, transparent);
+            border-top-color: var(--story-modal-accent);
+            border-radius: 50%;
+            animation: story-spin .8s linear infinite;
+        }
+        .story-lock-check { display: none; font-size: 30px; animation: story-check .45s cubic-bezier(.22, 1.4, .36, 1) both; }
+        .story-lock-success-icon.done .story-lock-spinner { display: none; }
+        .story-lock-success-icon.done .story-lock-check { display: block; }
+
+        @keyframes story-spin { to { transform: rotate(360deg); } }
+        @keyframes story-check { from { opacity: 0; transform: scale(.4) rotate(-18deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
 
         @keyframes story-shake {
 
@@ -191,6 +275,43 @@ final class StoryChrome
                 || boxes[0].parentElement.parentElement;
             panel.appendChild(message);
 
+            const modalBackdrop = document.createElement('div');
+            modalBackdrop.className = 'story-lock-modal-backdrop';
+            modalBackdrop.innerHTML = `
+                <section class="story-lock-modal" role="dialog" aria-modal="true" aria-labelledby="story-lock-modal-title">
+                    <div class="story-lock-modal-icon" data-modal-icon>!</div>
+                    <h2 id="story-lock-modal-title" data-modal-title></h2>
+                    <p data-modal-text></p>
+                    <button class="story-lock-modal-close" type="button" data-modal-close>Try again</button>
+                </section>`;
+            document.body.appendChild(modalBackdrop);
+            const modal = modalBackdrop.querySelector('.story-lock-modal');
+            modal.classList.add('theme-' + CONFIG.theme);
+            const modalIcon = modalBackdrop.querySelector('[data-modal-icon]');
+            const modalTitle = modalBackdrop.querySelector('[data-modal-title]');
+            const modalText = modalBackdrop.querySelector('[data-modal-text]');
+            const modalClose = modalBackdrop.querySelector('[data-modal-close]');
+
+            function showModal(kind, text) {
+                modalIcon.className = 'story-lock-modal-icon' + (kind === 'success' ? ' story-lock-success-icon' : '');
+                modalIcon.innerHTML = kind === 'success'
+                    ? '<span class="story-lock-spinner" aria-label="Checking"></span><span class="story-lock-check">✓</span>'
+                    : '!';
+                modalTitle.textContent = kind === 'success' ? 'Passcode correct' : 'Not quite';
+                modalText.textContent = kind === 'success' ? 'Opening your special surprise…' : (text || 'Maybe it is your special date?');
+                modalClose.style.display = kind === 'success' ? 'none' : '';
+                modalBackdrop.classList.add('show');
+            }
+
+            function closeModal() {
+                modalBackdrop.classList.remove('show');
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', event => {
+                if (event.target === modalBackdrop) closeModal();
+            });
+
             let code = '';
             let busy = false;
 
@@ -229,13 +350,16 @@ final class StoryChrome
                     .then(res => res.json().then(data => ({ ok: res.ok, data })))
                     .then(({ ok, data }) => {
                         if (ok && data.success) {
-                            window.location.href = data.next;
+                            showModal('success');
+                            setTimeout(() => modalIcon.classList.add('done'), 700);
+                            setTimeout(() => { window.location.href = data.next; }, 1450);
                             return;
                         }
                         busy = false;
                         code = '';
                         paint();
                         showError(data.message || 'That code is not right.');
+                        showModal('error', 'Maybe it is your special date?');
                     })
                     .catch(() => {
                         busy = false;
@@ -277,7 +401,10 @@ final class StoryChrome
             });
 
             paint();
-            if (CONFIG.error) showError(CONFIG.error);
+            if (CONFIG.error) {
+                showError(CONFIG.error);
+                showModal('error', 'Maybe it is your special date?');
+            }
         })();
         </script>
         HTML;
@@ -291,7 +418,7 @@ final class StoryChrome
     {
         $url = json_encode($nextUrl, JSON_UNESCAPED_SLASHES);
 
-        return self::styles().<<<HTML
+        return self::styles() . <<<HTML
         <script>
         (function () {
             const next = {$url};
@@ -347,7 +474,7 @@ final class StoryChrome
     {
         $url = e($backUrl);
 
-        return self::styles()."<div class=\"story-nav\"><a href=\"{$url}\">Next →</a></div>";
+        return self::styles() . "<div class=\"story-nav\"><a href=\"{$url}\">Next →</a></div>";
     }
 
     /**
@@ -366,10 +493,10 @@ final class StoryChrome
         $back = e($backUrl);
 
         return self::styles()
-            ."<div class=\"story-nav\">"
-            ."<a href=\"{$back}\">← Gifts</a>"
-            ."<a href=\"{$ending}\">One Last Thing →</a>"
-            ."</div>";
+            . "<div class=\"story-nav\">"
+            . "<a href=\"{$back}\">← Gifts</a>"
+            . "<a href=\"{$ending}\">One Last Thing →</a>"
+            . "</div>";
     }
 
     /** The ending page — the story is over; only a way back is offered. */
@@ -377,6 +504,6 @@ final class StoryChrome
     {
         $url = e($giftsUrl);
 
-        return self::styles()."<div class=\"story-nav\"><a href=\"{$url}\">← Back to the gifts</a></div>";
+        return self::styles() . "<div class=\"story-nav\"><a href=\"{$url}\">← Back to the gifts</a></div>";
     }
 }

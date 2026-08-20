@@ -45,7 +45,7 @@ class PublicStoryController extends Controller
     /** Session key holding whether this browser has entered the right code. */
     private function unlockKey(BirthdayCard $card): string
     {
-        return 'story_unlocked_'.$card->id;
+        return 'story_unlocked_' . $card->id;
     }
 
     private function isUnlocked(Request $request, BirthdayCard $card): bool
@@ -95,17 +95,17 @@ class PublicStoryController extends Controller
      */
     private function pageView(BirthdayCard $card, int $page, int $design): string
     {
-        $view = 'birthday.'.$card->theme.'-page-'.$page;
+        $view = 'birthday.' . $card->theme . '-page-' . $page;
 
-        return $design > 1 ? $view.'-'.$design : $view;
+        return $design > 1 ? $view . '-' . $design : $view;
     }
 
     private function giftView(BirthdayCard $card, int $gift, int $design): string
     {
-        return 'birthday.'.$card->theme
-            .'-page-3-variant-'.$this->giftScreenVariant($card)
-            .'-gift-'.$gift
-            .'-page-'.$design;
+        return 'birthday.' . $card->theme
+            . '-page-3-variant-' . $this->giftScreenVariant($card)
+            . '-gift-' . $gift
+            . '-page-' . $design;
     }
 
     /**
@@ -118,7 +118,7 @@ class PublicStoryController extends Controller
      */
     private function render(Request $request, string $view, array $params, string $chrome = '')
     {
-        $request->merge(array_filter($params, fn ($value) => $value !== null && $value !== ''));
+        $request->merge(array_filter($params, fn($value) => $value !== null && $value !== ''));
 
         $html = view($view)->render();
 
@@ -152,7 +152,8 @@ class PublicStoryController extends Controller
                 route('story.unlock', $card->slug),
                 csrf_token(),
                 $this->photoUrl($card->profile_image_path),
-                $request->session()->pull('story_lock_error')
+                $request->session()->pull('story_lock_error'),
+                $card->theme . '-' . $this->variant($card)
             )
         );
     }
@@ -241,7 +242,7 @@ class PublicStoryController extends Controller
             abort(404);
         }
 
-        $data = $card->{'gift'.$gift.'_data'} ?? [];
+        $data = $card->{'gift' . $gift . '_data'} ?? [];
         $design = (int) ($data['theme'] ?? 1);
         if ($design < 1 || $design > 4) {
             $design = 1;
@@ -270,7 +271,7 @@ class PublicStoryController extends Controller
     {
         $params = [];
         foreach (array_values($data['photos'] ?? []) as $i => $path) {
-            $params['photo'.($i + 1)] = $this->photoUrl($path);
+            $params['photo' . ($i + 1)] = $this->photoUrl($path);
         }
 
         $params['message'] = $data['message'] ?? null;
@@ -290,7 +291,7 @@ class PublicStoryController extends Controller
     {
         $params = [];
         foreach (array_values($data['photos'] ?? []) as $i => $path) {
-            $params['photo'.($i + 1)] = $this->photoUrl($path);
+            $params['photo' . ($i + 1)] = $this->photoUrl($path);
         }
 
         foreach (['name_first', 'name_second', 'message', 'signed'] as $key) {
@@ -317,7 +318,7 @@ class PublicStoryController extends Controller
     {
         $params = [];
         foreach (array_values($data['photos'] ?? []) as $i => $path) {
-            $params['photo'.($i + 1)] = $this->photoUrl($path);
+            $params['photo' . ($i + 1)] = $this->photoUrl($path);
         }
 
         foreach (BirthdayCardController::gift3TextKeys() as $key) {
