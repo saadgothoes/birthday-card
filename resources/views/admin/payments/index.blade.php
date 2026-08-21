@@ -655,8 +655,11 @@
             <a href="{{ route('admin.clients.index') }}" class="nav-item">
                 <div class="nav-icon">👥</div> All Clients
             </a>
-            <a href="{{ route('admin.clients.create') }}" class="nav-item">
-                <div class="nav-icon">➕</div> Add Client
+            <a href="{{ route('admin.subscriptions.index') }}" class="nav-item">
+                <div class="nav-icon">🎫</div> Subscriptions
+            </a>
+            <a href="{{ route('admin.links.index') }}" class="nav-item">
+                <div class="nav-icon">🔗</div> Generated Links
             </a>
             <a href="{{ route('admin.payments.index') }}" class="nav-item active">
                 <div class="nav-icon">💰</div> Payments

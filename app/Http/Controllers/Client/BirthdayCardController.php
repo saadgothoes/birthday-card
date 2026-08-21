@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\BirthdayCard;
+use App\Models\MusicTrack;
 use App\Support\QrRenderer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,19 +14,73 @@ use Illuminate\Support\Str;
 
 class BirthdayCardController extends Controller
 {
-    // Get (or create) the client's current in-progress draft card
+    /**
+     * The card every wizard step writes to.
+     *
+     * Cards used to be resolved as "this client's latest unpublished card",
+     * which meant starting a new card silently reopened the previous one and
+     * every step wrote over it. A card is now addressed explicitly:
+     *
+     *   1. the `X-Card-Id` header the dashboard attaches to each save,
+     *   2. the card the dashboard was last opened with, held in the session,
+     *   3. only as a last resort, the newest draft — or a brand new card.
+     *
+     * Every lookup is scoped to the signed-in client, so one client can never
+     * reach another's card by guessing an id.
+     */
     protected function currentDraft(): BirthdayCard
     {
-        $card = BirthdayCard::where('user_id', Auth::id())
-            ->where('is_published', false)
-            ->latest()
-            ->first();
+        $card = $this->resolveCard(request());
 
         if (! $card) {
-            $card = BirthdayCard::create(['user_id' => Auth::id()]);
+            $card = $this->createCardForCurrentUser();
         }
 
         return $card;
+    }
+
+    /** Locate the card this request is for, without creating one. */
+    protected function resolveCard(?Request $request = null): ?BirthdayCard
+    {
+        $request ??= request();
+
+        foreach ([$request->header('X-Card-Id'), $request->input('card_id'), session('active_card_id')] as $candidate) {
+            if (! $candidate) {
+                continue;
+            }
+
+            $card = BirthdayCard::where('user_id', Auth::id())
+                ->whereKey($candidate)
+                ->first();
+
+            if ($card) {
+                return $card;
+            }
+        }
+
+        return BirthdayCard::where('user_id', Auth::id())
+            ->where('is_published', false)
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * Create an empty card for the signed-in client, enforcing the plan's
+     * card limit. Nothing is copied from any earlier card — a new card starts
+     * genuinely blank.
+     */
+    public static function createCardForCurrentUser(): BirthdayCard
+    {
+        $user = Auth::user();
+
+        abort_if(! $user->canCreateCard(), 403, 'You have reached the card limit for your plan.');
+
+        return BirthdayCard::create([
+            'user_id' => $user->id,
+            'current_step' => 1,
+            'is_published' => false,
+            'last_opened_at' => now(),
+        ]);
     }
 
     /**
@@ -175,7 +230,7 @@ class BirthdayCardController extends Controller
         return response()->json([
             'success' => true,
             'card_id' => $card->id,
-            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+            'photo_urls' => array_map(fn($p) => $p ? Storage::url($p) : null, $photos),
         ]);
     }
 
@@ -197,7 +252,7 @@ class BirthdayCardController extends Controller
             'message' => 'nullable|string|max:' . $messageLimit,
             'signed' => 'nullable|string|max:' . self::GIFT2_LIMITS['signed'],
         ] + array_map(
-            fn ($limit) => 'nullable|string|max:' . $limit,
+            fn($limit) => 'nullable|string|max:' . $limit,
             self::GIFT2_GIRL_LIMITS
         ));
 
@@ -235,7 +290,7 @@ class BirthdayCardController extends Controller
         return response()->json([
             'success' => true,
             'card_id' => $card->id,
-            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+            'photo_urls' => array_map(fn($p) => $p ? Storage::url($p) : null, $photos),
         ]);
     }
 
@@ -422,12 +477,18 @@ class BirthdayCardController extends Controller
 
     /** Book page 6 — the date pickers, stored as ISO so they can be restored. */
     public const GIFT3_DATE_KEYS = [
-        'date1_value', 'date2_value', 'date3_value', 'date4_value',
+        'date1_value',
+        'date2_value',
+        'date3_value',
+        'date4_value',
     ];
 
     /** Checked/unchecked state of the "Future Dreams" checklist items. */
     public const GIFT3_FLAG_KEYS = [
-        'dream1_done', 'dream2_done', 'dream3_done', 'dream4_done',
+        'dream1_done',
+        'dream2_done',
+        'dream3_done',
+        'dream4_done',
     ];
 
     /** The checklist page holds three rows, or four if the client adds one. */
@@ -555,9 +616,9 @@ class BirthdayCardController extends Controller
         return response()->json([
             'success' => true,
             'card_id' => $card->id,
-            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+            'photo_urls' => array_map(fn($p) => $p ? Storage::url($p) : null, $photos),
             'video_urls' => array_map(
-                fn ($v) => $v ? Storage::url($v) : null,
+                fn($v) => $v ? Storage::url($v) : null,
                 $gift3['videos'] ?? [null]
             ),
         ]);
@@ -861,7 +922,7 @@ class BirthdayCardController extends Controller
      */
     public static function shareUrl(?string $slug): ?string
     {
-        return $slug ? url('/'.self::PUBLIC_CARD_PATH.'/'.$slug) : null;
+        return $slug ? url('/' . self::PUBLIC_CARD_PATH . '/' . $slug) : null;
     }
 
     /**
@@ -878,7 +939,7 @@ class BirthdayCardController extends Controller
         $stem = Str::slug((string) ($card->gift3_data['to_name'] ?? $card->recipient_name ?? '')) ?: 'birthday';
 
         do {
-            $slug = $stem.'-'.Str::lower(Str::random(6));
+            $slug = $stem . '-' . Str::lower(Str::random(6));
         } while (BirthdayCard::where('slug', $slug)->exists());
 
         $card->slug = $slug;
@@ -890,7 +951,7 @@ class BirthdayCardController extends Controller
     /** The four QR designs of a theme, rendered against a card's own URL. */
     public static function qrPreviews(?string $theme, ?string $slug, int $size = 300): array
     {
-        $url = self::shareUrl($slug) ?? url('/'.self::PUBLIC_CARD_PATH.'/preview');
+        $url = self::shareUrl($slug) ?? url('/' . self::PUBLIC_CARD_PATH . '/preview');
 
         $previews = [];
         foreach (self::qrThemes($theme) as $n => $design) {
@@ -914,10 +975,10 @@ class BirthdayCardController extends Controller
     {
         $request->validate([
             'video' => 'required|file|mimetypes:video/mp4,video/webm,video/ogg,video/quicktime|max:'
-                .self::GIFT3_GIRL_VIDEO_MAX_KB,
+                . self::GIFT3_GIRL_VIDEO_MAX_KB,
         ], [
             'video.max' => 'That clip is too large. The limit is '
-                .round(self::GIFT3_GIRL_VIDEO_MAX_KB / 1024).' MB.',
+                . round(self::GIFT3_GIRL_VIDEO_MAX_KB / 1024) . ' MB.',
             'video.mimetypes' => 'That file is not a video the card can play (MP4, WebM, OGG or MOV).',
         ]);
 
@@ -959,7 +1020,7 @@ class BirthdayCardController extends Controller
 
         $rules = ['theme' => 'required|integer|in:1,2,3,4'];
         foreach ($limits as $key => $limit) {
-            $rules[$key] = 'nullable|string|max:'.$limit;
+            $rules[$key] = 'nullable|string|max:' . $limit;
         }
 
         $validator = Validator::make($input, $rules);
@@ -971,7 +1032,7 @@ class BirthdayCardController extends Controller
             if ($lines > $maxLines) {
                 $validator->errors()->add(
                     'letter',
-                    'The letter cannot be more than '.$maxLines.' lines long.'
+                    'The letter cannot be more than ' . $maxLines . ' lines long.'
                 );
             }
         });
@@ -995,15 +1056,133 @@ class BirthdayCardController extends Controller
     }
 
     /**
-     * Step 9 — QR Select: save the chosen QR design and hand back the share
+     * How much of a song the story plays: two minutes, the way a social story
+     * takes a slice of a track rather than the whole thing.
+     *
+     * It is a fixed length — both the minimum and the maximum. The client
+     * chooses *which* two minutes, not how long. A song shorter than this has
+     * no slice to pick out of it and plays whole.
+     */
+    public const MUSIC_CLIP_SECONDS = 120.0;
+
+    /**
+     * Save as Draft — name the card and park it.
+     *
+     * Every step already persists as it goes, so this does not save the card
+     * content; what it adds is the label the client identifies the draft by on
+     * the dashboard, and a record of how far they had got so Edit can reopen
+     * at the right step.
+     */
+    public function saveDraft(Request $request)
+    {
+        $data = $request->validate([
+            'title' => 'nullable|string|max:80',
+            'current_step' => 'nullable|integer|min:1|max:10',
+        ]);
+
+        $card = $this->currentDraft();
+
+        if (! empty($data['title'])) {
+            $card->title = $data['title'];
+        }
+
+        // Keep the furthest point reached — stepping back to review an earlier
+        // step should not lose the progress already made.
+        if (! empty($data['current_step'])) {
+            $card->current_step = max((int) $card->current_step, (int) $data['current_step']);
+        }
+
+        $card->last_opened_at = now();
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'title' => $card->displayTitle(),
+            'redirect' => route('client.cards'),
+        ]);
+    }
+
+    /** Step 9 — save the client's music choice, and the part of it to play. */
+    public function saveStep9(Request $request)
+    {
+        $data = $request->validate([
+            'source' => 'required|in:library',
+            'track_id' => 'required|integer|exists:music_tracks,id',
+            'trim_start' => 'nullable|numeric|min:0',
+            'trim_end' => 'nullable|numeric|min:0',
+        ]);
+
+        $card = $this->currentDraft();
+        $music = ['source' => $data['source']];
+
+        if ($data['source'] === 'library') {
+            $track = MusicTrack::whereKey($data['track_id'] ?? 0)
+                ->where('is_active', true)
+                ->firstOrFail();
+            $music += [
+                'track_id' => $track->id,
+                'title' => $track->title,
+                'path' => $track->file_path,
+            ];
+        }
+
+        $music += self::musicTrim($data['trim_start'] ?? null, $data['trim_end'] ?? null);
+
+        $card->music_data = $music;
+        $card->current_step = max($card->current_step, 9);
+        $card->save();
+
+        return response()->json(['success' => true, 'card_id' => $card->id]);
+    }
+
+    /**
+     * The minute of the song the story should play, as the picker left it.
+     *
+     * The dashboard sends the window's two offsets in seconds, and the length
+     * between them is settled there — but the length is the one thing a client
+     * doesn't get to choose, so it is capped again here rather than trusted.
+     * Anything that isn't a usable window — no end, or an end at or before its
+     * start — is stored as no clip at all, and the song plays whole. The
+     * public story reads these two keys, so a card saved before the picker
+     * existed simply has no window and behaves exactly as it did.
+     *
+     * @return array{trim_start: float|null, trim_end: float|null}
+     */
+    private static function musicTrim(mixed $start, mixed $end): array
+    {
+        $none = ['trim_start' => null, 'trim_end' => null];
+
+        if ($end === null || $end === '') {
+            return $none;
+        }
+
+        $from = round(max(0.0, (float) $start), 2);
+        $to = round(min((float) $end, $from + self::MUSIC_CLIP_SECONDS), 2);
+
+        return $to <= $from ? $none : ['trim_start' => $from, 'trim_end' => $to];
+    }
+
+    /**
+     * Step 10 — QR Select: save the chosen QR design and hand back the share
      * link plus the rendered code.
      *
      * The card's slug is settled here (or earlier, when the dashboard first
      * rendered the previews), so the link a client copies today is the link
      * the story will answer on once the public flow is built.
      */
-    public function saveStep9(Request $request)
+    public function saveStep10(Request $request)
     {
+        // The QR code is the gate. A client may build and edit a card freely,
+        // but turning it into a shareable link needs an approved plan.
+        if (! Auth::user()->hasActiveSubscription()) {
+            return response()->json([
+                'success' => false,
+                'reason' => 'subscription_required',
+                'message' => 'An active subscription is required to generate the QR code.',
+            ], 403);
+        }
+
         $data = $request->validate([
             'theme' => 'required|integer|in:1,2,3,4',
         ]);
@@ -1016,7 +1195,10 @@ class BirthdayCardController extends Controller
             'theme' => (int) $data['theme'],
             'generated_at' => now()->toIso8601String(),
         ];
-        $card->current_step = max($card->current_step, 9);
+        $card->current_step = max($card->current_step, 10);
+        // Generating the code is what finishes a card — it moves out of
+        // Drafts and into the completed list from here.
+        $card->is_published = true;
         $card->save();
 
         $url = self::shareUrl($slug);

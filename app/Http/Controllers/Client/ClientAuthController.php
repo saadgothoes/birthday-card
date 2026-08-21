@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Mail\ClientPasswordReset;
 use App\Models\BirthdayCard;
 use App\Models\User;
+use App\Models\MusicTrack;
+use App\Support\SubscriptionPlans;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +21,7 @@ class ClientAuthController extends Controller
     public function loginPage()
     {
         if (Auth::check() && Auth::user()->isClient() && Auth::user()->status === 'active') {
-            return redirect()->route('client.dashboard');
+            return redirect()->route('client.cards');
         }
 
         return view('client.login');
@@ -35,7 +37,7 @@ class ClientAuthController extends Controller
         if (Auth::attempt($credentials)) {
             if (Auth::user()->isClient() && Auth::user()->status === 'active') {
                 $request->session()->regenerate();
-                return redirect()->route('client.dashboard');
+                return redirect()->route('client.cards');
             }
             Auth::logout();
             return back()->withErrors(['email' => 'Your account is disabled or access not allowed.']);
@@ -44,22 +46,101 @@ class ClientAuthController extends Controller
         return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
     }
 
-    public function dashboard()
+    /**
+     * Clients now create their own accounts — the Super Admin no longer
+     * provisions them. A fresh account starts with no plan at all: it can
+     * build a card, but the QR step stays locked until a subscription
+     * request is approved.
+     */
+    public function registerPage()
     {
-        $card = BirthdayCard::where('user_id', Auth::id())
-            ->where('is_published', false)
-            ->latest()
-            ->first();
+        if (Auth::check() && Auth::user()->isClient() && Auth::user()->status === 'active') {
+            return redirect()->route('client.cards');
+        }
+
+        return view('client.register');
+    }
+
+    public function register(Request $request)
+    {
+        $data = $request->validate([
+            'name'     => 'required|string|max:100',
+            'email'    => 'required|email|max:190|unique:users,email',
+            'phone'    => 'required|string|max:20',
+            'city'     => 'required|string|max:100',
+            'age'      => 'required|integer|min:1|max:120',
+            'password' => ['required', 'confirmed', PasswordRule::min(8)->mixedCase()->numbers()],
+        ]);
+
+        $user = User::create([
+            'name'             => $data['name'],
+            'email'            => $data['email'],
+            'phone'            => $data['phone'],
+            'city'             => $data['city'],
+            'age'              => $data['age'],
+            'password'         => $data['password'],
+            // Self-chosen from the start, so there is no generated password to
+            // keep around and nothing to nag them about changing.
+            'plain_password'   => null,
+            'password_changed' => true,
+            'role'             => 'client',
+            'status'           => 'active',
+            'subscription_status' => User::SUB_NONE,
+            'card_limit'       => SubscriptionPlans::FREE_CARD_LIMIT,
+        ]);
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('client.cards')
+            ->with('success', 'Welcome! Your account is ready — build your first card.');
+    }
+
+    /**
+     * The wizard, opened on one specific card.
+     *
+     * `?card=` names the card being edited. Without it the client is sent to
+     * the card hub rather than being dropped into whatever draft happened to
+     * be newest — that implicit behaviour was what made a "new" card come up
+     * pre-filled with the previous card's data.
+     */
+    public function dashboard(Request $request)
+    {
+        $user = Auth::user();
+
+        $card = null;
+        if ($request->filled('card')) {
+            $card = BirthdayCard::where('user_id', $user->id)
+                ->whereKey($request->query('card'))
+                ->first();
+        }
+
+        if (! $card) {
+            return redirect()->route('client.cards');
+        }
+
+        // Every save in this tab is tagged with this card, so no step can
+        // write into a different one.
+        session(['active_card_id' => $card->id]);
+        $card->forceFill(['last_opened_at' => now()])->save();
 
         // The QR step previews the four designs against the card's own share
         // link, so the address has to be settled before that step is reached,
         // not at publish time — otherwise the previews would encode one URL
         // and the generated code another.
-        if ($card) {
-            BirthdayCardController::ensureSlug($card);
-        }
+        BirthdayCardController::ensureSlug($card);
 
-        return view('client.dashboard', ['card' => $card]);
+        return view('client.dashboard', [
+            'card' => $card,
+            'musicTracks' => MusicTrack::where('is_active', true)->latest()->get(),
+            'plans' => SubscriptionPlans::all(),
+            'hasSubscription' => $user->hasActiveSubscription(),
+            'pendingRequest' => $user->pendingSubscriptionRequest(),
+            'planLabel' => $user->planLabel(),
+            'cardLimit' => $user->cardLimit(),
+            'cardsUsed' => $user->cardsUsed(),
+            'cardsRemaining' => $user->cardsRemaining(),
+        ]);
     }
 
     public function logout(Request $request)
@@ -119,7 +200,7 @@ class ClientAuthController extends Controller
             'email' => [
                 'required',
                 'email',
-                Rule::exists('users', 'email')->where(fn ($query) => $query
+                Rule::exists('users', 'email')->where(fn($query) => $query
                     ->where('role', 'client')),
             ],
         ]);
@@ -164,7 +245,7 @@ class ClientAuthController extends Controller
             'email' => [
                 'required',
                 'email',
-                Rule::exists('users', 'email')->where(fn ($query) => $query
+                Rule::exists('users', 'email')->where(fn($query) => $query
                     ->where('role', 'client')
                     ->where('status', 'active')),
             ],

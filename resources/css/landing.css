@@ -280,8 +280,37 @@ html.has-custom-cursor, html.has-custom-cursor .landing, html.has-custom-cursor 
 
 .l-nav__cta { padding: .7rem 1.35rem; font-size: .85rem; }
 
+/* Login sits beside the Sign Up button as the quieter of the two actions. */
+.l-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.l-nav__login {
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  position: relative;
+  padding-block: .25rem;
+  transition: color .25s ease;
+}
+.l-nav__login::after {
+  content: '';
+  position: absolute; left: 0; right: 100%; bottom: -2px;
+  height: 1.5px; background: var(--purple);
+  transition: right .3s cubic-bezier(.16, 1, .3, 1);
+}
+.l-nav__login:hover { color: var(--ink); }
+.l-nav__login:hover::after { right: 0; }
+
 @media (max-width: 860px) {
   .l-nav__links { display: none; }
+}
+
+@media (max-width: 480px) {
+  .l-nav__actions { gap: .75rem; }
+  .l-nav__cta { padding: .6rem 1rem; font-size: .8rem; }
 }
 
 /* ── Hero ───────────────────────────────────────────────────────────── */

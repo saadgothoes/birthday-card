@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clients — Admin</title>
+    <title>Subscriptions — Admin</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <style>
+<style>
         :root {
             --bg: #f4f6fb;
             --surface: #ffffff;
@@ -661,6 +661,100 @@
             display: none;
         }
     </style>
+    <style>
+        .panel {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.4rem 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.6rem;
+        }
+
+        .panel h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            margin-bottom: .3rem;
+        }
+
+        .panel p.sub {
+            font-size: .82rem;
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+        }
+
+        .mini-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mini-table th {
+            text-align: left;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted);
+            padding: .5rem .6rem;
+            border-bottom: 1.5px solid var(--border);
+        }
+
+        .mini-table td {
+            padding: .8rem .6rem;
+            border-bottom: 1px solid var(--border);
+            font-size: .85rem;
+            vertical-align: middle;
+        }
+
+        .mini-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        .none-note {
+            color: var(--text-dim);
+            font-size: .85rem;
+            padding: 1rem 0;
+        }
+
+        .plan-legend {
+            display: flex;
+            gap: .6rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.6rem;
+        }
+
+        .plan-chip {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: .7rem 1.1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .plan-chip .amt {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+        }
+
+        .plan-chip .cds {
+            font-size: .74rem;
+            color: var(--text-muted);
+        }
+
+        .pending-flag {
+            display: inline-block;
+            background: var(--amber-s);
+            color: var(--amber);
+            font-weight: 700;
+            font-size: .72rem;
+            padding: .25rem .6rem;
+            border-radius: 999px;
+        }
+    </style>
 </head>
 
 <body>
@@ -675,10 +769,10 @@
             <a href="{{ route('admin.dashboard') }}" class="nav-item">
                 <div class="nav-icon">🏠</div> Dashboard
             </a>
-            <a href="{{ route('admin.clients.index') }}" class="nav-item active">
+            <a href="{{ route('admin.clients.index') }}" class="nav-item">
                 <div class="nav-icon">👥</div> All Clients
             </a>
-            <a href="{{ route('admin.subscriptions.index') }}" class="nav-item">
+            <a href="{{ route('admin.subscriptions.index') }}" class="nav-item active">
                 <div class="nav-icon">🎫</div> Subscriptions
             </a>
             <a href="{{ route('admin.links.index') }}" class="nav-item">
@@ -705,158 +799,126 @@
     </aside>
 
     <main class="main">
-
         <div class="topbar">
             <div>
-                <h1>Clients</h1>
-                <p>All registered client accounts — clients sign themselves up</p>
+                <h1>Subscription Requests</h1>
+                <p>Approve a request to activate the client's plan — payment is not collected online yet</p>
             </div>
-            <a href="{{ route('admin.subscriptions.index') }}" class="btn-add">🎫 Subscription Requests</a>
+            <div class="count-pill"><strong>{{ $pending->count() }}</strong> pending</div>
         </div>
 
-        @if(session('success'))
-        <div class="alert alert-success">✓ {{ session('success') }}</div>
-        @endif
-        @if(session('warning'))
-        <div class="alert alert-warning">⚠ {{ session('warning') }}</div>
+        @if (session('success'))
+            <div class="alert alert-success">✓ {{ session('success') }}</div>
         @endif
 
-        <div class="stats-row">
-            <div class="mini-stat">
-                <div class="mini-stat-icon blue">👥</div>
-                <div class="mini-stat-body">
-                    <div class="num">{{ \App\Models\User::where('role','client')->count() }}</div>
-                    <div class="lbl">Total Clients</div>
+        <div class="plan-legend">
+            @foreach ($plans as $plan)
+                <div class="plan-chip">
+                    <div class="amt">Rs {{ number_format($plan['amount']) }}</div>
+                    <div class="cds">{{ $plan['cards'] }} {{ $plan['cards'] === 1 ? 'card' : 'cards' }}</div>
                 </div>
-            </div>
-            <div class="mini-stat">
-                <div class="mini-stat-icon green">✨</div>
-                <div class="mini-stat-body">
-                    <div class="num">
-                        {{ \App\Models\User::where('role','client')->whereDate('created_at',today())->count() }}
-                    </div>
-                    <div class="lbl">Signed Up Today</div>
-                </div>
-            </div>
-            <div class="mini-stat">
-                <div class="mini-stat-icon gold">📅</div>
-                <div class="mini-stat-body">
-                    <div class="num">
-                        {{ \App\Models\User::where('role','client')->whereMonth('created_at',now()->month)->count() }}
-                    </div>
-                    <div class="lbl">This Month</div>
-                </div>
-            </div>
+            @endforeach
         </div>
 
-        <div class="table-card">
-            <div class="table-toolbar">
-                <div class="search-wrap">
-                    <span class="search-ico">🔍</span>
-                    <input type="text" id="searchInput" placeholder="Search name, email, city…" oninput="filterTable()">
+        {{-- ── Waiting for review ── --}}
+        <div class="panel">
+            <h3>Pending</h3>
+            <p class="sub">Approving sets the client's card limit and unlocks QR generation for them.</p>
+
+            @if ($pending->isEmpty())
+                <p class="none-note">Nothing waiting for review.</p>
+            @else
+                <div class="table-scroll">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Requested Plan</th>
+                                <th>Cards</th>
+                                <th>Requested On</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($pending as $req)
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('admin.clients.show', $req->user_id) }}"
+                                            style="text-decoration:none;color:inherit;">
+                                            <strong>{{ $req->user?->name ?? 'Deleted user' }}</strong>
+                                            <span style="display:block;font-size:.74rem;color:var(--text-dim)">
+                                                {{ $req->user?->email }}
+                                            </span>
+                                        </a>
+                                    </td>
+                                    <td><strong>Rs {{ number_format($req->plan_amount) }}</strong></td>
+                                    <td>{{ \App\Support\SubscriptionPlans::cardsFor($req->plan_amount) }}</td>
+                                    <td>{{ $req->created_at?->format('d M Y, g:i A') ?? '—' }}</td>
+                                    <td>
+                                        <form action="{{ route('admin.subscriptions.approve', $req->id) }}"
+                                            method="POST" style="display:inline;">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="btn-toggle enable">Approve</button>
+                                        </form>
+                                        <form action="{{ route('admin.subscriptions.reject', $req->id) }}"
+                                            method="POST" style="display:inline;">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="btn-toggle disable">Reject</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-                <div class="count-pill"><strong id="shownCount">{{ count($clients) }}</strong> clients</div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Client</th>
-                        <th>Contact</th>
-                        <th>Plan</th>
-                        <th>Subscription</th>
-                        <th>Cards</th>
-                        <th>Devices</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    @forelse($clients as $i => $client)
-                    @php
-                        $limit = $client->cardLimit();
-                        $used = $client->birthday_cards_count;
-                        $devices = (int) ($sessionCounts[$client->id] ?? 0);
-                        $pending = (int) ($pendingCounts[$client->id] ?? 0);
-                    @endphp
-                    <tr>
-                        <td><span class="row-num">{{ str_pad($i+1,2,'0',STR_PAD_LEFT) }}</span></td>
-                        <td>
-                            <a href="{{ route('admin.clients.show', $client->id) }}" class="name-cell"
-                                style="text-decoration:none;color:inherit;">
-                                <div class="av">{{ strtoupper(substr($client->name,0,1)) }}</div>
-                                <span>
-                                    <span class="name-strong">{{ $client->name }}</span>
-                                    <span style="display:block;font-size:.72rem;color:var(--text-dim)">
-                                        {{ $client->city ?? '—' }}@if($client->age) · {{ $client->age }} yrs @endif
-                                    </span>
-                                </span>
-                            </a>
-                        </td>
-                        <td>
-                            <span class="email-cell">{{ $client->email }}</span>
-                            <span style="display:block;font-size:.72rem;color:var(--text-dim)">{{ $client->phone ?? '—' }}</span>
-                        </td>
-                        <td><span class="city-pill">{{ $client->planLabel() }}</span></td>
-                        <td>
-                            <span class="status-badge {{ $client->hasActiveSubscription() ? 'active' : 'disabled' }}">
-                                {{ $client->hasActiveSubscription() ? 'active' : ($pending ? 'pending' : 'none') }}
-                            </span>
-                            @if ($pending)
-                                <span style="display:block;font-size:.7rem;color:#f59e0b;font-weight:700;margin-top:.2rem;">
-                                    {{ $pending }} request{{ $pending === 1 ? '' : 's' }} waiting
-                                </span>
-                            @endif
-                        </td>
-                        <td>
-                            <span class="age-cell">{{ $used }} / {{ $limit }}</span>
-                            <span style="display:block;font-size:.72rem;color:var(--text-dim)">
-                                {{ max(0, $limit - $used) }} left
-                            </span>
-                        </td>
-                        <td><span class="age-cell">{{ $devices }}</span></td>
-                        <td><span class="status-badge {{ $client->status == 'active' ? 'active' : 'disabled' }}">{{ $client->status }}</span></td>
-                        <td>
-                            <a href="{{ route('admin.clients.show', $client->id) }}" class="btn-toggle enable"
-                                style="text-decoration:none;display:inline-block;margin-bottom:.3rem;">View</a>
-                            <form action="{{ route('admin.clients.toggle-status', $client->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn-toggle {{ $client->status == 'active' ? 'disable' : 'enable' }}">
-                                    {{ $client->status == 'active' ? 'Disable' : 'Enable' }}
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="9">
-                            <div class="empty-state">
-                                <div class="ei">👤</div>
-                                <h3>No clients yet</h3>
-                                <p>Clients appear here as soon as they sign up from the landing page</p>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+            @endif
+        </div>
+
+        {{-- ── Already reviewed ── --}}
+        <div class="panel">
+            <h3>Reviewed</h3>
+            <p class="sub">The 50 most recently reviewed requests.</p>
+
+            @if ($reviewed->isEmpty())
+                <p class="none-note">No requests have been reviewed yet.</p>
+            @else
+                <div class="table-scroll">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Reviewed By</th>
+                                <th>Reviewed On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($reviewed as $req)
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('admin.clients.show', $req->user_id) }}"
+                                            style="text-decoration:none;color:inherit;">
+                                            <strong>{{ $req->user?->name ?? 'Deleted user' }}</strong>
+                                        </a>
+                                    </td>
+                                    <td>Rs {{ number_format($req->plan_amount) }}</td>
+                                    <td>
+                                        <span class="status-badge {{ $req->status === 'approved' ? 'active' : 'disabled' }}">
+                                            {{ $req->status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $req->reviewer?->name ?? '—' }}</td>
+                                    <td>{{ $req->reviewed_at?->format('d M Y, g:i A') ?? '—' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
     </main>
 
-    <script>
-        function filterTable() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('#tableBody tr');
-            let n = 0;
-            rows.forEach(r => {
-                const show = r.textContent.toLowerCase().includes(q);
-                r.classList.toggle('hidden', !show);
-                if (show) n++;
-            });
-            document.getElementById('shownCount').textContent = n;
-        }
-    </script>
 </body>
 
 </html>

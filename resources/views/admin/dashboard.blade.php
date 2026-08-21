@@ -560,14 +560,20 @@
             <a href="{{ route('admin.clients.index') }}" class="nav-item">
                 <div class="nav-icon">👥</div> All Clients
             </a>
-            <a href="{{ route('admin.clients.create') }}" class="nav-item">
-                <div class="nav-icon">➕</div> Add Client
+            <a href="{{ route('admin.subscriptions.index') }}" class="nav-item">
+                <div class="nav-icon">🎫</div> Subscriptions
+            </a>
+            <a href="{{ route('admin.links.index') }}" class="nav-item">
+                <div class="nav-icon">🔗</div> Generated Links
             </a>
             <a href="{{ route('admin.payments.index') }}" class="nav-item">
                 <div class="nav-icon">💰</div> Payments
             </a>
             <a href="{{ route('admin.bg-owner') }}" class="nav-item">
                 <div class="nav-icon">🔒</div> BG Owner
+            </a>
+            <a href="{{ route('admin.music.index') }}" class="nav-item">
+                <div class="nav-icon">🎵</div> Music Library
             </a>
         </nav>
 
@@ -639,6 +645,24 @@
             </div>
             <div class="stat-card">
                 <div class="stat-header">
+                    <div class="stat-icon gold">🎫</div>
+                    <div class="stat-trend neu">Pending</div>
+                </div>
+                <div class="stat-num">
+                    {{ \App\Models\SubscriptionRequest::where('status', 'pending')->count() }}
+                </div>
+                <div class="stat-label">Subscription Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon green">🎂</div>
+                    <div class="stat-trend up">All time</div>
+                </div>
+                <div class="stat-num">{{ \App\Models\BirthdayCard::count() }}</div>
+                <div class="stat-label">Cards Created</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
                     <div class="stat-icon blue">💰</div>
                     <div class="stat-trend up">Total</div>
                 </div>
@@ -687,11 +711,11 @@
                 </div>
                 <div class="action-arrow">→</div>
             </a>
-            <a href="{{ route('admin.clients.create') }}" class="action-card">
-                <div class="action-icon">➕</div>
+            <a href="{{ route('admin.subscriptions.index') }}" class="action-card">
+                <div class="action-icon">🎫</div>
                 <div class="action-text">
-                    <h3>Add New Client</h3>
-                    <p>Create a client account & send credentials via email</p>
+                    <h3>Subscription Requests</h3>
+                    <p>Approve plan requests to unlock QR generation for a client</p>
                 </div>
                 <div class="action-arrow">→</div>
             </a>

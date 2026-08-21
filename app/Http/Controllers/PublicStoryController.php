@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Client\BirthdayCardController;
 use App\Models\BirthdayCard;
+use App\Models\MusicTrack;
 use App\Support\StoryChrome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -77,6 +78,49 @@ class PublicStoryController extends Controller
         return $path ? Storage::url($path) : null;
     }
 
+    /**
+     * The song a card plays, the minute of it the client kept, and what to
+     * call it on screen.
+     *
+     * Step 9's picker stores the window as two offsets in seconds; a card
+     * saved before it existed has neither, which reads here as the whole song.
+     *
+     * @return array{url: string, start: float, end: float|null, title: string, artist: string|null}|null
+     */
+    private function musicClip(BirthdayCard $card): ?array
+    {
+        $music = $card->music_data ?? [];
+
+        // Prefer the library row: it carries the artist for the player, and
+        // its URL is the stream route, which answers the Range requests the
+        // player needs to start a minute into the song. A card whose track has
+        // since been deleted falls back to the stored path.
+        $track = isset($music['track_id']) ? MusicTrack::find($music['track_id']) : null;
+        $url = $track ? $track->url : $this->photoUrl($music['path'] ?? null);
+
+        if (! $url) {
+            return null;
+        }
+
+        $start = (float) ($music['trim_start'] ?? 0);
+        $end = isset($music['trim_end']) ? (float) $music['trim_end'] : null;
+
+        // The length is capped here as well as on save, so a card stored under
+        // an earlier rule — when the client set both ends themselves and could
+        // keep more than a minute — still plays the minute the story allows.
+        if ($end !== null) {
+            $end = min($end, $start + BirthdayCardController::MUSIC_CLIP_SECONDS);
+        }
+
+        return [
+            'url' => $url,
+            'start' => $end === null ? 0.0 : $start,
+            'end' => $end,
+            'title' => $track->title ?? $music['title'] ?? 'Story music',
+            'artist' => $track->artist ?? null,
+        ];
+    }
+
     /** Which of the two designs a card picked for a given screen. */
     private function variant(BirthdayCard $card): int
     {
@@ -109,15 +153,65 @@ class PublicStoryController extends Controller
     }
 
     /**
+     * Is this request the story itself, or the shell that wraps it?
+     *
+     * Browsers mark frame navigations with Sec-Fetch-Dest, which keeps the
+     * shared links clean — the recipient sees `/c/abc/gifts`, not a URL with a
+     * flag on it. The shell still puts `frame=1` on the src it asks for, both
+     * for browsers too old to send the header and so a request is never
+     * ambiguous about which half of the pair it wants.
+     */
+    private function insideShell(Request $request): bool
+    {
+        return $request->boolean('frame') || $request->header('Sec-Fetch-Dest') === 'iframe';
+    }
+
+    /**
+     * The shell: one document holding the music player, with the story in a
+     * frame inside it.
+     *
+     * Serving this instead of the page is what makes the music survive the
+     * story. Moving from the welcome screen to the gifts navigates the frame,
+     * not the shell, so the <audio> element in here is never torn down and the
+     * track is still the same one playing — there is nothing to resume.
+     *
+     * @see resources/views/story/shell.blade.php
+     */
+    private function shell(Request $request, BirthdayCard $card)
+    {
+        // A relative src, so the frame is always same-origin and same-scheme
+        // as the shell around it — an absolute one built from the request can
+        // come back http:// behind a proxy that doesn't forward the scheme,
+        // and an https page will refuse to load it.
+        $query = ['frame' => 1] + $request->query();
+
+        return response(view('story.shell', [
+            'frameSrc' => $request->getPathInfo() . '?' . http_build_query($query),
+            'lockPath' => route('story.lock', $card->slug, false),
+            'music' => $this->musicClip($card),
+            'storageKey' => 'story-music:' . $card->slug,
+            'title' => $card->heading ?: 'A Birthday Surprise',
+            'side' => $card->theme,
+        ])->render());
+    }
+
+    /**
      * Render a card template with the client's saved values, then add the
      * story's own navigation to it.
+     *
+     * A request that isn't already inside the shell gets the shell instead;
+     * the frame it opens comes straight back here for the page itself.
      *
      * @param  array<string, mixed>  $params  merged into the request, which is
      *                                        where the templates read from
      * @param  string  $chrome  the navigation snippet to inject
      */
-    private function render(Request $request, string $view, array $params, string $chrome = '')
+    private function render(Request $request, BirthdayCard $card, string $view, array $params, string $chrome = '')
     {
+        if (! $this->insideShell($request)) {
+            return $this->shell($request, $card);
+        }
+
         $request->merge(array_filter($params, fn($value) => $value !== null && $value !== ''));
 
         $html = view($view)->render();
@@ -146,6 +240,7 @@ class PublicStoryController extends Controller
 
         return $this->render(
             $request,
+            $card,
             $this->pageView($card, 1, $this->variant($card)),
             ['photo' => $this->photoUrl($card->profile_image_path)],
             StoryChrome::lock(
@@ -199,12 +294,13 @@ class PublicStoryController extends Controller
 
         return $this->render(
             $request,
+            $card,
             $this->pageView($card, 2, $this->variant($card)),
             [
                 'heading' => $card->heading,
                 'message' => $card->welcome_message,
             ],
-            StoryChrome::welcome(route('story.gifts', $card->slug))
+            StoryChrome::welcome(route('story.gifts', $card->slug), $this->musicClip($card))
         );
     }
 
@@ -219,13 +315,14 @@ class PublicStoryController extends Controller
 
         return $this->render(
             $request,
+            $card,
             $this->pageView($card, 3, $this->giftScreenVariant($card)),
             [],
             StoryChrome::gifts([
                 1 => route('story.gift', [$card->slug, 1]),
                 2 => route('story.gift', [$card->slug, 2]),
                 3 => route('story.gift', [$card->slug, 3]),
-            ])
+            ], $this->musicClip($card))
         );
     }
 
@@ -257,10 +354,10 @@ class PublicStoryController extends Controller
         // Gifts 1 and 2 come back to the gift screen; the book is the last of
         // the three, so finishing it goes on to the ending page.
         $chrome = $gift === 3
-            ? StoryChrome::book(route('story.ending', $card->slug), route('story.gifts', $card->slug))
-            : StoryChrome::gift(route('story.gifts', $card->slug));
+            ? StoryChrome::book(route('story.ending', $card->slug), route('story.gifts', $card->slug), $this->musicClip($card))
+            : StoryChrome::gift(route('story.gifts', $card->slug), $this->musicClip($card));
 
-        return $this->render($request, $this->giftView($card, $gift, $design), $params, $chrome);
+        return $this->render($request, $card, $this->giftView($card, $gift, $design), $params, $chrome);
     }
 
     /**
@@ -388,9 +485,10 @@ class PublicStoryController extends Controller
 
         return $this->render(
             $request,
+            $card,
             $this->pageView($card, 4, $design),
             $params,
-            StoryChrome::ending(route('story.gifts', $card->slug))
+            StoryChrome::ending(route('story.gifts', $card->slug), $this->musicClip($card))
         );
     }
 }

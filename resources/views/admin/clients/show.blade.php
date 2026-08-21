@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clients — Admin</title>
+    <title>{{ $client->name }} — Admin</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <style>
+<style>
         :root {
             --bg: #f4f6fb;
             --surface: #ffffff;
@@ -661,6 +661,127 @@
             display: none;
         }
     </style>
+    <style>
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.1rem;
+            margin-bottom: 1.6rem;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.4rem 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.6rem;
+        }
+
+        .panel h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .kv {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: .6rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: .85rem;
+        }
+
+        .kv:last-child {
+            border-bottom: none;
+        }
+
+        .kv span {
+            color: var(--text-muted);
+        }
+
+        .kv b {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .stat-tile {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem 1.3rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-tile .k {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: .4rem;
+        }
+
+        .stat-tile .v {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .stat-tile .v.sm {
+            font-size: 1.05rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: .85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        .mini-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mini-table th {
+            text-align: left;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted);
+            padding: .5rem .6rem;
+            border-bottom: 1.5px solid var(--border);
+        }
+
+        .mini-table td {
+            padding: .7rem .6rem;
+            border-bottom: 1px solid var(--border);
+            font-size: .84rem;
+            vertical-align: middle;
+        }
+
+        .mini-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        .none-note {
+            color: var(--text-dim);
+            font-size: .85rem;
+            padding: .8rem 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -705,158 +826,209 @@
     </aside>
 
     <main class="main">
+        <a href="{{ route('admin.clients.index') }}" class="back-link">← Back to all clients</a>
 
         <div class="topbar">
             <div>
-                <h1>Clients</h1>
-                <p>All registered client accounts — clients sign themselves up</p>
+                <h1>{{ $client->name }}</h1>
+                <p>{{ $client->email }}</p>
             </div>
-            <a href="{{ route('admin.subscriptions.index') }}" class="btn-add">🎫 Subscription Requests</a>
+            <form action="{{ route('admin.clients.toggle-status', $client->id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn-toggle {{ $client->status == 'active' ? 'disable' : 'enable' }}">
+                    {{ $client->status == 'active' ? 'Disable Account' : 'Enable Account' }}
+                </button>
+            </form>
         </div>
 
-        @if(session('success'))
-        <div class="alert alert-success">✓ {{ session('success') }}</div>
-        @endif
-        @if(session('warning'))
-        <div class="alert alert-warning">⚠ {{ session('warning') }}</div>
+        @if (session('success'))
+            <div class="alert alert-success">✓ {{ session('success') }}</div>
         @endif
 
-        <div class="stats-row">
-            <div class="mini-stat">
-                <div class="mini-stat-icon blue">👥</div>
-                <div class="mini-stat-body">
-                    <div class="num">{{ \App\Models\User::where('role','client')->count() }}</div>
-                    <div class="lbl">Total Clients</div>
+        {{-- ── Headline numbers ── --}}
+        <div class="detail-grid">
+            <div class="stat-tile">
+                <div class="k">Plan</div>
+                <div class="v sm">{{ $client->planLabel() }}</div>
+            </div>
+            <div class="stat-tile">
+                <div class="k">Subscription</div>
+                <div class="v sm">
+                    <span class="status-badge {{ $client->hasActiveSubscription() ? 'active' : 'disabled' }}">
+                        {{ $client->subscription_status }}
+                    </span>
                 </div>
             </div>
-            <div class="mini-stat">
-                <div class="mini-stat-icon green">✨</div>
-                <div class="mini-stat-body">
-                    <div class="num">
-                        {{ \App\Models\User::where('role','client')->whereDate('created_at',today())->count() }}
-                    </div>
-                    <div class="lbl">Signed Up Today</div>
-                </div>
+            <div class="stat-tile">
+                <div class="k">Cards Created</div>
+                <div class="v">{{ $client->birthday_cards_count }}</div>
             </div>
-            <div class="mini-stat">
-                <div class="mini-stat-icon gold">📅</div>
-                <div class="mini-stat-body">
-                    <div class="num">
-                        {{ \App\Models\User::where('role','client')->whereMonth('created_at',now()->month)->count() }}
-                    </div>
-                    <div class="lbl">This Month</div>
-                </div>
+            <div class="stat-tile">
+                <div class="k">Card Limit</div>
+                <div class="v">{{ $client->cardLimit() }}</div>
+            </div>
+            <div class="stat-tile">
+                <div class="k">Cards Remaining</div>
+                <div class="v">{{ max(0, $client->cardLimit() - $client->birthday_cards_count) }}</div>
+            </div>
+            <div class="stat-tile">
+                <div class="k">Active Logins</div>
+                <div class="v">{{ $sessions->count() }}</div>
             </div>
         </div>
 
-        <div class="table-card">
-            <div class="table-toolbar">
-                <div class="search-wrap">
-                    <span class="search-ico">🔍</span>
-                    <input type="text" id="searchInput" placeholder="Search name, email, city…" oninput="filterTable()">
-                </div>
-                <div class="count-pill"><strong id="shownCount">{{ count($clients) }}</strong> clients</div>
+        {{-- ── Account details ── --}}
+        <div class="panel">
+            <h3>Account Details</h3>
+            <div class="kv"><span>Full name</span><b>{{ $client->name }}</b></div>
+            <div class="kv"><span>Email</span><b>{{ $client->email }}</b></div>
+            <div class="kv"><span>Phone</span><b>{{ $client->phone ?? '—' }}</b></div>
+            <div class="kv"><span>City</span><b>{{ $client->city ?? '—' }}</b></div>
+            <div class="kv"><span>Age</span><b>{{ $client->age ?? '—' }}</b></div>
+            <div class="kv"><span>Account status</span><b>
+                    <span class="status-badge {{ $client->status == 'active' ? 'active' : 'disabled' }}">{{ $client->status }}</span>
+                </b></div>
+            <div class="kv"><span>Signed up</span><b>{{ $client->created_at?->format('d M Y, g:i A') ?? '—' }}</b></div>
+            <div class="kv"><span>Subscription started</span>
+                <b>{{ $client->subscription_activated_at?->format('d M Y') ?? '—' }}</b>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Client</th>
-                        <th>Contact</th>
-                        <th>Plan</th>
-                        <th>Subscription</th>
-                        <th>Cards</th>
-                        <th>Devices</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    @forelse($clients as $i => $client)
-                    @php
-                        $limit = $client->cardLimit();
-                        $used = $client->birthday_cards_count;
-                        $devices = (int) ($sessionCounts[$client->id] ?? 0);
-                        $pending = (int) ($pendingCounts[$client->id] ?? 0);
-                    @endphp
-                    <tr>
-                        <td><span class="row-num">{{ str_pad($i+1,2,'0',STR_PAD_LEFT) }}</span></td>
-                        <td>
-                            <a href="{{ route('admin.clients.show', $client->id) }}" class="name-cell"
-                                style="text-decoration:none;color:inherit;">
-                                <div class="av">{{ strtoupper(substr($client->name,0,1)) }}</div>
-                                <span>
-                                    <span class="name-strong">{{ $client->name }}</span>
-                                    <span style="display:block;font-size:.72rem;color:var(--text-dim)">
-                                        {{ $client->city ?? '—' }}@if($client->age) · {{ $client->age }} yrs @endif
-                                    </span>
-                                </span>
-                            </a>
-                        </td>
-                        <td>
-                            <span class="email-cell">{{ $client->email }}</span>
-                            <span style="display:block;font-size:.72rem;color:var(--text-dim)">{{ $client->phone ?? '—' }}</span>
-                        </td>
-                        <td><span class="city-pill">{{ $client->planLabel() }}</span></td>
-                        <td>
-                            <span class="status-badge {{ $client->hasActiveSubscription() ? 'active' : 'disabled' }}">
-                                {{ $client->hasActiveSubscription() ? 'active' : ($pending ? 'pending' : 'none') }}
-                            </span>
-                            @if ($pending)
-                                <span style="display:block;font-size:.7rem;color:#f59e0b;font-weight:700;margin-top:.2rem;">
-                                    {{ $pending }} request{{ $pending === 1 ? '' : 's' }} waiting
-                                </span>
-                            @endif
-                        </td>
-                        <td>
-                            <span class="age-cell">{{ $used }} / {{ $limit }}</span>
-                            <span style="display:block;font-size:.72rem;color:var(--text-dim)">
-                                {{ max(0, $limit - $used) }} left
-                            </span>
-                        </td>
-                        <td><span class="age-cell">{{ $devices }}</span></td>
-                        <td><span class="status-badge {{ $client->status == 'active' ? 'active' : 'disabled' }}">{{ $client->status }}</span></td>
-                        <td>
-                            <a href="{{ route('admin.clients.show', $client->id) }}" class="btn-toggle enable"
-                                style="text-decoration:none;display:inline-block;margin-bottom:.3rem;">View</a>
-                            <form action="{{ route('admin.clients.toggle-status', $client->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn-toggle {{ $client->status == 'active' ? 'disable' : 'enable' }}">
-                                    {{ $client->status == 'active' ? 'Disable' : 'Enable' }}
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="9">
-                            <div class="empty-state">
-                                <div class="ei">👤</div>
-                                <h3>No clients yet</h3>
-                                <p>Clients appear here as soon as they sign up from the landing page</p>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+            <div class="kv"><span>Plan fee</span><b>{{ $client->plan_amount ? 'Rs ' . number_format($client->plan_amount) : '—' }}</b></div>
+        </div>
+
+        {{-- ── Devices / logins ── --}}
+        <div class="panel">
+            <h3>Logged-in Devices &amp; Browsers</h3>
+
+            @if ($sessions->isEmpty())
+                <p class="none-note">This client is not signed in on any device right now.</p>
+            @else
+                <div class="table-scroll">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Device / Browser</th>
+                                <th>IP Address</th>
+                                <th>Last Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($sessions as $session)
+                                <tr>
+                                    <td><strong>{{ $session->device }}</strong></td>
+                                    <td>{{ $session->ip_address ?? '—' }}</td>
+                                    <td>{{ $session->last_activity?->diffForHumans() ?? '—' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <p class="none-note">Read from the active session store — these are the live logins the system
+                    can see.</p>
+            @endif
+        </div>
+
+        {{-- ── Subscription history ── --}}
+        <div class="panel">
+            <h3>Subscription Requests</h3>
+
+            @if ($requests->isEmpty())
+                <p class="none-note">This client has not requested a subscription yet.</p>
+            @else
+                <div class="table-scroll">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Plan</th>
+                                <th>Requested</th>
+                                <th>Status</th>
+                                <th>Reviewed By</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($requests as $req)
+                                <tr>
+                                    <td><strong>{{ \App\Support\SubscriptionPlans::label($req->plan_amount) }}</strong></td>
+                                    <td>{{ $req->created_at?->format('d M Y') ?? '—' }}</td>
+                                    <td>
+                                        <span class="status-badge {{ $req->status === 'approved' ? 'active' : 'disabled' }}">
+                                            {{ $req->status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $req->reviewer?->name ?? '—' }}</td>
+                                    <td>
+                                        @if ($req->isPending())
+                                            <form action="{{ route('admin.subscriptions.approve', $req->id) }}"
+                                                method="POST" style="display:inline;">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="btn-toggle enable">Approve</button>
+                                            </form>
+                                            <form action="{{ route('admin.subscriptions.reject', $req->id) }}"
+                                                method="POST" style="display:inline;">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="btn-toggle disable">Reject</button>
+                                            </form>
+                                        @else
+                                            <span style="color:var(--text-dim)">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+
+            @if ($client->hasActiveSubscription())
+                <form action="{{ route('admin.subscriptions.revoke', $client->id) }}" method="POST"
+                    style="margin-top:1rem;"
+                    onsubmit="return confirm('Revoke this subscription? The client will not be able to generate new QR codes.')">
+                    @csrf @method('PATCH')
+                    <button type="submit" class="btn-toggle disable">Revoke Subscription</button>
+                </form>
+            @endif
+        </div>
+
+        {{-- ── Cards ── --}}
+        <div class="panel">
+            <h3>Cards ({{ $cards->count() }})</h3>
+
+            @if ($cards->isEmpty())
+                <p class="none-note">This client has not created any cards yet.</p>
+            @else
+                <div class="table-scroll">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>Card</th>
+                                <th>Theme</th>
+                                <th>Progress</th>
+                                <th>State</th>
+                                <th>Last Edited</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($cards as $card)
+                                <tr>
+                                    <td><strong>{{ $card->displayTitle() }}</strong></td>
+                                    <td>{{ $card->theme ? ucfirst($card->theme) : '—' }}</td>
+                                    <td>Step {{ min(10, max(1, (int) $card->current_step)) }} of 10</td>
+                                    <td>
+                                        <span class="status-badge {{ $card->isDraft() ? 'disabled' : 'active' }}">
+                                            {{ $card->isDraft() ? 'draft' : 'completed' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $card->updated_at?->diffForHumans() ?? '—' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
     </main>
 
-    <script>
-        function filterTable() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('#tableBody tr');
-            let n = 0;
-            rows.forEach(r => {
-                const show = r.textContent.toLowerCase().includes(q);
-                r.classList.toggle('hidden', !show);
-                if (show) n++;
-            });
-            document.getElementById('shownCount').textContent = n;
-        }
-    </script>
 </body>
 
 </html>

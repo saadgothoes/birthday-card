@@ -3,84 +3,75 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Mail\ClientWelcomeMail;
+use App\Models\BirthdayCard;
+use App\Models\SubscriptionRequest;
 use App\Models\User;
+use App\Support\SubscriptionPlans;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
+/**
+ * Super Admin's view of the client base.
+ *
+ * Clients create their own accounts now, so there is no create/store here any
+ * more — this controller reports on accounts and controls their access.
+ */
 class ClientController extends Controller
 {
-    // Client list
+    /** Client list, with the plan and usage figures on every row. */
     public function index()
     {
-        $clients = User::where('role', 'client')->latest()->get();
-        return view('admin.clients.index', compact('clients'));
-    }
+        $clients = User::where('role', 'client')
+            ->withCount('birthdayCards')
+            ->latest()
+            ->get();
 
-    // Create form
-    public function create()
-    {
-        return view('admin.clients.create');
-    }
-
-    // Store client
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'  => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string|max:20',
-            'city'  => 'required|string|max:100',
-            'age'   => 'required|integer|min:1|max:120',
-        ]);
-
-        // System generated password
-        $plainPassword = Str::random(10);
-
-        $client = User::create([
-            'name'           => $request->name,
-            'email'          => $request->email,
-            'phone'          => $request->phone,
-            'city'           => $request->city,
-            'age'            => $request->age,
-            'password'       => $plainPassword, // auto hashed via cast
-            'plain_password' => $plainPassword, // store for reference
-            'password_changed' => false, // new clients haven't changed password yet
-            'role'           => 'client',
-            'status'         => 'active',
-            'subscription_start_date' => now(),
-            'subscription_fee' => auth()->user()->default_subscription_fee ?? 0,
-        ]);
-
-        $flashType = 'success';
-        $flashMessage = "Client created! Credentials sent to {$client->email}";
-
-        try {
-            Mail::to($client->email)->send(
-                new ClientWelcomeMail($client->name, $client->email, $plainPassword)
-            );
-        } catch (TransportExceptionInterface $exception) {
-            report($exception);
-
-            $flashType = 'warning';
-            $flashMessage = "Client created, but the welcome email could not be sent. Check your mail configuration and try again.";
+        // One grouped query instead of a session lookup per row.
+        $sessionCounts = collect();
+        if (config('session.driver') === 'database') {
+            $sessionCounts = \Illuminate\Support\Facades\DB::table(config('session.table', 'sessions'))
+                ->whereNotNull('user_id')
+                ->selectRaw('user_id, COUNT(*) as total')
+                ->groupBy('user_id')
+                ->pluck('total', 'user_id');
         }
 
-        return redirect()->route('admin.clients.index')
-            ->with($flashType, $flashMessage);
+        $pendingCounts = SubscriptionRequest::where('status', SubscriptionRequest::PENDING)
+            ->selectRaw('user_id, COUNT(*) as total')
+            ->groupBy('user_id')
+            ->pluck('total', 'user_id');
+
+        return view('admin.clients.index', [
+            'clients' => $clients,
+            'sessionCounts' => $sessionCounts,
+            'pendingCounts' => $pendingCounts,
+        ]);
     }
 
-    // Toggle client status
+    /** Everything the system knows about one client. */
+    public function show(int $id)
+    {
+        $client = User::where('role', 'client')
+            ->withCount('birthdayCards')
+            ->findOrFail($id);
+
+        return view('admin.clients.show', [
+            'client' => $client,
+            'cards' => BirthdayCard::where('user_id', $client->id)
+                ->orderByDesc('updated_at')
+                ->get(),
+            'sessions' => $client->activeSessions(),
+            'requests' => $client->subscriptionRequests()->with('reviewer')->get(),
+            'plans' => SubscriptionPlans::all(),
+        ]);
+    }
+
+    /** Enable/disable a client — unchanged behaviour. */
     public function toggleStatus($id)
     {
         $client = User::where('role', 'client')->findOrFail($id);
         $client->status = $client->status === 'active' ? 'disabled' : 'active';
         $client->save();
 
-        return redirect()->route('admin.clients.index')
-            ->with('success', 'Client status updated successfully.');
+        return back()->with('success', 'Client status updated successfully.');
     }
 }

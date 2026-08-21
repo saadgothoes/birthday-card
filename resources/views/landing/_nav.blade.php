@@ -12,12 +12,16 @@
             <a href="#gallery">Gallery</a>
         </nav>
 
-        <a href="{{ route('client.login') }}" class="btn-magnetic l-nav__cta" data-magnetic data-cursor-hover>
-            <span class="btn-magnetic__fill"></span>
-            <span class="btn-magnetic__label">
-                <span>Login</span>
-                <span class="btn-magnetic__icon">→</span>
-            </span>
-        </a>
+        <div class="l-nav__actions">
+            <a href="{{ route('client.login') }}" class="l-nav__login" data-cursor-hover>Login</a>
+
+            <a href="{{ route('client.register') }}" class="btn-magnetic l-nav__cta" data-magnetic data-cursor-hover>
+                <span class="btn-magnetic__fill"></span>
+                <span class="btn-magnetic__label">
+                    <span>Sign Up</span>
+                    <span class="btn-magnetic__icon">→</span>
+                </span>
+            </a>
+        </div>
     </div>
 </header>

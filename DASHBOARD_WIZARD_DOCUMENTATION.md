@@ -5,27 +5,33 @@ dynamic with real live previews, and the underlying card templates data-driven �
 public story those settings drive.
 
 **Scope of this document:** the whole loop. The wizard up to and including the **Ending Page
-(Step 8)** and **QR Select (Step 9)** in sections 1-16, the **public story** a recipient opens
+(Step 8)**, **Music (Step 9)** and **QR Select (Step 10)** in sections 1-16, the **public story** a recipient opens
 from the generated link in sections 17-19, the **girl side** of Pages 1-3, Gift 1 and
 Gift 2 in sections 20-22, the **rest of the girl side** — Gift 3, its own ending design,
 its own QR set and its public story — plus one boy bug fix in sections 23-27, and a
 Step 8 error-messaging fix plus a dead-code cleanup in section 28, and the public gift-card
-click-target correction in section 29. Both themes are now complete, dashboard through to the
-public story.
+click-target correction in section 29, the music library and story soundtrack in section 30,
+and — in section 31 — client self-signup, subscriptions and card limits, the QR
+subscription gate, and the New/Recent/Draft card hub, and — in section 32 — the dashboard
+redesign, Save as Draft with card labels, resume-at-last-step and the theme-persistence fix.
+Both themes are complete, dashboard through to the public story.
 
 **Corresponding commits:**
 
-| Commit | Covers |
-|---|---|
-| `d9fa1c1` | Steps 3-6 (Welcome, Gift Box, Gift 1, Gift 2) — sections 1-6 below |
-| `c4b818a` | Gift 3 as Step 7 — section 7 |
-| `e44d212` | Gift 3 interactions + design-safe text limits — sections 8-10 |
-| *(earlier)* | Ending Page as Step 8, QR Select as Step 9 — sections 11-14 |
-| *(earlier)* | The public story at `/c/{slug}` — sections 17-19 |
-| *(earlier)* | The girl side: Pages 1-3, Gift 1 and Gift 2 — sections 20-22 |
-| *(earlier)* | Girl Gift 3, ending page, QR and public story; boy welcome fix — sections 23-27 |
-| *(this change)* | Step 8 error surfacing fix + dead-code cleanup — section 28 |
-| *(this change)* | Public gift-selection click-target correction — section 29 |
+| Commit          | Covers                                                                          |
+| --------------- | ------------------------------------------------------------------------------- |
+| `d9fa1c1`       | Steps 3-6 (Welcome, Gift Box, Gift 1, Gift 2) — sections 1-6 below              |
+| `c4b818a`       | Gift 3 as Step 7 — section 7                                                    |
+| `e44d212`       | Gift 3 interactions + design-safe text limits — sections 8-10                   |
+| _(earlier)_     | Ending Page as Step 8, QR Select as Step 9 — sections 11-14                     |
+| _(earlier)_     | The public story at `/c/{slug}` — sections 17-19                                |
+| _(earlier)_     | The girl side: Pages 1-3, Gift 1 and Gift 2 — sections 20-22                    |
+| _(earlier)_     | Girl Gift 3, ending page, QR and public story; boy welcome fix — sections 23-27 |
+| _(this change)_ | Step 8 error surfacing fix + dead-code cleanup — section 28                     |
+| _(earlier)_     | Public gift-selection click-target correction — section 29                      |
+| _(earlier)_     | Music library and story soundtrack — section 30                                 |
+| _(earlier)_     | Signup, subscriptions, card limits, QR gate, card hub — section 31              |
+| _(this change)_ | Dashboard redesign, Save as Draft, resume + theme fix — section 32              |
 
 ---
 
@@ -35,16 +41,16 @@ Four migrations were added.
 
 ### `2026_08_13_000000_add_heading_and_gift_variant_to_birthday_cards_table.php`
 
-| Column | Type | Purpose |
-|---|---|---|
-| `heading` | `string` nullable | Step 3 — welcome screen heading |
+| Column                | Type                           | Purpose                                        |
+| --------------------- | ------------------------------ | ---------------------------------------------- |
+| `heading`             | `string` nullable              | Step 3 — welcome screen heading                |
 | `gift_screen_variant` | `unsignedTinyInteger` nullable | Step 4 — which gift-box screen design (1 or 2) |
 
 ### `2026_08_13_010000_add_gift1_gift2_data_to_birthday_cards_table.php`
 
-| Column | Type | Purpose |
-|---|---|---|
-| `gift1_data` | `json` nullable | Step 5 — Gift 1 theme + photos |
+| Column       | Type            | Purpose                                              |
+| ------------ | --------------- | ---------------------------------------------------- |
+| `gift1_data` | `json` nullable | Step 5 — Gift 1 theme + photos                       |
 | `gift2_data` | `json` nullable | Step 6 — Gift 2 theme + photos + names + date + text |
 
 A third migration, for Gift 3's `gift3_data`, is covered in section 7.1; a fourth, for
@@ -85,17 +91,17 @@ step landed.
 
 ### Controller — `app/Http/Controllers/Client/BirthdayCardController.php`
 
-| Method | Saves | Advances `current_step` to |
-|---|---|---|
-| `saveStep1` | theme, variant | 2 |
-| `saveStep2` | lock_code (PIN), profile photo | 3 |
-| `saveStep3` | heading, welcome_message | 4 |
-| `saveStep4` | gift_screen_variant | 5 |
-| `saveStep5` | gift1_data (theme + up to 3 photos) | 6 |
-| `saveStep6` | gift2_data (theme + up to 4 photos + names + date + text) | 7 |
-| `saveStep7` | gift3_data (theme + 5 photos + every book page's text) | 8 |
-| `saveStep8` | ending_data (design + the seven ending-page text slots) | 9 |
-| `saveStep9` | qr_data (QR design) + the share slug; returns the link and the code | 9 |
+| Method      | Saves                                                               | Advances `current_step` to |
+| ----------- | ------------------------------------------------------------------- | -------------------------- |
+| `saveStep1` | theme, variant                                                      | 2                          |
+| `saveStep2` | lock_code (PIN), profile photo                                      | 3                          |
+| `saveStep3` | heading, welcome_message                                            | 4                          |
+| `saveStep4` | gift_screen_variant                                                 | 5                          |
+| `saveStep5` | gift1_data (theme + up to 3 photos)                                 | 6                          |
+| `saveStep6` | gift2_data (theme + up to 4 photos + names + date + text)           | 7                          |
+| `saveStep7` | gift3_data (theme + 5 photos + every book page's text)              | 8                          |
+| `saveStep8` | ending_data (design + the seven ending-page text slots)             | 9                          |
+| `saveStep9` | qr_data (QR design) + the share slug; returns the link and the code | 9                          |
 
 All methods operate on `currentDraft()` — the client's latest unpublished `BirthdayCard`,
 created on demand. Photo uploads merge into the existing photo array rather than replacing
@@ -103,6 +109,7 @@ it, so re-saving a step without re-picking every image does not wipe previously 
 photos. Replaced files are deleted from disk.
 
 Uploads are stored on the `public` disk:
+
 - `birthday-cards/profile/` — Step 2 profile photo
 - `birthday-cards/gift1/` — Gift 1 photos
 - `birthday-cards/gift2/` — Gift 2 photos
@@ -126,8 +133,8 @@ Route::post('/card/step9', [BirthdayCardController::class, 'saveStep9'])->name('
 
 ## 3. Dashboard Wizard
 
-`resources/views/client/dashboard.blade.php` — now **9 steps** (`const totalSteps = 9`).
-Steps 1-6 landed first; Gift 3 was slotted in as Step 7; the old *Generate & Share* stub
+`resources/views/client/dashboard.blade.php` — now **10 steps** (`const totalSteps = 10`).
+Steps 1-6 landed first; Gift 3 was slotted in as Step 7; the old _Generate & Share_ stub
 was then split into the Ending Page and QR Select:
 
 1. Choose Theme
@@ -138,7 +145,8 @@ was then split into the Ending Page and QR Select:
 6. Gift 2
 7. Gift 3 — see section 7
 8. Ending Page — see section 11
-9. QR Select — see section 12
+9. Music — see section 30
+10. QR Select — see section 12
 
 ### Step 3 — Welcome Screen
 
@@ -148,12 +156,12 @@ Replaced the old mock preview (fake avatar/name/message card) with the real thin
 - Defaults auto-populate from the theme + design chosen in Step 1, matching each design's
   own original wording:
 
-  | Theme | Variant | Default heading |
-  |---|---|---|
-  | boy | 1 | Happy Birthday My Love |
-  | boy | 2 | Happy Birthday King |
-  | girl | 1 | Happy Birthday My Love |
-  | girl | 2 | Happy Birthday Princess |
+    | Theme | Variant | Default heading         |
+    | ----- | ------- | ----------------------- |
+    | boy   | 1       | Happy Birthday My Love  |
+    | boy   | 2       | Happy Birthday King     |
+    | girl  | 1       | Happy Birthday My Love  |
+    | girl  | 2       | Happy Birthday Princess |
 
 - **Live preview** is an iframe of the actual public page (`/{theme}/page/2/{variant}`),
   not a mockup. It updates in real time as the user types (debounced ~250ms).
@@ -186,13 +194,13 @@ Replaced the old mock preview (fake avatar/name/message card) with the real thin
   signature line, so those fields (and the 4th photo slot) are hidden when the girl theme
   is active, instead of collecting data the design cannot display.
 
-  | Field | Boy | Girl |
-  |---|---|---|
-  | Photo slots | 4 | 3 |
-  | Name 1 / Name 2 | shown | hidden |
-  | Special Date | shown | hidden |
-  | Message | shown | shown |
-  | Signed | shown | hidden |
+    | Field           | Boy   | Girl   |
+    | --------------- | ----- | ------ |
+    | Photo slots     | 4     | 3      |
+    | Name 1 / Name 2 | shown | hidden |
+    | Special Date    | shown | hidden |
+    | Message         | shown | shown  |
+    | Signed          | shown | hidden |
 
 ### Resume behaviour
 
@@ -207,7 +215,7 @@ and signature. A client can close the dashboard mid-build and continue where the
 36 template files under `resources/views/birthday/` were converted from hardcoded content
 to query-parameter driven content, using Laravel's `request('key', 'default')` helper.
 
-**Design principle:** every parameter has the template's *own original text* as its
+**Design principle:** every parameter has the template's _own original text_ as its
 fallback default. With no query string, each page renders byte-for-byte as it did before —
 so the templates still work standalone, and the dashboard preview simply passes params.
 
@@ -215,51 +223,51 @@ so the templates still work standalone, and the dashboard preview simply passes 
 
 `boy-page-2`, `boy-page-2-2`, `girl-page-2`, `girl-page-2-2`
 
-| Param | Purpose |
-|---|---|
-| `heading` | Main title text |
+| Param     | Purpose                            |
+| --------- | ---------------------------------- |
+| `heading` | Main title text                    |
 | `message` | Body message (supports multi-line) |
 
 ### Gift 1 — boy (8 files)
 
 `boy-page-3-variant-{1,2}-gift-1-page-{1..4}` — polaroid photo board.
 
-| Param | Purpose |
-|---|---|
+| Param                        | Purpose                                 |
+| ---------------------------- | --------------------------------------- |
 | `photo1`, `photo2`, `photo3` | Replace the decorative SVG placeholders |
 
 ### Gift 1 — girl (8 files)
 
 `girl-page-3-variant-{1,2}-gift-1-page-{1..4}` — memory board with calendar.
 
-| Param | Purpose |
-|---|---|
-| `photo1`, `photo2`, `photo3` | Polaroid photos |
-| `cal_month` | Calendar month label |
-| `cal_day` | Highlighted day |
-| `message` | Handwritten note |
+| Param                        | Purpose              |
+| ---------------------------- | -------------------- |
+| `photo1`, `photo2`, `photo3` | Polaroid photos      |
+| `cal_month`                  | Calendar month label |
+| `cal_day`                    | Highlighted day      |
+| `message`                    | Handwritten note     |
 
 ### Gift 2 — boy (8 files)
 
 `boy-page-3-variant-{1,2}-gift-2-page-{1..4}` — couple memory tiles + calendar + note.
 
-| Param | Purpose |
-|---|---|
-| `photo1`–`photo4` | The four image tiles (walk / beach / coffee / embrace) |
-| `name_first`, `name_second` | Couple names |
-| `cal_month` | Calendar title |
-| `cal_day` | Day marked with the heart |
-| `message` | Note text |
-| `signed` | Signature line |
+| Param                       | Purpose                                                |
+| --------------------------- | ------------------------------------------------------ |
+| `photo1`–`photo4`           | The four image tiles (walk / beach / coffee / embrace) |
+| `name_first`, `name_second` | Couple names                                           |
+| `cal_month`                 | Calendar title                                         |
+| `cal_day`                   | Day marked with the heart                              |
+| `message`                   | Note text                                              |
+| `signed`                    | Signature line                                         |
 
 ### Gift 2 — girl (8 files)
 
 `girl-page-3-variant-{1,2}-gift-2-page-{1..4}` — handwritten letter reveal.
 
-| Param | Purpose |
-|---|---|
-| `photo1`, `photo2`, `photo3` | The three polaroids |
-| `message` | Letter text — newlines split into handwritten lines |
+| Param                        | Purpose                                             |
+| ---------------------------- | --------------------------------------------------- |
+| `photo1`, `photo2`, `photo3` | The three polaroids                                 |
+| `message`                    | Letter text — newlines split into handwritten lines |
 
 ---
 
@@ -304,7 +312,7 @@ checks, not just by inspection:
 ## 7. Gift 3 — Step 7, the "Our Story" Book
 
 Gift 3 is a ten-page flip book with a leather cover. It was added as **Step 7**, which
-pushed *Generate & Share* to **Step 8** (`const totalSteps = 8`). Boy side only — the
+pushed _Generate & Share_ to **Step 8** (`const totalSteps = 8`). Boy side only — the
 girl Gift 3 templates are untouched and have no wizard step.
 
 ### 7.1 Database
@@ -329,12 +337,12 @@ file, so the column can already exist here even though a fresh install still nee
 
 ### 7.2 Backend
 
-| Piece | Detail |
-|---|---|
-| Route | `POST /client/card/step7` → `client.card.step7` |
-| Controller | `BirthdayCardController@saveStep7`, advances `current_step` to 8 |
-| Uploads | `birthday-cards/gift3/` — five photos, merged not replaced, as with Gifts 1-2 |
-| Model | `gift3_data` added to `#[Fillable]` and cast to `'array'` |
+| Piece      | Detail                                                                        |
+| ---------- | ----------------------------------------------------------------------------- |
+| Route      | `POST /client/card/step7` → `client.card.step7`                               |
+| Controller | `BirthdayCardController@saveStep7`, advances `current_step` to 8              |
+| Uploads    | `birthday-cards/gift3/` — five photos, merged not replaced, as with Gifts 1-2 |
+| Model      | `gift3_data` added to `#[Fillable]` and cast to `'array'`                     |
 
 Field names live in **one place**, `GIFT3_TEXT_LIMITS`, which the save endpoint validates
 against, the dashboard reads for its `maxlength` attributes, and the templates read off the
@@ -347,14 +355,14 @@ page at a time**:
 
 - 4 theme thumbnails — real iframes of `/boy/page/3/{giftScreenVariant}/gift/3/{1-4}`.
 - A progress strip of 10 dots; one `.book-page-panel` visible at a time, with
-  *Previous page* / *Next page*.
+  _Previous page_ / _Next page_.
 - **Continue** only appears on the last book page, so the whole book gets walked through.
 - A live preview under the fields that **jumps to the page being edited** — the templates
   take a `preview_page=N` parameter that opens the book straight to that page.
 - All five photos are required before Continue will save.
 
 Gift 3 renders in a **portrait** iframe (460×723, `.gift3-thumb` / `.gift3-preview`) rather
-than the 900×562 the other steps use: the book is sized off viewport *height*, so in a
+than the 900×562 the other steps use: the book is sized off viewport _height_, so in a
 landscape frame it shrank to a sliver in the middle.
 
 ### 7.4 Templates
@@ -369,15 +377,15 @@ applied to all 8. The closed cover is deliberately **not** editable.
 
 ### 8.1 What changed on the page
 
-| Book page | Change |
-|---|---|
-| Cover | The inside face was a blank slab for the whole 1.4s swing; it now carries a small "Our Story" plate. |
-| 5 — Letter | Paper sheet enlarged and anchored top-and-bottom; paragraphs get a small margin instead of a full blank line; font auto-steps down (`.sm` / `.xs`) as the letter gets longer. |
-| 6 — Dates | Each row takes an ISO date from a **date picker** and prints it long-form (`12 Mar 2020`). Free text entered before this change still renders as typed. |
-| 7 — Dreams | Now **3 or 4** items (`dream_count`), not a fixed 5. Defaults: First Coffee ✓, First Selfie ✓, First Trip ✓, Grow Old Together. |
-| 8 — Quote | Written out a character at a time, with a blinking caret and a longer pause on punctuation. Height is reserved up front (after `document.fonts.ready`) so the page doesn't jump. |
-| 9 — Ribbon | A **Click to Open** button beside the hint; the ribbon itself is clickable too. Page text is kept to the clear column left of the ribbon. |
-| 10 — Final | **Close the Book** added beside Replay Story. |
+| Book page  | Change                                                                                                                                                                           |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cover      | The inside face was a blank slab for the whole 1.4s swing; it now carries a small "Our Story" plate.                                                                             |
+| 5 — Letter | Paper sheet enlarged and anchored top-and-bottom; paragraphs get a small margin instead of a full blank line; font auto-steps down (`.sm` / `.xs`) as the letter gets longer.    |
+| 6 — Dates  | Each row takes an ISO date from a **date picker** and prints it long-form (`12 Mar 2020`). Free text entered before this change still renders as typed.                          |
+| 7 — Dreams | Now **3 or 4** items (`dream_count`), not a fixed 5. Defaults: First Coffee ✓, First Selfie ✓, First Trip ✓, Grow Old Together.                                                  |
+| 8 — Quote  | Written out a character at a time, with a blinking caret and a longer pause on punctuation. Height is reserved up front (after `document.fonts.ready`) so the page doesn't jump. |
+| 9 — Ribbon | A **Click to Open** button beside the hint; the ribbon itself is clickable too. Page text is kept to the clear column left of the ribbon.                                        |
+| 10 — Final | **Close the Book** added beside Replay Story.                                                                                                                                    |
 
 **Replay Story** closes the cover, resets every interactive page, then re-opens on page one —
 the whole opening plays again from where the story was first opened. **Close the Book** does
@@ -393,39 +401,39 @@ counter on each field, and `maxlength` stops input at the ceiling.
 
 Defined in `BirthdayCardController`:
 
-| Constant | Fields |
-|---|---|
-| `WELCOME_LIMITS` | heading 40, message 160 (+ 4-line cap) |
-| `GIFT2_LIMITS` | name 14, signed 30, note **180 boy / 300 girl** — the ceiling follows the theme, because the boy design uses a small fixed note panel and the girl one a taller scrollable letter sheet |
-| `GIFT3_TEXT_LIMITS` | 30 slots, below |
-| `GIFT3_LETTER_MAX_LINES` | 10 — characters alone don't bound the letter's height |
-| `GIFT3_MIN_DREAMS` / `GIFT3_MAX_DREAMS` | 3 / 4 |
-| `ENDING_TEXT_LIMITS` | 7 slots, see section 11.4 |
-| `ENDING_LETTER_MAX_LINES` | 14 — as with Gift 3's letter, characters alone don't bound the height |
+| Constant                                | Fields                                                                                                                                                                                  |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WELCOME_LIMITS`                        | heading 40, message 160 (+ 4-line cap)                                                                                                                                                  |
+| `GIFT2_LIMITS`                          | name 14, signed 30, note **180 boy / 300 girl** — the ceiling follows the theme, because the boy design uses a small fixed note panel and the girl one a taller scrollable letter sheet |
+| `GIFT3_TEXT_LIMITS`                     | 30 slots, below                                                                                                                                                                         |
+| `GIFT3_LETTER_MAX_LINES`                | 10 — characters alone don't bound the letter's height                                                                                                                                   |
+| `GIFT3_MIN_DREAMS` / `GIFT3_MAX_DREAMS` | 3 / 4                                                                                                                                                                                   |
+| `ENDING_TEXT_LIMITS`                    | 7 slots, see section 11.4                                                                                                                                                               |
+| `ENDING_LETTER_MAX_LINES`               | 14 — as with Gift 3's letter, characters alone don't bound the height                                                                                                                   |
 
 Gift 3, by book page:
 
-| Page | Field(s) | Limit | Why |
-|---|---|---|---|
-| 1 | `eyebrow` | 28 | uppercase display face with 4px tracking |
-| 1 | `from_name`, `to_name` | 18 | script face at up to 42px |
-| 2 | `caption` | 45 | italic line under a full-width photo |
-| 3 | `memory_text` | 70 | narrow half-width column beside the photo |
-| 4 | `polaroid_label` | 32 | page label |
-| 4 | `note1`-`note3` | 18 | handwritten strip under a polaroid |
-| 5 | `letter_label` | 32 | page label |
-| 5 | `letter` | 280 + 10 lines | plus the auto font step-down |
-| 5 | `envelope_hint` | 28 | |
-| 6 | `dates_label` | 32 | |
-| 6 | `date1_name`-`date4_name` | 22 | shares its row with the date itself |
-| 7 | `dreams_label` | 32 | |
-| 7 | `dream1`-`dream4` | 24 | row width minus the tickbox |
-| 8 | `quote` | 120 | |
-| 9 | `secret_label` | 32 | |
-| 9 | `secret_button` | 20 | pill button |
-| 9 | `secret_message` | 48 | |
-| 10 | `final_line1`, `final_line2` | 42 | |
-| 10 | `replay_label`, `close_label` | 20 | pill buttons |
+| Page | Field(s)                      | Limit          | Why                                       |
+| ---- | ----------------------------- | -------------- | ----------------------------------------- |
+| 1    | `eyebrow`                     | 28             | uppercase display face with 4px tracking  |
+| 1    | `from_name`, `to_name`        | 18             | script face at up to 42px                 |
+| 2    | `caption`                     | 45             | italic line under a full-width photo      |
+| 3    | `memory_text`                 | 70             | narrow half-width column beside the photo |
+| 4    | `polaroid_label`              | 32             | page label                                |
+| 4    | `note1`-`note3`               | 18             | handwritten strip under a polaroid        |
+| 5    | `letter_label`                | 32             | page label                                |
+| 5    | `letter`                      | 280 + 10 lines | plus the auto font step-down              |
+| 5    | `envelope_hint`               | 28             |                                           |
+| 6    | `dates_label`                 | 32             |                                           |
+| 6    | `date1_name`-`date4_name`     | 22             | shares its row with the date itself       |
+| 7    | `dreams_label`                | 32             |                                           |
+| 7    | `dream1`-`dream4`             | 24             | row width minus the tickbox               |
+| 8    | `quote`                       | 120            |                                           |
+| 9    | `secret_label`                | 32             |                                           |
+| 9    | `secret_button`               | 20             | pill button                               |
+| 9    | `secret_message`              | 48             |                                           |
+| 10   | `final_line1`, `final_line2`  | 42             |                                           |
+| 10   | `replay_label`, `close_label` | 20             | pill buttons                              |
 
 Newlines are normalised to `\n` (`normaliseNewlines()`) on the way into the database for the
 welcome message, the Gift 2 note, the Gift 3 letter and the ending-page letter.
@@ -483,11 +491,11 @@ A final sweep that filled **every field on a page to its exact limit at once** s
 minor overflow in three places, all at the largest render (the 460×723 preview iframe) and
 only with every field simultaneously maxed:
 
-| Page | Overflow |
-|---|---|
+| Page      | Overflow                                                             |
+| --------- | -------------------------------------------------------------------- |
 | 1 — Title | `.heart-deco` pushed ~6-13px past the page at the smallest viewports |
-| 6 — Dates | ~45px when all four titles are 22 chars *and* all four dates are set |
-| 8 — Quote | ~86px at the full 120 characters |
+| 6 — Dates | ~45px when all four titles are 22 chars _and_ all four dates are set |
+| 8 — Quote | ~86px at the full 120 characters                                     |
 
 Ordinary content is well clear of this, but the three limits above want tightening (bisecting
 the true safe length per field is the way to do it). Nothing else in the sweep overflowed;
@@ -506,10 +514,10 @@ and reachable from the dashboard, boy side fully integrated.
 
 `2026_08_18_010000_add_ending_and_qr_data_to_birthday_cards_table.php`
 
-| Column | Type | Purpose |
-|---|---|---|
-| `ending_data` | `json` nullable | Step 8 — ending design + all seven text slots |
-| `qr_data` | `json` nullable | Step 9 — chosen QR design + when it was generated |
+| Column        | Type            | Purpose                                           |
+| ------------- | --------------- | ------------------------------------------------- |
+| `ending_data` | `json` nullable | Step 8 — ending design + all seven text slots     |
+| `qr_data`     | `json` nullable | Step 9 — chosen QR design + when it was generated |
 
 The same migration **drops `ending_variant` and `ending_message`** — the orphan columns
 left by the reverted attempt at this feature. No migration ever created them, nothing read
@@ -549,11 +557,11 @@ designs that are coming, rather than an empty tab.
 
 ### 11.3 Backend
 
-| Piece | Detail |
-|---|---|
-| Route | `POST /client/card/step8` → `client.card.step8` |
+| Piece      | Detail                                                           |
+| ---------- | ---------------------------------------------------------------- |
+| Route      | `POST /client/card/step8` → `client.card.step8`                  |
 | Controller | `BirthdayCardController@saveStep8`, advances `current_step` to 9 |
-| Limits | `ENDING_TEXT_LIMITS` (7 slots) + `ENDING_LETTER_MAX_LINES` (14) |
+| Limits     | `ENDING_TEXT_LIMITS` (7 slots) + `ENDING_LETTER_MAX_LINES` (14)  |
 
 `endingTextKeys()` exposes the key order, so the dashboard, the validator and the templates
 all read one list — the same arrangement Gift 3 uses.
@@ -564,15 +572,15 @@ All four boy templates (`boy-page-4`, `-4-2`, `-4-3`, `-4-4`) are now query-para
 driven, each parameter defaulting to the template's own original text, so the pages still
 render byte-for-byte unchanged with no query string.
 
-| Param | Slot | Limit |
-|---|---|---|
-| `title` | envelope heading | 28 |
-| `subtitle` | line under it | 48 |
-| `tap_label` | uppercase tap hint | 20 |
-| `letter_heading` | heading on the paper | 32 |
-| `letter` | the letter itself | 500 + 14 lines |
-| `signoff` | signature line | 28 |
-| `end_label` | closing stamp | 20 |
+| Param            | Slot                 | Limit          |
+| ---------------- | -------------------- | -------------- |
+| `title`          | envelope heading     | 28             |
+| `subtitle`       | line under it        | 48             |
+| `tap_label`      | uppercase tap hint   | 20             |
+| `letter_heading` | heading on the paper | 32             |
+| `letter`         | the letter itself    | 500 + 14 lines |
+| `signoff`        | signature line       | 28             |
+| `end_label`      | closing stamp        | 20             |
 
 `?preview_stage=letter` skips the envelope and prints the letter in full — the dashboard
 preview uses it so the client can see the text they are typing without sitting through the
@@ -593,7 +601,7 @@ in a landscape frame the letter sheet reads nothing like it does on a phone.
 
 ## 12. QR Select — Step 9
 
-Step 9 replaces the old *Generate & Share* panel, which was a client-side stub that
+Step 9 replaces the old _Generate & Share_ panel, which was a client-side stub that
 fabricated a fake slug and drew a dashed placeholder box.
 
 ### 12.1 QR generation
@@ -620,12 +628,12 @@ reason.
 `BirthdayCardController::QR_THEMES`, same per-side shape and `available` flag as the ending
 registry:
 
-| # | Boy | Girl (not wired up yet) |
-|---|---|---|
-| 1 | Midnight Navy — classic squares, ivory card | Dusty Pink |
-| 2 | Steel Glow — rounded modules, blue gradient | Blush Petal |
-| 3 | Graphite Ice — dark card, ice blue dots | Rose Gold Noir |
-| 4 | Blueprint — dashed frame, plain squares | Lavender Line |
+| #   | Boy                                         | Girl (not wired up yet) |
+| --- | ------------------------------------------- | ----------------------- |
+| 1   | Midnight Navy — classic squares, ivory card | Dusty Pink              |
+| 2   | Steel Glow — rounded modules, blue gradient | Blush Petal             |
+| 3   | Graphite Ice — dark card, ice blue dots     | Rose Gold Noir          |
+| 4   | Blueprint — dashed frame, plain squares     | Lavender Line           |
 
 ### 12.3 The share link
 
@@ -640,12 +648,12 @@ so a code generated today still points at the right place once that flow lands.
 
 ### 12.4 Backend
 
-| Piece | Detail |
-|---|---|
-| Route | `POST /client/card/step9` → `client.card.step9` |
-| Controller | `BirthdayCardController@saveStep9` |
-| Saves | `qr_data` = `{ theme, generated_at }`, plus the slug if it was still unset |
-| Returns | `slug`, `share_url`, `qr_svg` (720px) |
+| Piece      | Detail                                                                     |
+| ---------- | -------------------------------------------------------------------------- |
+| Route      | `POST /client/card/step9` → `client.card.step9`                            |
+| Controller | `BirthdayCardController@saveStep9`                                         |
+| Saves      | `qr_data` = `{ theme, generated_at }`, plus the slug if it was still unset |
+| Returns    | `slug`, `share_url`, `qr_svg` (720px)                                      |
 
 ### 12.5 Dashboard
 
@@ -717,7 +725,7 @@ Real browser automation (Playwright driving Chrome) plus `curl`, not inspection.
 
 ## 15. Not Included
 
-*(As of section 17 the public story is built — this list is superseded by section 19.)*
+_(As of section 17 the public story is built — this list is superseded by section 19.)_
 
 - **Girl Gift 3, ending page and QR** — the girl Gift 3 templates are untouched, and the
   girl ending/QR designs are registered but flagged unavailable. Steps 7-9 are boy-only.
@@ -731,10 +739,10 @@ Real browser automation (Playwright driving Chrome) plus `curl`, not inspection.
   `DB_CONNECTION=pgsql`, `DB_HOST=postgres`, `DB_DATABASE=munsif` (a different project),
   which take precedence over `.env` and cause `php artisan` to fail with a connection error.
   Workaround when running artisan commands:
-  ```bash
-  env -u DB_CONNECTION -u DB_HOST -u DB_PORT -u DB_DATABASE -u DB_USERNAME -u DB_PASSWORD \
-    php artisan migrate:status
-  ```
+    ```bash
+    env -u DB_CONNECTION -u DB_HOST -u DB_PORT -u DB_DATABASE -u DB_USERNAME -u DB_PASSWORD \
+      php artisan migrate:status
+    ```
 - **No GD extension.** Anything that needs to produce a raster image server-side will fail;
   the QR code is SVG for this reason, and PNG is produced in the browser.
 - **Some uploaded photos were lost.** During earlier test-data cleanup, the gift/profile
@@ -742,9 +750,9 @@ Real browser automation (Playwright driving Chrome) plus `curl`, not inspection.
   photos belonging to existing cards (user IDs 2 and 8). The database rows still reference
   those paths, but the image files are gone and must be re-uploaded.
 
-*(Resolved since the last revision: `vendor/endroid/` is no longer orphaned — see 12.1;
+_(Resolved since the last revision: `vendor/endroid/` is no longer orphaned — see 12.1;
 `ending_variant` / `ending_message` are dropped — see 11.1; `boy-page-4-3.blade.php` is no
-longer corrupted — see 13.)*
+longer corrupted — see 13.)_
 
 ---
 
@@ -765,14 +773,14 @@ Dashboard → save configuration → generate link/QR
 Every card already carries its own `slug` (settled in Step 9 — see 12.3), so a single set of
 routes serves every client and each link opens only that client's configuration:
 
-| Route | Name | Page |
-|---|---|---|
-| `GET /c/{slug}` | `story.lock` | Page 1 — the lock screen |
-| `POST /c/{slug}/unlock` | `story.unlock` | code check |
-| `GET /c/{slug}/welcome` | `story.welcome` | Page 2 |
-| `GET /c/{slug}/gifts` | `story.gifts` | Page 3 — gift selection |
-| `GET /c/{slug}/gift/{1,2,3}` | `story.gift` | the three gifts |
-| `GET /c/{slug}/ending` | `story.ending` | the ending page |
+| Route                        | Name            | Page                     |
+| ---------------------------- | --------------- | ------------------------ |
+| `GET /c/{slug}`              | `story.lock`    | Page 1 — the lock screen |
+| `POST /c/{slug}/unlock`      | `story.unlock`  | code check               |
+| `GET /c/{slug}/welcome`      | `story.welcome` | Page 2                   |
+| `GET /c/{slug}/gifts`        | `story.gifts`   | Page 3 — gift selection  |
+| `GET /c/{slug}/gift/{1,2,3}` | `story.gift`    | the three gifts          |
+| `GET /c/{slug}/ending`       | `story.ending`  | the ending page          |
 
 An unknown slug is a 404. A girl card is a 404 too, for now — the dashboard does not
 configure the girl side, so there is nothing honest to render. Adding `'girl'` to
@@ -786,15 +794,15 @@ query parameters the dashboard's live preview passes**, merges them into the req
 renders the **same template**. The templates already read their content with
 `request('key', default)`, so nothing new had to be taught to them.
 
-| Page | Template | Comes from |
-|---|---|---|
-| Lock | `boy-page-1{-2}` | `variant`, `profile_image_path`, `lock_code` |
-| Welcome | `boy-page-2{-2}` | `variant`, `heading`, `welcome_message` |
-| Gifts | `boy-page-3{-2}` | `gift_screen_variant` |
-| Gift 1 | `…gift-1-page-{n}` | `gift1_data` — design + 3 photos |
-| Gift 2 | `…gift-2-page-{n}` | `gift2_data` — design, 4 photos, names, `cal_day`, note, signature |
-| Gift 3 | `…gift-3-page-{n}` | `gift3_data` — design, 5 photos, all 30 text slots, dates, tick states, dream count |
-| Ending | `boy-page-4{-2,-3,-4}` | `ending_data` — design + 7 text slots |
+| Page    | Template               | Comes from                                                                          |
+| ------- | ---------------------- | ----------------------------------------------------------------------------------- |
+| Lock    | `boy-page-1{-2}`       | `variant`, `profile_image_path`, `lock_code`                                        |
+| Welcome | `boy-page-2{-2}`       | `variant`, `heading`, `welcome_message`                                             |
+| Gifts   | `boy-page-3{-2}`       | `gift_screen_variant`                                                               |
+| Gift 1  | `…gift-1-page-{n}`     | `gift1_data` — design + 3 photos                                                    |
+| Gift 2  | `…gift-2-page-{n}`     | `gift2_data` — design, 4 photos, names, `cal_day`, note, signature                  |
+| Gift 3  | `…gift-3-page-{n}`     | `gift3_data` — design, 5 photos, all 30 text slots, dates, tick states, dream count |
+| Ending  | `boy-page-4{-2,-3,-4}` | `ending_data` — design + 7 text slots                                               |
 
 Because the inputs are identical, **the public page and the dashboard preview are the same
 page**. Gift 2's `cal_day` is derived from the stored `cal_date` exactly as the dashboard
@@ -811,14 +819,14 @@ So `App\Support\StoryChrome` adds it to the rendered HTML instead, just before `
 Each snippet is self-contained and only ever adds; where a design already has the right
 control, the snippet wires that one up rather than drawing a second:
 
-| Page | What the chrome does |
-|---|---|
-| Lock | Turns the decorative numpad into a real 4-digit entry, drops the client's photo into the frame, adds the error line. Matches all three designs' class names (`.boy2-*`, `.girl-*`, `.girl2-*`) |
-| Welcome | Points the design's own **NEXT** button at the gift screen |
-| Gifts | Redefines `openGiftPage(n)` — which pointed at a URL that was never built — keeping the design's loading flourish |
-| Gift 1 / 2 | A floating **Next →** back to the gift screen |
-| Gift 3 | A floating **← Gifts** and **One Last Thing →** |
-| Ending | A floating **← Back to the gifts** |
+| Page       | What the chrome does                                                                                                                                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lock       | Turns the decorative numpad into a real 4-digit entry, drops the client's photo into the frame, adds the error line. Matches all three designs' class names (`.boy2-*`, `.girl-*`, `.girl2-*`) |
+| Welcome    | Points the design's own **NEXT** button at the gift screen                                                                                                                                     |
+| Gifts      | Redefines `openGiftPage(n)` — which pointed at a URL that was never built — keeping the design's loading flourish                                                                              |
+| Gift 1 / 2 | A floating **Next →** back to the gift screen                                                                                                                                                  |
+| Gift 3     | A floating **← Gifts** and **One Last Thing →**                                                                                                                                                |
+| Ending     | A floating **← Back to the gifts**                                                                                                                                                             |
 
 Verified: none of this chrome appears on the standalone `/boy/page/…` preview URLs.
 
@@ -891,11 +899,11 @@ design actually has, and Gift 2 given an editor that matches its scene.
 
 ### 20.1 Pages 1-3
 
-| Page | State before | Now |
-|---|---|---|
-| 1 — Lock | Design 2 took a `photo`; design 1 drew an illustration with no way in | Design 1 takes `photo` too, with the illustration kept as the fallback when there isn't one |
-| 2 — Welcome | Already took `heading` and `message` | Unchanged |
-| 3 — Gift screen | Both designs already offered and saved in Step 4 | Unchanged |
+| Page            | State before                                                          | Now                                                                                         |
+| --------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 1 — Lock        | Design 2 took a `photo`; design 1 drew an illustration with no way in | Design 1 takes `photo` too, with the illustration kept as the fallback when there isn't one |
+| 2 — Welcome     | Already took `heading` and `message`                                  | Unchanged                                                                                   |
+| 3 — Gift screen | Both designs already offered and saved in Step 4                      | Unchanged                                                                                   |
 
 So the only real gap was the lock screen's photo, which meant a girl client uploaded a
 picture in Step 2 and then couldn't see it in the preview. `girl-page-1` now renders the
@@ -906,15 +914,15 @@ the template still renders byte-for-byte as before with no parameters.
 
 The girl Gift 1 templates were **already** parameter-driven (`photo1-3`, `cal_month`,
 `cal_day`, `message`). What was wrong was the dashboard: Step 5 offered three photo slots and
-nothing else, because that is all the *boy* design has. A girl client could pick one of the
+nothing else, because that is all the _boy_ design has. A girl client could pick one of the
 four girl themes and then had no way to set the calendar it prints or the note beside it.
 
 Step 5 is now theme-aware, the same way Step 6 already was:
 
-| Field | Boy | Girl |
-|---|---|---|
-| Photo slots | 3 | 3 |
-| Special Date | hidden | shown |
+| Field            | Boy    | Girl  |
+| ---------------- | ------ | ----- |
+| Photo slots      | 3      | 3     |
+| Special Date     | hidden | shown |
 | Handwritten Note | hidden | shown |
 
 - **One date picker drives the whole calendar.** `cal_month`, the marked day, and the number
@@ -933,21 +941,21 @@ The girl Gift 2 is not a form's worth of fields: it is a wrapped box that opens 
 polaroids and then an envelope. Putting all of it on one panel would have buried the step, so
 it is walked in **five beats**, the same shape Gift 3's book already uses:
 
-| Beat | Fields | Limit |
-|---|---|---|
-| 1 — The Gift Box | Line above the box (`box_title`) | 34 |
-| | Prompt under it (`box_hint`) | 20 |
-| 2 — Photo 1 | photo + caption (`cap1`) | 18 |
-| 3 — Photo 2 | photo + caption (`cap2`) | 18 |
-| 4 — Photo 3 | photo + caption (`cap3`) | 18 |
-| 5 — The Letter | `message` | 300 |
+| Beat             | Fields                           | Limit |
+| ---------------- | -------------------------------- | ----- |
+| 1 — The Gift Box | Line above the box (`box_title`) | 34    |
+|                  | Prompt under it (`box_hint`)     | 20    |
+| 2 — Photo 1      | photo + caption (`cap1`)         | 18    |
+| 3 — Photo 2      | photo + caption (`cap2`)         | 18    |
+| 4 — Photo 3      | photo + caption (`cap3`)         | 18    |
+| 5 — The Letter   | `message`                        | 300   |
 
 - A progress strip of five dots, **Previous / Next** between beats, and **Continue** held
   back until the last one so the whole scene gets walked through. (This is the missing Next
   button — before, the girl side had no way through the step at all.)
 - The two sides now have **separate editors**: `#gift2BoySide` is the original single form,
   `#gift2GirlSide` the five beats, and only one is ever shown.
-- Each beat carries its own photo slot, driven by the *same* file input as the boy form's, so
+- Each beat carries its own photo slot, driven by the _same_ file input as the boy form's, so
   `mirrorGiftPhotoSlot()` keeps the two thumbnails in step rather than duplicating the upload.
 - The letter box appears in both editors and mirrors itself (`onGift2MessageInput`), so
   switching theme never loses what was written. Its ceiling still follows the design —
@@ -1008,7 +1016,7 @@ Playwright driving Chrome, plus `curl`.
 
 ---
 
-## 22. Girl Side — Still To Do *(superseded by section 26)*
+## 22. Girl Side — Still To Do _(superseded by section 26)_
 
 - **Gift 3** — the girl book templates are untouched; Step 7 remains boy-only.
 - **Ending Page and QR Select** — the girl designs are registered in the theme tables and
@@ -1038,24 +1046,24 @@ the design's own original content.
 The dashboard walks it in **nine beats**, the same shape Gift 3's book and Gift 2's scene
 already use:
 
-| Beat | Card | Fields |
-|---|---|---|
-| 1 | The Cover | `cover_title`, `cover_sub`, `cover_tap`, `gallery_title` |
-| 2 | Photo 1 | photo + `p1_date`, `p1_place`, `p1_caption` |
-| 3 | Video Clip 1 | cover still + **clip upload** + `v1_duration`, `v1_date`, `v1_place`, `v1_caption` |
-| 4 | The Chat | `chat_name`, `chat1`, `chat2`, `chat3`, `chat_date`, `chat_caption` |
-| 5 | Photo 2 | photo + `p2_date`, `p2_place`, `p2_caption` |
-| 6 | The Pinned Note | `note_date`, `note_text` (3-line cap) |
-| 7 | Video Clip 2 | cover still + **clip upload** + `v2_*` |
-| 8 | Photo 3 | photo + `p3_date`, `p3_place`, `p3_caption` |
-| 9 | A Love Letter | `letter` (12-line cap), `signoff` |
+| Beat | Card            | Fields                                                                             |
+| ---- | --------------- | ---------------------------------------------------------------------------------- |
+| 1    | The Cover       | `cover_title`, `cover_sub`, `cover_tap`, `gallery_title`                           |
+| 2    | Photo 1         | photo + `p1_date`, `p1_place`, `p1_caption`                                        |
+| 3    | Video Clip 1    | cover still + **clip upload** + `v1_duration`, `v1_date`, `v1_place`, `v1_caption` |
+| 4    | The Chat        | `chat_name`, `chat1`, `chat2`, `chat3`, `chat_date`, `chat_caption`                |
+| 5    | Photo 2         | photo + `p2_date`, `p2_place`, `p2_caption`                                        |
+| 6    | The Pinned Note | `note_date`, `note_text` (3-line cap)                                              |
+| 7    | Video Clip 2    | cover still + **clip upload** + `v2_*`                                             |
+| 8    | Photo 3         | photo + `p3_date`, `p3_place`, `p3_caption`                                        |
+| 9    | A Love Letter   | `letter` (12-line cap), `signoff`                                                  |
 
 - **Video is a new kind of upload.** Two clips, stored under `birthday-cards/gift3-video/`,
   validated on their real MIME type (`video/mp4`, `webm`, `ogg`, `quicktime`) with a 20 MB
   ceiling. Each slot shows a frame of the chosen clip, and the card plays it on tap.
-  > **Deployment note:** PHP's own `upload_max_filesize` and `post_max_size` must be raised
-  > to at least 20 MB. They ship at 2 MB and 8 MB here, and a request over them never
-  > reaches Laravel at all.
+    > **Deployment note:** PHP's own `upload_max_filesize` and `post_max_size` must be raised
+    > to at least 20 MB. They ship at 2 MB and 8 MB here, and a request over them never
+    > reaches Laravel at all.
 - **Storage.** The five image slots reuse the existing `photos` array — slots 0-2 are the
   photo cards, 3-4 the two video posters — so all the existing merge-not-replace upload
   handling applies unchanged. `videos` is a new two-slot array beside it. `saveStep7`
@@ -1073,14 +1081,14 @@ screen the whole time, so a client filling in photo 2 or the letter never saw wh
 making. Both templates now take a preview parameter, exactly as the boy book's
 `preview_page` already did:
 
-| Design | Parameter | Effect |
-|---|---|---|
+| Design      | Parameter              | Effect                                                               |
+| ----------- | ---------------------- | -------------------------------------------------------------------- |
 | Girl Gift 2 | `preview_stage=photos` | Skips the box, shows all three polaroids at once with their captions |
-| | `preview_stage=letter` | …and opens the envelope with the letter already written |
-| Girl Gift 3 | `preview_card=N` | Opens the roll, reveals every card, scrolls to card N |
+|             | `preview_stage=letter` | …and opens the envelope with the letter already written              |
+| Girl Gift 3 | `preview_card=N`       | Opens the roll, reveals every card, scrolls to card N                |
 
 The dashboard sets them from whichever beat is on screen, so the preview moves with the
-client. Both fast-forwards reveal *all* the cards or photos at once rather than staging them
+client. Both fast-forwards reveal _all_ the cards or photos at once rather than staging them
 in one at a time, because the staging is what hid the thing being edited.
 
 ### 23.3 A Girl ending page — "The Bloom"
@@ -1093,12 +1101,12 @@ drifting past throughout.
 Four colourways, same markup, colour tokens only — the convention the other four-theme sets
 use:
 
-| # | Name | |
-|---|---|---|
-| 1 | Blush Rose | blush petals on cream |
-| 2 | Lilac Dusk | lavender petals on soft violet |
-| 3 | Rose Gold Noir | dark field, rose gold bloom |
-| 4 | Plum Midnight | midnight field, plum bloom |
+| #   | Name           |                                |
+| --- | -------------- | ------------------------------ |
+| 1   | Blush Rose     | blush petals on cream          |
+| 2   | Lilac Dusk     | lavender petals on soft violet |
+| 3   | Rose Gold Noir | dark field, rose gold bloom    |
+| 4   | Plum Midnight  | midnight field, plum bloom     |
 
 The seven text slots line up one-for-one with the boy ending's, but their wording, their
 ceilings and the half of the page a preview should show all differ. So Step 8 keeps **one**
@@ -1114,12 +1122,12 @@ rounded and dot modules throughout where the boy designs use hard squares, blush
 palettes, and a **double card border** the boy set never uses — a new `frame: 'double'` in
 `QrRenderer`.
 
-| # | Name | Modules | Frame |
-|---|---|---|---|
-| 1 | Blush Petal | rounded | double, blush |
-| 2 | Lilac Confetti | dots | none |
-| 3 | Rose Gold Noir | dots on a dark card | double |
-| 4 | Plum Midnight | rounded on deep plum | solid |
+| #   | Name           | Modules              | Frame         |
+| --- | -------------- | -------------------- | ------------- |
+| 1   | Blush Petal    | rounded              | double, blush |
+| 2   | Lilac Confetti | dots                 | none          |
+| 3   | Rose Gold Noir | dots on a dark card  | double        |
+| 4   | Plum Midnight  | rounded on deep plum | solid         |
 
 Generation, the link, copy and both downloads run through the same endpoint and the same
 flow as the boy side — nothing was duplicated.
@@ -1144,13 +1152,13 @@ The lock screen already matched all three designs' class names from the previous
 Every new slot's ceiling was measured in a browser, not guessed — and the measuring turned
 up four real layout bugs first.
 
-| Constant | Notable slots |
-|---|---|
-| `GIFT3_GIRL_TEXT_LIMITS` | 30 slots; captions **34**, chat bubbles 44, note 90 (+3 lines), letter 420 (+12 lines) |
-| `GIFT3_GIRL_NOTE_MAX_LINES` / `GIFT3_GIRL_LETTER_MAX_LINES` | 3 / 12 |
-| `GIFT3_GIRL_VIDEO_MAX_KB` | 20480 |
-| `ENDING_GIRL_TEXT_LIMITS` | title 24, subtitle 40, tap 18, heading 26, **note 180**, signoff 22, closing 18 |
-| `ENDING_GIRL_LETTER_MAX_LINES` | 8 |
+| Constant                                                    | Notable slots                                                                          |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `GIFT3_GIRL_TEXT_LIMITS`                                    | 30 slots; captions **34**, chat bubbles 44, note 90 (+3 lines), letter 420 (+12 lines) |
+| `GIFT3_GIRL_NOTE_MAX_LINES` / `GIFT3_GIRL_LETTER_MAX_LINES` | 3 / 12                                                                                 |
+| `GIFT3_GIRL_VIDEO_MAX_KB`                                   | 20480                                                                                  |
+| `ENDING_GIRL_TEXT_LIMITS`                                   | title 24, subtitle 40, tap 18, heading 26, **note 180**, signoff 22, closing 18        |
+| `ENDING_GIRL_LETTER_MAX_LINES`                              | 8                                                                                      |
 
 The girl ending's note is capped well below the boy's 500 because a circle holds far less
 than a rectangular sheet, and the keepsake card does not scroll.
@@ -1158,7 +1166,7 @@ than a rectangular sheet, and the keepsake card does not scroll.
 ### Bugs the sweep found
 
 **The keepsake card's padding was a percentage.** Percentage padding resolves against the
-*containing block's* width, not the element's — so at 1440px wide, `15%` was 210px a side on
+_containing block's_ width, not the element's — so at 1440px wide, `15%` was 210px a side on
 a 420px card and left the note zero content width. It collapsed to one character per line
 and ran 3000px tall. Both padding and width are now derived from one `--keep-size` length.
 
@@ -1190,8 +1198,8 @@ Playwright driving Chrome, plus `curl`.
   live with the four bloom designs, girl defaults, the 180 ceiling and Flower/Note tabs; the
   four girl QR designs render, generate a link, copy it and download as PNG and SVG;
   everything comes back after a reload.
-- **Design-safe limits, 64 cases** — every new girl slot filled to its exact ceiling *at the
-  same time*, across both gift-screen variants, all four designs each, at 360×640, 390×844,
+- **Design-safe limits, 64 cases** — every new girl slot filled to its exact ceiling _at the
+  same time_, across both gift-screen variants, all four designs each, at 360×640, 390×844,
   the preview frame and desktop. Nothing overflows, nothing is clipped, no page scrolls
   sideways.
 - **QR scannability, all 8 themes** — each rendered SVG rasterised and sampled at every
@@ -1201,7 +1209,7 @@ Playwright driving Chrome, plus `curl`.
 - **Girl public story, 26 assertions** — the link opens the girl lock screen, the code is not
   in the source, a wrong code is rejected, the right one opens the welcome page, NEXT reaches
   the gifts, each gift opens with its configured content, the roll carries every configured
-  card *and the uploaded clips*, and the ending is **girl design 3's bloom**, which opens into
+  card _and the uploaded clips_, and the ending is **girl design 3's bloom**, which opens into
   the keepsake card with the configured note.
 - **Boy regression, 18 assertions on both designs** — lock, welcome, NEXT, gift 1 out and
   back, the story book, on to the ending, and the envelope still opening into the letter.
@@ -1261,6 +1269,7 @@ showed the same generic message regardless of cause, so a client over a limit ha
 tell what to shorten.
 
 **Fix.**
+
 - Added `firstValidationError(body)`, a small helper that reads Laravel's `422` JSON shape
   (`{ message, errors: { field: [msg, ...] } }`) and returns the first field's first message.
 - `saveStep8AndContinue()` now parses the response body on a non-`ok` result and surfaces that
@@ -1308,3 +1317,485 @@ routing or saved card data changed.
 **Verified.** Each template now binds its centre area to `openGiftPage(2)` and its right area
 to `openGiftPage(3)`. The injected public-story navigation maps those calls to
 `/c/{slug}/gift/2` and `/c/{slug}/gift/3`, respectively.
+
+## 30. Music Library and Story Soundtrack
+
+The QR step is now Step 10. A new **Music** step (Step 9) sits immediately after the Ending Page and before QR generation.
+
+### Super Admin music library
+
+Super Admins can open **Music Library** from the admin sidebar and manage the shared catalogue:
+
+- Upload MP3, MP4, M4A, WAV or OGG files up to 100 MB. Uploads are sent in 1 MB chunks so PHP's normal request limit is never exceeded.
+- Add a title, optional artist, and an `English` or `Hindi` category.
+- Preview, hide/show, and delete tracks.
+- Only active tracks appear in the client dashboard.
+
+The catalogue is stored in `music_tracks`; uploaded files live under `storage/app/public/music-library/`. Default English/Hindi songs are uploaded and maintained by Super Admin rather than hardcoded into the application, so the library can change without a deployment.
+
+### How audio is served
+
+Audio goes through the app, not the public disk: `GET /music/{track}` → `MusicStreamController`, and `MusicTrack::url` returns that route.
+
+This is not cosmetic. The story plays a chosen minute out of a track, so the player has to **seek**, and seeking needs the server to answer a `Range` request with the bytes around that offset. Served as a plain static file, that was left to whatever sits in front of the app — and the built-in server answers a Range request with `200` and the whole 12 MB file. The browser then cannot seek at all: `play()` stalls with no sound, no error and nothing in the console. A misconfigured nginx or a CDN in the way does the same thing.
+
+`response()->file()` returns a Symfony `BinaryFileResponse`, which implements Range itself, so every deployment now answers `206 Partial Content` with a `Content-Range` regardless of what is serving the app:
+
+```
+$ curl -I -H 'Range: bytes=2100000-2200000' /music/1
+HTTP/1.1 206 Partial Content
+Content-Type: audio/mpeg
+Content-Range: bytes 2100000-2200000/12709408
+```
+
+- Inactive tracks are still streamed. Hiding a song in the library stops it being offered to new cards; the cards already using it must keep playing.
+- The route is public — the recipient of a card is not logged in to anything.
+- URLs are relative (`/music/1`), so they are always same-scheme as the page asking, which an absolute URL is not behind a proxy that doesn't forward the scheme.
+- The file behind a track never changes (a new upload is a new row with a new UUID), so it is cached for 30 days.
+
+### Client Music step
+
+Clients can choose one active library track only; custom client uploads are disabled. The selection is stored in `birthday_cards.music_data`.
+
+#### Picking the part
+
+A five-minute track is rarely what a card wants playing behind it, so choosing a song opens a **clip picker** underneath the grid. It works the way picking music for a social story does: the length is fixed at two minutes and the client chooses *which* two minutes, sliding a window along the track until it sits over the right part.
+
+- **Exactly two minutes** — `BirthdayCardController::MUSIC_CLIP_SECONDS` (120 s), which is both the minimum and the maximum. There is no control for length at all, only for position. A song no longer than the clip has nothing to pick out of it and plays whole.
+- **One slider, and its thumb is the selection.** The thumb is widened to the share of the track the clip covers (`--clip-window`, set from the duration), so the thing being dragged *is* the window. This falls out of how a range input already works — its thumb travels the rail minus its own width, which is exactly the distance the window has to move to sweep the song — so drag, keyboard and touch all come for free.
+- **You hear what you pick.** Dragging scrubs: the part under the handle plays from the moment you move there. Letting go starts it if nothing was playing, so choosing a part and hearing it are one gesture. The preview loops the window rather than running on into the rest of the song, with a progress bar and a volume slider under it — what the client hears is what the recipient gets.
+- The window is stored as `trim_start` / `trim_end` (seconds) in `music_data`; a song too short to clip stores `null` for both, which plays the file as it is.
+- The handles are placed from the song's duration, which only arrives with the file's metadata, so the picker opens in a reading state and fills itself in. If a duration can't be read, the whole track plays.
+- Picking a different song resets the window to the song's opening stretch; re-opening Step 9, or re-picking the song already chosen, restores it. A saved window that no longer fits the track falls back to the opening.
+- The length is capped **twice** server-side and never trusted from the browser: `saveStep9` clamps `trim_end` to `trim_start + 120`, and `PublicStoryController::musicClip()` clamps again on the way out. Cards saved under an earlier, shorter rule keep the window they have until the client picks again — the clamp is a ceiling, not a rewrite.
+
+The QR flow is now:
+
+```text
+Ending Page (8) -> Music (9) -> QR Select (10)
+```
+
+### Public story playback
+
+After the passcode is accepted the chosen part starts on the Welcome page and plays — without stopping, restarting or skipping — through the welcome, gifts, book and ending pages, repeating for as long as the recipient stays in the story — the clip restarts itself the moment it ends, so the story is never silent.
+
+#### The story shell
+
+Every card design is a standalone HTML document with its own `<head>`, styles and scripts. There are seventy-odd of them and no shared layout, which is why the story's navigation is injected after rendering rather than written into them. That also left nowhere to hang an `<audio>` element that survives a click on Next: a full navigation destroys the page and everything in it, so a player living inside a card can only be rebuilt on the next page and nudged back to roughly where it was.
+
+`resources/views/story/shell.blade.php` is the common layout the project never had. The shell holds the player and its controls; the story runs in a frame inside it. Moving through the story navigates the frame, and the shell — with the music in it — is never reloaded at all. **The track is not resumed between pages because it never stopped.**
+
+The card designs needed no changes for this: they are already standalone documents that the dashboard previews in a frame, so they render in the shell exactly as they do on their own.
+
+- **Which half you get.** `PublicStoryController::insideShell()` reads `Sec-Fetch-Dest: iframe`, which browsers send for frame navigations — so shared links stay clean (`/c/abc/gifts`, no flag). The shell also puts `frame=1` on the src it asks for, both for browsers too old to send the header and so a request is never ambiguous. A shell that still finds itself nested replaces itself with the page, which costs one extra request on those older browsers and nothing on the rest.
+- **The address bar.** The shell never navigates, so on each frame load it reads the frame's path and `history.replaceState`s it — a refresh or a shared link lands where the recipient actually is.
+- **The badge.** A small pill in the bottom-left corner. It lives outside the frame, so it sits above every card design without knowing anything about them, and it persists across pages the way the music does. It is not interactive — see "The badge, not a player" below.
+- **When it starts.** By itself, and only once the story is unlocked: the lock screen is not part of the story, so music starts on the unlock signal or the first frame load past the lock — and landing on the lock screen is what clears a previous run's saved position.
+- **State.** Track, window and position go to `localStorage` under `story-music:{slug}`, written about twice a second and again on `pagehide`. The shell only loads once per visit, so this is for a reload of the shell itself — not for moving between pages, which needs no state at all. The track URL and the clip window are compared before restoring, so re-picking a card's music doesn't drop the new clip in at the old position.
+- **Autoplay.** A reload spends the page's autoplay permission. If `play()` is refused, the next touch — in the shell or inside the frame — starts the music; the shell arms listeners in both documents, since clicks inside a frame never reach its parent.
+
+#### The standalone fallback
+
+`StoryChrome::music()` still injects a self-contained player into each page, and it stands down (`window.top !== window.self`) whenever the shell is above it, so the music is never doubled. It matters for a card design opened on its own, outside the shell — which has to keep working, because the dashboard previews them exactly that way. That player carries the position across pages in `sessionStorage` and restores it on the next one; the notes below are what make that restoring hold up.
+
+- The element is **built in script, not written into the markup**. A parsed `<audio autoplay>` starts at the top before any handler can seek it, and when the file is already cached its `loadedmetadata` fires before the handler is even attached — the seek is missed and the track genuinely restarts. The element is created silent and faded in only once the seek has landed.
+- The clip **loops**, so a story that outlasts the song never falls silent. Reaching `trim_end` sends the playhead back to `trim_start` instead of letting the rest of the track run, so the clip replays for as long as the recipient stays; an untrimmed song simply loops whole.
+- The saved position is cleared when the passcode is accepted, so each fresh run of the story begins at the top of the clip.
+
+### 30.1 Music playback fixes and player polish
+
+Three problems were reported: the dashboard's clip preview made no sound, the story's music did not play once a recipient was past the lock screen, and the corner player needed a better face.
+
+#### The root cause of both silences
+
+Both were the same bug, and neither was in the JavaScript. Audio was served as a static file from the public disk, and **the server answered `Range` requests with `200` and the entire 12 MB body** — no `Accept-Ranges`, no `206`, no `Content-Range`.
+
+Every part of this feature seeks: the picker previews from partway in, and the story starts partway into the track. Without Range, the browser cannot seek — `play()` stalls with no sound, no error and nothing in the console, which is exactly what "the music is not audible" looks like. Serving audio through `MusicStreamController` fixed both at once; see "How audio is served" above.
+
+#### Dashboard preview
+
+- `preload="auto"`, so the bytes around the chosen part are already there when Play is pressed.
+- `muted` and `volume` are set explicitly on every play rather than inherited from whatever state the element was left in, and a volume slider sits under the picker.
+- A rejected `play()` now says so in the picker instead of being swallowed by an empty `catch`; buffering says so; a file that will not load disables the button with a message. A silent preview used to look identical to a working one.
+- Moving the slider seeks immediately and loops the preview inside the window; letting go starts it, so choosing a part and hearing it are one gesture.
+
+#### Starting on the unlock gesture
+
+`StoryChrome::lock()` posts `birthday-story-unlocked` to the shell the moment the code is accepted, and the shell starts the music on it rather than waiting for the welcome page to finish loading a second and a half later. That click is the recipient's user gesture; using it directly is the difference between playing and being refused on browsers that expire activation across a navigation. By the time the frame moves on, the song is already going — which is the point of the shell. The message is origin-checked on arrival.
+
+The frame-load path still starts the music too, and `startMusic()` is idempotent, so a recipient who reloads mid-story or deep-links past the lock is covered by whichever fires first. That path also now handles a frame that finished loading before the shell's own script ran — a cached page, or simply a fast one — by checking `readyState` as well as listening for `load`.
+
+#### The badge, not a player
+
+The music is the card's, not the recipient's. It starts itself once the story is unlocked and simply plays, so what sits in the corner is a **sign, not a control**: no play/pause, no volume, no mute, no off switch. An earlier revision carried all of those; they were removed deliberately.
+
+- **Nothing to press.** The badge carries `pointer-events: none` throughout, so it can never take a tap meant for the story underneath it. That is what keeps it from disturbing the page it sits over.
+- **Small, and smaller still.** It arrives at the bottom-left with the song's name and artist, then tucks itself away after about five seconds to a round badge of moving bars, giving the corner back.
+- **Alive only when the sound is.** The equalizer animates off the element's real `play`/`pause` state, so it never claims to be playing while silent.
+- **Themed** — ice-blue on boy cards, rose on girl cards, so it reads as part of the story rather than a browser control parked on top of it.
+- **Responsive** — narrower pill and tighter margins on phones; hidden in print.
+
+Removing the controls removes the only way a recipient could have rescued a blocked autoplay by hand, so the two automatic paths matter more than before: the unlock-gesture start above, and a listener armed on **any** touch, anywhere in either document, that starts the music without having to be aimed at. A tab returning to the foreground resumes too.
+
+Only the playhead position is kept in `localStorage`, for a reload of the shell itself. Moving between pages needs none of it: the element is never torn down.
+
+`StoryChrome::music()` — the standalone fallback for a card design opened outside the shell — keeps its clip looping and cross-page position behaviour unchanged, and still stands down whenever the shell is above it.
+
+---
+
+## 31. Self-Signup, Subscriptions, Card Limits and the Card Hub
+
+This change turns the product from an admin-provisioned tool into one people sign
+up for themselves, puts a subscription gate in front of QR generation, and replaces
+the single implicit draft with a proper multi-card workspace.
+
+**Payment integration is deliberately not included** — see "Still pending" at the end
+of this section.
+
+### 31.1 Signup flow changes
+
+Accounts are no longer created by the Super Admin.
+
+- The landing page nav now carries **Login and Sign Up** side by side
+  (`landing/_nav.blade.php`, with `.l-nav__actions` / `.l-nav__login` in `landing.css`).
+- `client/register.blade.php` is the new signup form — name, email, phone, city, age
+  and a self-chosen password. It reuses the login page's styling so the two match.
+- `ClientAuthController@registerPage` / `@register` create the account, sign the person
+  in, and drop them on the card hub. New accounts are `status = active`,
+  `subscription_status = none`, `password_changed = true` — a self-chosen password
+  means there is no generated credential to email or nag about.
+- The client login page links across to signup, and vice versa.
+
+**Removed:** `ClientController@create` / `@store`, the `admin.clients.create` and
+`admin.clients.store` routes, `admin/clients/create.blade.php`, and the "Add Client"
+entries in every admin sidebar and the dashboard quick-actions. The welcome-mail path
+that sent generated credentials is no longer reachable from the client flow.
+
+**Kept unchanged:** Disable/Enable. `ClientController@toggleStatus` and its route,
+button and badge behave exactly as before.
+
+### 31.2 Super Admin changes
+
+`admin/clients/index.blade.php` now reports, per client: name/city/age, contact,
+**plan**, **subscription status** (with a "n requests waiting" flag), **cards used /
+card limit** with the remainder, **device count**, and account status. Row counts come
+from `withCount('birthdayCards')` plus two grouped queries, so the list does not fan
+out into a query per row.
+
+`admin/clients/show.blade.php` is new — the full picture for one client:
+
+| Panel                 | Shows                                                              |
+| --------------------- | ------------------------------------------------------------------ |
+| Headline tiles        | plan, subscription state, cards created, card limit, remaining, logins |
+| Account Details       | name, email, phone, city, age, status, signup date, plan fee       |
+| Logged-in Devices     | browser + platform, IP, last-active, one row per live session      |
+| Subscription Requests | full history, with approve/reject inline and a Revoke control      |
+| Cards                 | every card, its theme, wizard progress, draft/completed, last edit |
+
+**Devices/browsers** are read from the database session store (`SESSION_DRIVER=database`,
+already the project default) via `User::activeSessions()`. `User::describeDevice()`
+turns a user-agent into "Chrome on Windows" — the Edge/Opera/Chrome ordering matters,
+since those UAs all contain earlier needles. No UA-parsing package was added; unknown
+agents degrade to "Unknown device" rather than dumping a raw string at the admin. This
+is the most login/device detail the system can honestly provide: it is live sessions,
+not a historical login audit.
+
+### 31.3 Subscription and card limits
+
+`app/Support/SubscriptionPlans.php` is the single catalogue:
+
+| Amount   | Cards |
+| -------- | ----- |
+| Rs 199   | 1     |
+| Rs 399   | 3     |
+| Rs 599   | 6     |
+
+`FREE_CARD_LIMIT = 1` is what an account gets before any plan is approved — enough to
+build one card all the way to the QR step, which is where the gate actually is.
+
+Users columns added (`2026_08_21_100000`): `subscription_status` (`none` / `pending` /
+`active`), `plan_amount`, `card_limit`, `subscription_activated_at`.
+
+The client sees **current plan, allowed cards, created cards and remaining cards** in two
+places: the plan bar at the top of the card hub, and the plan strip in the wizard sidebar.
+
+Enforcement is server-side, not just in the UI — `User::canCreateCard()` is checked in
+`CardManagerController@store` (flash + refusal) and in
+`BirthdayCardController::createCardForCurrentUser()` (403). The New Card tile also
+renders disabled when nothing is left, but that is presentation, not the control.
+
+### 31.4 Subscription approval flow
+
+No payment is taken. The request itself is the whole flow.
+
+```text
+client picks a plan  →  subscription_requests row (pending), user → pending
+        ↓
+Super Admin approves →  user → active, plan_amount + card_limit set
+        ↓
+client can generate QR
+```
+
+- `subscription_requests` (`2026_08_21_100001`): user, plan amount, card limit, status,
+  reviewer, reviewed-at, note.
+- Client side: `CardManagerController@requestSubscription`, reachable from the card hub
+  modal and from the gate inside the QR step. One pending request at a time.
+- Admin side: `Admin\SubscriptionController` and `admin/subscriptions/index.blade.php` —
+  a pending queue and a reviewed history, plus approve/reject from the client detail page.
+- Approving sets `subscription_status = active`, `plan_amount`, `card_limit` and the
+  activation date. Rejecting only clears a *pending* flag; it never revokes a plan that
+  was already approved. `revoke` is the separate, deliberate action for that.
+
+### 31.5 QR restriction
+
+`BirthdayCardController@saveStep10` returns **403** with
+`{"reason": "subscription_required"}` when the account has no active plan. The check is
+first in the method, before validation, so no work happens on a gated call.
+
+In the dashboard, Step 10 shows a subscription gate above the Generate button: the plan
+choices and a "Send Request to Admin" button, or — once a request exists — a pending
+notice with the plan and date. The Generate button renders `disabled`, the client-side
+`HAS_SUBSCRIPTION` guard scrolls to the gate rather than firing a doomed request, and the
+403's own message is surfaced instead of the generic "please try again".
+
+Building and editing a card is **not** restricted. Only turning it into a shareable
+link and code is.
+
+### 31.6 New / Recent / Draft
+
+The old model was "the client's latest unpublished card" — implicit, single, and the
+reason a new card came up carrying the previous card's data.
+
+**`client/cards.blade.php`** is the new hub, and where login now lands:
+
+- **New Card** — leads the Recent grid, creates a genuinely empty row, nothing copied.
+- **Recent** — the six most recently touched cards, newest edit first.
+- **Drafts** — everything not yet finished.
+- **Completed** — cards whose QR has been generated.
+
+Each tile shows its own progress (`Step n of 10`), a draft/completed pill, and Edit and
+Delete. Delete also removes that card's uploads, so the plan slot comes back clean.
+
+**Card identity** is the substantive fix. `currentDraft()` now resolves a card
+explicitly, in order: the `X-Card-Id` header → a `card_id` field → the session's
+`active_card_id` → only then the newest draft. Every lookup is scoped to
+`Auth::id()`, so one client cannot reach another's card by guessing an id.
+
+The dashboard opens on `?card={id}` (no id → redirect to the hub) and installs a small
+`window.fetch` wrapper that attaches `X-Card-Id` to every `/client/card*` save. All
+eleven step saves already went through `fetch`, so one wrapper covers them without
+touching each call site. Two tabs editing two different cards stay independent.
+
+New columns (`2026_08_21_100002`): `title`, `last_opened_at`, and a `(user_id,
+is_published)` index. Generating a QR now sets `is_published = true`, which is what
+moves a card out of Drafts into Completed.
+
+### 31.7 Verified
+
+- Signup → build → QR blocked (403) → request Rs 399 → admin approves → plan active,
+  limit 3, remaining 2 → QR generates and returns a share URL, card marked published.
+- Card limit refuses a second card at 1/1.
+- Writing to card A while card B is the newer draft leaves B untouched, and vice versa.
+- A second client aiming `X-Card-Id` at another client's card cannot reach it.
+- All 17 pages render (landing, login, signup, forgot-password, admin login, card hub,
+  profile, settings, admin dashboard/clients/client-detail/subscriptions/payments/music/
+  bg-owner, wizard, public story). The rendered wizard JavaScript parses clean.
+- The public story at `/c/{slug}` is unaffected — it never filtered on `is_published`.
+
+### 31.8 Still pending
+
+- **Payment integration is not implemented.** Plan amounts are what a client is asking
+  to be put on, not something they have paid. Approval is a manual Super Admin action,
+  and `subscription_fee` is set from the approved plan for reporting only. A real
+  gateway, receipts, renewals and expiry all remain to be built — there is currently no
+  expiry at all, so an approved subscription stays active until revoked.
+- Login/device reporting is live sessions only; there is no historical login audit.
+
+---
+
+## 32. Dashboard Redesign, Save as Draft, and Resume-Where-You-Left-Off
+
+Section 31 introduced multiple cards and the card hub. This change makes that hub a
+real dashboard, gives drafts a name the client chooses, and — the substantive fix —
+makes reopening a draft actually resume it.
+
+### 32.1 Changes implemented
+
+| Area              | Change                                                                       |
+| ----------------- | ---------------------------------------------------------------------------- |
+| Dashboard UI      | Rebuilt with a sidebar, stat row, subscription panel and activity feed        |
+| Sidebar           | **Main Dashboard** added as the first item, in the hub and in the wizard      |
+| Save as Draft     | New button + label modal, in the topbar and immediately before QR generation  |
+| Draft editing     | Reopens at the last saved step, not Step 1                                    |
+| Theme persistence | Fixed — the saved design was being discarded on reopen                        |
+| Multiple cards    | Verified independent across theme, step data and draft labels                 |
+
+### 32.2 Dashboard updates
+
+`client/cards.blade.php` was rebuilt. It is now a fixed-sidebar layout rather than a
+single centred column:
+
+- **Sidebar** — **Main Dashboard** first, then Recent / Drafts / Completed with live
+  counts, then Profile and Settings, with the account and log-out pinned to the bottom.
+  It collapses behind a hamburger and backdrop below 860px.
+- **Stat row** — cards created against the limit (with a meter that turns amber when
+  full), drafts in progress, completed cards, and the current plan with cards remaining.
+- **Main column** — Recent, Drafts and Completed grids. New Card always leads Recent.
+- **Right rail** — a subscription panel (state badge, plan, allowed/created/remaining,
+  active-since, and the request button when unsubscribed) and **Recent Activity**.
+
+**Recent activity** is derived in `CardManagerController::recentActivity()` from the
+cards' own timestamps — created, edited, QR generated — rather than from a new audit
+table. Creation and edit collapse into one entry when they are within a minute of each
+other, so a freshly made card does not appear twice.
+
+Each tile now shows the card's **label**, its theme, when it was last edited, a progress
+meter, and **"Saved at step n of 10"** — so a draft says where it will resume before you
+open it. Tiles carry Continue/Edit, an inline **rename**, and delete.
+
+### 32.3 Save as Draft flow
+
+Two entry points, one behaviour:
+
+- The wizard topbar, available at every step.
+- A panel on the QR step, sitting immediately **before** the Generate button.
+
+Both open a modal asking for a **Card Label / Name** (80 characters, pre-filled with the
+current label), then `POST /client/card/draft` → `BirthdayCardController@saveDraft`.
+
+The step data itself is *not* saved here — every step already persists as it goes. What
+this adds is the label and a record of progress:
+
+```php
+$card->title = $data['title'];
+$card->current_step = max($card->current_step, $data['current_step']);
+```
+
+`max()` matters: stepping back to review Step 3 and saving must not rewind a card that
+had reached Step 9. On success the client is returned to the dashboard, where the card
+now appears under its chosen name.
+
+### 32.4 Card editing / resume flow
+
+Previously the wizard opened at Step 1 every time — `let currentStep = 1` and nothing
+ever read `current_step`. A draft was preserved in the database but the client had to
+click forward through every finished step to get back to their place.
+
+Now:
+
+```js
+const SAVED_STEP = Math.min(10, Math.max(1, {{ current_step }}));
+...
+resumeAtSavedStep();   // last line of the load handler
+```
+
+`resumeAtSavedStep()` marks steps 1…n-1 done in the sidebar and calls `goToStep(n)`.
+It runs **last**, after every restore block, because `goToStep()` fires each step's own
+loaders and previews and those need the restored values already in place.
+
+A card saved at the final stage has `current_step = 10`, so Edit opens straight on the
+**QR step**, ready to generate or to keep editing.
+
+> **Note on step numbering:** the request described the final stage as "Step 9 (QR
+> Generation)". In this wizard QR Select is **Step 10** — Music took Step 9 in section 30.
+> Resume uses the card's stored `current_step`, so a card saved at the end lands on the
+> QR step whichever number it carries.
+
+### 32.5 Theme persistence
+
+This was a real bug, and the cause of "theme phir se select karna padta hai".
+
+`selectTheme()` begins with `selectedVariant = null` — correct when a person picks a
+theme by hand, since the old design no longer applies. But the restore code read the
+saved variant *after* that call:
+
+```js
+selectTheme(savedTheme);
+if (selectedVariant) selectVariant(selectedVariant);   // always null by now
+```
+
+`selectedVariant` was initialised from the card, then wiped a line later. The theme came
+back; the design never did. Fixed by holding the saved value aside first:
+
+```js
+const savedTheme   = @json($card->theme ?? null);
+const savedVariant = @json($card->variant ?? null);
+if (savedTheme) {
+    selectTheme(savedTheme);
+    if (savedVariant) selectVariant(savedVariant);
+}
+```
+
+Theme and design now both come back on reopen, and no step asks for them again.
+
+### 32.6 Multiple-card handling
+
+Unchanged from section 31.6 and re-verified here: cards are addressed by
+`X-Card-Id` → `card_id` → session → newest draft, every lookup scoped to `Auth::id()`.
+The draft save goes through the same `currentDraft()` resolution, so naming one card
+cannot rename another. Theme, step data and label were each confirmed independent
+across two cards owned by the same client.
+
+### 32.7 Subscription / QR flow
+
+Unchanged from section 31 — `saveStep10` still returns 403 `subscription_required`
+without an active plan, and the gate still offers the plan picker. What is new is that
+a client who cannot yet generate a QR now has somewhere to put the card: **Save as
+Draft** sits directly above the Generate button, so the dead end is a parking place
+instead.
+
+### 32.8 Backend / database changes
+
+No migrations were needed — `title` and `last_opened_at` already landed in
+`2026_08_21_100002` (section 31.6), and `current_step` has existed since the original
+cards table.
+
+| File                          | Change                                                    |
+| ----------------------------- | --------------------------------------------------------- |
+| `BirthdayCardController`      | `saveDraft()` — label + furthest-step, `max()`-guarded     |
+| `routes/web.php`              | `POST /client/card/draft` → `client.card.draft`            |
+| `CardManagerController`       | `recentActivity()`; passes activity + latest request       |
+| `client/cards.blade.php`      | Rebuilt as the dashboard                                   |
+| `client/partials/card-tile`   | Label, theme, resume step, rename, Continue/Edit           |
+| `client/dashboard.blade.php`  | Main Dashboard link, draft button + modal, resume, theme fix |
+
+### 32.9 Verified
+
+- Dashboard renders with Main Dashboard, activity feed, subscription panel, and both
+  draft labels; tiles report "Saved at step 7" and "Saved at step 10" correctly.
+- A card at `current_step = 7` reopens with `SAVED_STEP = 7`; one at 10 reopens on the
+  QR step. Theme and variant both restore (`boy`/2 and `girl`/1).
+- Save as Draft renames a card and advances `current_step` forward only — saving at
+  step 4 left a card that had reached 7 at 7; saving at 9 moved it to 9.
+- Re-saving Step 1 on a card at step 9 did not rewind it.
+- Two cards owned by one client kept independent themes, headings and labels.
+- All 17 pages render; the rendered wizard JavaScript parses clean.
+
+---
+
+## Final Summary
+
+### Completed
+
+- **Self-signup** (section 31.1) — landing-page Sign Up, client-created accounts,
+  admin-side client creation removed; Disable/Enable untouched.
+- **Super Admin reporting** (31.2) — plan, subscription state, card usage, device count
+  per client, plus a full client detail page with live logged-in devices.
+- **Plans and card limits** (31.3) — Rs 199/399/599 → 1/3/6 cards, enforced server-side,
+  surfaced on the dashboard and in the wizard sidebar.
+- **Subscription approval** (31.4) — request → Super Admin queue → approve/reject/revoke.
+- **QR restriction** (31.5) — 403 without an active plan, with an in-wizard gate.
+- **New / Recent / Drafts** (31.6) — card hub, per-card addressing, no cross-contamination.
+- **Dashboard redesign** (32.2) — sidebar, stats, subscription panel, activity feed.
+- **Save as Draft with labels** (32.3) — name a card and park it from any step.
+- **Resume at last saved step** (32.4) — including landing on QR for finished cards.
+- **Theme persistence fix** (32.5) — saved design no longer discarded on reopen.
+
+### Still pending
+
+- **Payment integration is not built.** Plan amounts are what a client asks to be put
+  on, not something they have paid. Approval remains a manual Super Admin action.
+- **No subscription expiry or renewal** — an approved plan stays active until revoked.
+- **Device reporting is live sessions only** — there is no historical login audit.
+- **Two pre-existing test failures** in `ClientPasswordResetTest`, environmental: the
+  `pdo_sqlite` PHP extension is not installed. Unrelated to these changes.

@@ -22,6 +22,14 @@ namespace App\Support;
  */
 final class StoryChrome
 {
+    /**
+     * Where the music playhead is parked between pages.
+     *
+     * Each screen of the story is its own document, so the audio element is
+     * destroyed on every Next — this entry is what survives the navigation.
+     */
+    private const MUSIC_KEY = 'birthday-story-music';
+
     /** Put a snippet in just before </body>, or at the end if there isn't one. */
     public static function inject(string $html, string $chrome): string
     {
@@ -100,6 +108,7 @@ final class StoryChrome
      */
     public static function lock(string $postUrl, string $csrf, ?string $photo, ?string $error, string $theme): string
     {
+        $musicKey = self::MUSIC_KEY;
         $config = json_encode([
             'url' => $postUrl,
             'csrf' => $csrf,
@@ -350,6 +359,18 @@ final class StoryChrome
                     .then(res => res.json().then(data => ({ ok: res.ok, data })))
                     .then(({ ok, data }) => {
                         if (ok && data.success) {
+                            // A new run of the story starts the song at the
+                            // top, not wherever a previous visit left it.
+                            try { sessionStorage.removeItem('{$musicKey}'); } catch (e) {}
+                            // The successful PIN click is the recipient's
+                            // user gesture. Let the persistent shell use it
+                            // before the browser clears activation on the
+                            // redirect to the welcome page.
+                            try {
+                                if (window.parent !== window) {
+                                    window.parent.postMessage({ type: 'birthday-story-unlocked' }, '*');
+                                }
+                            } catch (e) {}
                             showModal('success');
                             setTimeout(() => modalIcon.classList.add('done'), 700);
                             setTimeout(() => { window.location.href = data.next; }, 1450);
@@ -414,7 +435,7 @@ final class StoryChrome
      * Page 2 — the welcome screen already has a NEXT button; point it onward.
      * Each side names it differently (.bb-next / .gb-next).
      */
-    public static function welcome(string $nextUrl): string
+    public static function welcome(string $nextUrl, ?array $music = null): string
     {
         $url = json_encode($nextUrl, JSON_UNESCAPED_SLASHES);
 
@@ -432,6 +453,196 @@ final class StoryChrome
             }
         })();
         </script>
+        HTML . self::music($music);
+    }
+
+    /**
+     * The story's background music.
+     *
+     * The audio element cannot survive a click on Next: every screen is a
+     * standalone document, so the browser tears the page down and builds the
+     * next one from scratch. What is carried across instead is the playhead —
+     * the position is written to sessionStorage as the track plays and read
+     * back on the next page, which resumes the same file from that offset. To
+     * the recipient the song simply keeps going, however many pages they open
+     * and however often they refresh.
+     *
+     * Three details make that hold up. The element is built in script rather
+     * than written into the markup, because a parsed <audio autoplay> starts
+     * at the top before any handler can seek it — and if the file is already
+     * cached, its loadedmetadata fires before the handler is even attached, so
+     * the seek is missed entirely and the track really does start over. It is
+     * created silent and faded in only once the seek has landed, so the
+     * opening bars are never heard a second time. And it loops, so a story
+     * that outlasts the song never drops into silence.
+     *
+     * A reload also spends the page's autoplay permission, so a browser may
+     * refuse the play() outright; the first tap, click or key press on the
+     * page picks the music back up.
+     *
+     * All of that is the fallback path. In the story proper the page runs
+     * inside resources/views/story/shell.blade.php, whose player is created
+     * once and never torn down, so the music does not stop between pages and
+     * none of this resuming is needed; this snippet stands down there. It
+     * still matters for a card design opened on its own, which has to keep
+     * working — the dashboard previews them exactly that way.
+     *
+     * @param  array{url: string, start: float, end: float|null}|null  $music
+     *         the chosen track and the window of it the client kept in the
+     *         dashboard's trim editor; a null end means the whole song
+     */
+    private static function music(?array $music): string
+    {
+        if (! $music || empty($music['url'])) {
+            return '';
+        }
+
+        $src = json_encode($music['url'], JSON_UNESCAPED_SLASHES);
+        $start = json_encode(round((float) ($music['start'] ?? 0), 2));
+        $end = json_encode(isset($music['end']) ? round((float) $music['end'], 2) : null);
+        $key = self::MUSIC_KEY;
+
+        return <<<HTML
+        <script>
+        (function () {
+            const SRC = {$src};
+            // The trimmed window, in seconds. END is null for the whole song.
+            const START = {$start};
+            const END = {$end};
+            const KEY = '{$key}';
+
+            if (document.getElementById('storyMusic')) return;
+
+            // Inside the story shell the parent document owns the player and
+            // has done since before this page loaded, so there is nothing to
+            // do here — a second element would simply double the music. This
+            // player is the standalone path: a card design opened on its own,
+            // outside the shell, still carries its own music.
+            if (window.top !== window.self) return;
+
+            // Where the previous page left off. The source and the window are
+            // checked too, so re-trimming a card — or swapping its track —
+            // doesn't drop the new clip in at the old one's position.
+            let from = START;
+            try {
+                const saved = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+                if (saved && saved.src === SRC && saved.start === START && saved.end === END) {
+                    const at = Number(saved.t);
+                    if (isFinite(at) && at > START && (END === null || at < END - 0.25)) from = at;
+                }
+            } catch (e) {}
+
+            const audio = document.createElement('audio');
+            audio.id = 'storyMusic';
+            audio.loop = true;
+            audio.preload = 'auto';
+            audio.volume = 0;
+            audio.muted = false;
+            audio.defaultMuted = false;
+            audio.setAttribute('playsinline', '');
+            audio.src = SRC;
+            document.body.appendChild(audio);
+
+            let fading = false;
+
+            function fadeIn() {
+                if (fading) return;
+                fading = true;
+                const step = function () {
+                    audio.volume = Math.min(1, audio.volume + 0.05);
+                    if (audio.volume < 1) requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            }
+
+            // A blocked play() is not an error worth surfacing — the recipient
+            // is about to touch the page anyway, and that gesture starts it.
+            function resumeOnGesture() {
+                const go = function () {
+                    audio.play().then(fadeIn).catch(function () {});
+                };
+                ['pointerdown', 'touchstart', 'keydown'].forEach(function (type) {
+                    document.addEventListener(type, go, { capture: true, passive: true });
+                });
+            }
+
+            function play() {
+                const started = audio.play();
+                if (started && started.then) started.then(fadeIn).catch(resumeOnGesture);
+                else fadeIn();
+            }
+
+            // The clip repeats on its own: reaching the end sends the playhead
+            // back to the start rather than letting the rest of the song run.
+            // The element loops as well, which covers a window that runs to
+            // the very end of the file — that wrap lands on 0 and is pulled
+            // back up to START here.
+            function keepInsideClip() {
+                const at = audio.currentTime;
+                if (!isFinite(at)) return;
+                if (END !== null && at >= END - 0.1) {
+                    try { audio.currentTime = START; } catch (e) {}
+                } else if (at < START - 0.25) {
+                    try { audio.currentTime = START; } catch (e) {}
+                }
+            }
+
+            function begin() {
+                const duration = audio.duration;
+                let at = from;
+                // A window saved against a different file than the one now
+                // being served would seek past the end; fall back to the top.
+                if (isFinite(duration) && at > duration - 0.25) at = START;
+                if (isFinite(duration) && at > duration - 0.25) at = 0;
+                if (at > 0) {
+                    try { audio.currentTime = at; } catch (e) {}
+                }
+                play();
+            }
+
+            // readyState is checked as well as the event: a cached file can
+            // have its metadata ready before this runs, and then the event
+            // never fires again.
+            if (audio.readyState >= 1) begin();
+            else audio.addEventListener('loadedmetadata', begin, { once: true });
+
+            let lastSave = 0;
+
+            function remember() {
+                const at = audio.currentTime;
+                if (!isFinite(at) || at <= 0) return;
+                try {
+                    sessionStorage.setItem(KEY, JSON.stringify({
+                        src: SRC, start: START, end: END, t: at,
+                    }));
+                } catch (e) {}
+            }
+
+            audio.addEventListener('timeupdate', function () {
+                keepInsideClip();
+                const now = Date.now();
+                if (now - lastSave < 250) return;
+                lastSave = now;
+                remember();
+            });
+
+            // timeupdate stops the moment the page starts unloading, so the
+            // last quarter-second is caught here — pagehide covers the back /
+            // forward cache, where unload never runs at all.
+            window.addEventListener('pagehide', remember);
+            window.addEventListener('beforeunload', remember);
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'hidden') remember();
+                else if (audio.paused) audio.play().then(fadeIn).catch(function () {});
+            });
+
+            // Coming back through the browser's back button restores a paused
+            // element on some browsers; start it moving again.
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted && audio.paused) play();
+            });
+        })();
+        </script>
         HTML;
     }
 
@@ -443,7 +654,7 @@ final class StoryChrome
      * flourish the design plays and sends the recipient to their own story's
      * gift instead.
      */
-    public static function gifts(array $urls): string
+    public static function gifts(array $urls, ?array $music = null): string
     {
         $map = json_encode($urls, JSON_UNESCAPED_SLASHES);
 
@@ -466,15 +677,15 @@ final class StoryChrome
             };
         })();
         </script>
-        HTML;
+        HTML . self::music($music);
     }
 
     /** Gifts 1 and 2 — a way back to the gift screen. */
-    public static function gift(string $backUrl): string
+    public static function gift(string $backUrl, ?array $music = null): string
     {
         $url = e($backUrl);
 
-        return self::styles() . "<div class=\"story-nav\"><a href=\"{$url}\">Next →</a></div>";
+        return self::styles() . "<div class=\"story-nav\"><a href=\"{$url}\">Next →</a></div>" . self::music($music);
     }
 
     /**
@@ -487,7 +698,7 @@ final class StoryChrome
      * and works whatever state the book is in — including after the recipient
      * closes it.
      */
-    public static function book(string $endingUrl, string $backUrl): string
+    public static function book(string $endingUrl, string $backUrl, ?array $music = null): string
     {
         $ending = e($endingUrl);
         $back = e($backUrl);
@@ -496,14 +707,22 @@ final class StoryChrome
             . "<div class=\"story-nav\">"
             . "<a href=\"{$back}\">← Gifts</a>"
             . "<a href=\"{$ending}\">One Last Thing →</a>"
-            . "</div>";
+            . "</div>" . self::music($music);
     }
 
-    /** The ending page — the story is over; only a way back is offered. */
-    public static function ending(string $giftsUrl): string
+    /**
+     * The ending page — the story is over; only a way back is offered.
+     *
+     * The music plays on here too. This is the last screen rather than a way
+     * out, and the recipient can still walk back to the gifts, so cutting the
+     * song off at the door would be the one silence in the whole story.
+     */
+    public static function ending(string $giftsUrl, ?array $music = null): string
     {
         $url = e($giftsUrl);
 
-        return self::styles() . "<div class=\"story-nav\"><a href=\"{$url}\">← Back to the gifts</a></div>";
+        return self::styles()
+            . "<div class=\"story-nav\"><a href=\"{$url}\">← Back to the gifts</a></div>"
+            . self::music($music);
     }
 }

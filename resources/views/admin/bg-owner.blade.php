@@ -452,6 +452,386 @@
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
         }
+    
+        /* ── BG Owner: client content ─────────────────────────── */
+        .bgo-totals {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: .9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bgo-total {
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+            background: var(--surface, #fff);
+            border: 1.5px solid var(--border, #e4e9f4);
+            border-radius: 14px;
+            padding: .95rem 1.1rem;
+        }
+
+        .bgo-total-ico {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: var(--accent-g, rgba(91, 94, 244, .1));
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .bgo-total-num {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .bgo-total-lbl {
+            font-size: .74rem;
+            color: var(--text-muted, #6b7a99);
+            margin-top: .2rem;
+        }
+
+        .bgo-toolbar {
+            display: flex;
+            gap: .8rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+
+        .bgo-search {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            flex: 1;
+            min-width: 220px;
+            background: var(--surface, #fff);
+            border: 1.5px solid var(--border, #e4e9f4);
+            border-radius: 11px;
+            padding: .6rem .9rem;
+        }
+
+        .bgo-search input {
+            border: none;
+            outline: none;
+            background: none;
+            font-family: inherit;
+            font-size: .86rem;
+            width: 100%;
+            color: inherit;
+        }
+
+        .bgo-filters {
+            display: flex;
+            gap: .4rem;
+            flex-wrap: wrap;
+        }
+
+        .bgo-chip {
+            border: 1.5px solid var(--border, #e4e9f4);
+            background: var(--surface, #fff);
+            font-family: inherit;
+            font-size: .78rem;
+            font-weight: 600;
+            padding: .5rem .9rem;
+            border-radius: 999px;
+            cursor: pointer;
+            color: var(--text-muted, #6b7a99);
+        }
+
+        .bgo-chip.active {
+            background: var(--accent, #5b5ef4);
+            border-color: var(--accent, #5b5ef4);
+            color: #fff;
+        }
+
+        .bgo-client {
+            background: var(--surface, #fff);
+            border: 1.5px solid var(--border, #e4e9f4);
+            border-radius: 16px;
+            margin-bottom: .9rem;
+            overflow: hidden;
+        }
+
+        .bgo-client-head {
+            display: flex;
+            align-items: center;
+            gap: .9rem;
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .bgo-client-head:hover {
+            background: var(--surface2, #f8faff);
+        }
+
+        .bgo-av {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--accent, #5b5ef4);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .bgo-client-id {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .bgo-client-id strong {
+            display: block;
+            font-size: .92rem;
+        }
+
+        .bgo-client-id span {
+            display: block;
+            font-size: .76rem;
+            color: var(--text-muted, #6b7a99);
+        }
+
+        .bgo-client-tallies {
+            display: flex;
+            gap: .7rem;
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--text-muted, #6b7a99);
+            flex-wrap: wrap;
+        }
+
+        .bgo-caret {
+            transition: transform .2s ease;
+            color: var(--text-muted, #6b7a99);
+        }
+
+        .bgo-client.open .bgo-caret {
+            transform: rotate(180deg);
+        }
+
+        .bgo-client-body {
+            display: none;
+            padding: 0 1.2rem 1.2rem;
+            border-top: 1.5px solid var(--border, #e4e9f4);
+        }
+
+        .bgo-client.open .bgo-client-body {
+            display: block;
+        }
+
+        .bgo-kv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: .3rem 1.2rem;
+            padding: 1rem 0;
+        }
+
+        .bgo-kv {
+            display: flex;
+            justify-content: space-between;
+            gap: .6rem;
+            font-size: .8rem;
+            padding: .35rem 0;
+            border-bottom: 1px solid var(--border, #e4e9f4);
+        }
+
+        .bgo-kv span {
+            color: var(--text-muted, #6b7a99);
+        }
+
+        .bgo-kv b {
+            font-weight: 600;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .bgo-card {
+            border: 1.5px solid var(--border, #e4e9f4);
+            border-radius: 13px;
+            padding: 1.1rem;
+            margin-top: .9rem;
+            background: var(--surface2, #f8faff);
+        }
+
+        .bgo-card-head {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            flex-wrap: wrap;
+            margin-bottom: .8rem;
+        }
+
+        .bgo-card-head strong {
+            font-size: .92rem;
+        }
+
+        .bgo-tag {
+            font-size: .68rem;
+            font-weight: 700;
+            padding: .2rem .55rem;
+            border-radius: 999px;
+            background: #eef1f8;
+            color: var(--text-muted, #6b7a99);
+        }
+
+        .bgo-tag.done {
+            background: var(--green-s, #ecfdf5);
+            color: var(--green, #10b981);
+        }
+
+        .bgo-tag.draft {
+            background: var(--amber-s, #fffbeb);
+            color: var(--amber, #f59e0b);
+        }
+
+        .bgo-tag.lock {
+            background: var(--red-s, #fef2f2);
+            color: var(--red, #ef4444);
+        }
+
+        .bgo-when {
+            font-size: .72rem;
+            color: var(--text-dim, #adb5cc);
+            margin-left: auto;
+        }
+
+        .bgo-link {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            background: var(--surface, #fff);
+            border: 1.5px solid var(--border, #e4e9f4);
+            border-radius: 10px;
+            padding: .6rem .8rem;
+            font-size: .8rem;
+            margin-bottom: .9rem;
+            flex-wrap: wrap;
+        }
+
+        .bgo-link a {
+            color: var(--accent, #5b5ef4);
+            text-decoration: none;
+            word-break: break-all;
+            font-weight: 600;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .bgo-link a:hover {
+            text-decoration: underline;
+        }
+
+        .bgo-link.none {
+            color: var(--text-dim, #adb5cc);
+            font-style: italic;
+        }
+
+        .bgo-copy {
+            border: 1.5px solid var(--border, #e4e9f4);
+            background: var(--surface, #fff);
+            font-family: inherit;
+            font-size: .72rem;
+            font-weight: 700;
+            padding: .3rem .7rem;
+            border-radius: 7px;
+            cursor: pointer;
+            color: var(--text-muted, #6b7a99);
+        }
+
+        .bgo-copy:hover {
+            border-color: var(--accent, #5b5ef4);
+            color: var(--accent, #5b5ef4);
+        }
+
+        .bgo-sub {
+            font-size: .76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted, #6b7a99);
+            margin: 1rem 0 .55rem;
+        }
+
+        .bgo-media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+            gap: .6rem;
+        }
+
+        .bgo-media {
+            display: block;
+            border: 1.5px solid var(--border, #e4e9f4);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--surface, #fff);
+            text-decoration: none;
+        }
+
+        .bgo-media img,
+        .bgo-media video {
+            display: block;
+            width: 100%;
+            height: 104px;
+            object-fit: cover;
+            background: #eef1f8;
+        }
+
+        .bgo-media span {
+            display: block;
+            font-size: .68rem;
+            color: var(--text-muted, #6b7a99);
+            padding: .35rem .5rem;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .bgo-media:hover {
+            border-color: var(--accent, #5b5ef4);
+        }
+
+        .bgo-texts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: .5rem;
+        }
+
+        .bgo-text {
+            background: var(--surface, #fff);
+            border: 1.5px solid var(--border, #e4e9f4);
+            border-radius: 9px;
+            padding: .55rem .7rem;
+        }
+
+        .bgo-text span {
+            display: block;
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--text-dim, #adb5cc);
+            margin-bottom: .2rem;
+        }
+
+        .bgo-text p {
+            font-size: .8rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .bgo-empty {
+            font-size: .8rem;
+            color: var(--text-dim, #adb5cc);
+            font-style: italic;
+            padding: .5rem 0;
+        }
+
     </style>
 </head>
 
@@ -470,8 +850,11 @@
             <a href="{{ route('admin.clients.index') }}" class="nav-item">
                 <div class="nav-icon">👥</div> All Clients
             </a>
-            <a href="{{ route('admin.clients.create') }}" class="nav-item">
-                <div class="nav-icon">➕</div> Add Client
+            <a href="{{ route('admin.subscriptions.index') }}" class="nav-item">
+                <div class="nav-icon">🎫</div> Subscriptions
+            </a>
+            <a href="{{ route('admin.links.index') }}" class="nav-item">
+                <div class="nav-icon">🔗</div> Generated Links
             </a>
             <a href="{{ route('admin.payments.index') }}" class="nav-item">
                 <div class="nav-icon">💰</div> Payments
@@ -530,40 +913,36 @@
                 </div>
             </div>
 
-            <!-- Main Content (Hidden until PIN verified) -->
+            <!-- Main Content (loaded only after the PIN is accepted) -->
             <div id="mainContent" class="main-content" style="display: none;">
                 <div class="bg-owner-header">
                     <h1>🎯 BG Owner Dashboard</h1>
-                    <p>Access to all client uploaded data and sensitive information</p>
+                    <p>Every client's uploads, content and generated links</p>
                 </div>
 
-                <div class="data-sections">
-                    <!-- Images Section -->
-                    <div class="data-section">
-                        <h3>📸 Client Images</h3>
-                        <div class="data-grid" id="imagesGrid">
-                            <!-- Images will be loaded here -->
-                            <div class="loading">Loading images...</div>
-                        </div>
-                    </div>
+                <!-- Totals across the whole system -->
+                <div class="bgo-totals" id="bgoTotals"></div>
 
-                    <!-- Videos Section -->
-                    <div class="data-section">
-                        <h3>🎥 Client Videos</h3>
-                        <div class="data-grid" id="videosGrid">
-                            <!-- Videos will be loaded here -->
-                            <div class="loading">Loading videos...</div>
-                        </div>
+                <div class="bgo-toolbar">
+                    <div class="bgo-search">
+                        <span>🔍</span>
+                        <input type="text" id="bgoSearch" placeholder="Search client, email, card, link…"
+                            oninput="filterClients()">
                     </div>
+                    <div class="bgo-filters">
+                        <button class="bgo-chip active" data-filter="all" onclick="setFilter(this,'all')">All</button>
+                        <button class="bgo-chip" data-filter="images" onclick="setFilter(this,'images')">With
+                            images</button>
+                        <button class="bgo-chip" data-filter="videos" onclick="setFilter(this,'videos')">With
+                            videos</button>
+                        <button class="bgo-chip" data-filter="links" onclick="setFilter(this,'links')">With
+                            links</button>
+                    </div>
+                </div>
 
-                    <!-- Other Data Section -->
-                    <div class="data-section">
-                        <h3>📄 Client Data</h3>
-                        <div class="data-list" id="dataList">
-                            <!-- Data will be loaded here -->
-                            <div class="loading">Loading data...</div>
-                        </div>
-                    </div>
+                <!-- One block per client -->
+                <div id="bgoClients">
+                    <div class="loading">Loading client data…</div>
                 </div>
             </div>
         </div>
@@ -651,12 +1030,183 @@
                 });
         }
 
+        // ── Client data ─────────────────────────────────────────
+        // Fetched only after the PIN is accepted; the endpoint checks the same
+        // session flag, so the content never reaches an unverified page.
+        let BGO_DATA = null;
+        let BGO_FILTER = 'all';
+
+        function esc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
         function loadClientData() {
-            // This is a placeholder - you'll need to implement actual data loading
-            // For now, just show some sample content
-            document.getElementById('imagesGrid').innerHTML = '<div class="loading">No images found</div>';
-            document.getElementById('videosGrid').innerHTML = '<div class="loading">No videos found</div>';
-            document.getElementById('dataList').innerHTML = '<div class="loading">No data found</div>';
+            const host = document.getElementById('bgoClients');
+            host.innerHTML = '<div class="loading">Loading client data…</div>';
+
+            fetch('{{ route('admin.bg-owner.data') }}', {
+                    headers: { 'Accept': 'application/json' },
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Request failed');
+                    return res.json();
+                })
+                .then(data => {
+                    BGO_DATA = data;
+                    renderTotals(data.totals);
+                    renderClients(data.clients);
+                })
+                .catch(() => {
+                    host.innerHTML = '<div class="loading">Could not load client data. Reload and re-enter the PIN.</div>';
+                });
+        }
+
+        function renderTotals(t) {
+            document.getElementById('bgoTotals').innerHTML = [
+                ['👥', BGO_DATA.clients.length, 'Clients'],
+                ['🎂', t.cards, 'Cards'],
+                ['📸', t.images, 'Images'],
+                ['🎥', t.videos, 'Videos'],
+                ['🔗', t.links, 'Links'],
+                ['💾', t.storage, 'Storage'],
+            ].map(([ico, num, lbl]) =>
+                '<div class="bgo-total"><div class="bgo-total-ico">' + ico + '</div>' +
+                '<div><div class="bgo-total-num">' + esc(num) + '</div>' +
+                '<div class="bgo-total-lbl">' + lbl + '</div></div></div>'
+            ).join('');
+        }
+
+        function renderClients(clients) {
+            const host = document.getElementById('bgoClients');
+
+            if (!clients.length) {
+                host.innerHTML = '<div class="loading">No clients yet.</div>';
+                return;
+            }
+
+            host.innerHTML = clients.map(c => {
+                const initial = (c.name || '?').charAt(0).toUpperCase();
+
+                const meta = [
+                    ['Email', c.email], ['Phone', c.phone || '—'], ['City', c.city || '—'],
+                    ['Age', c.age || '—'], ['Plan', c.plan], ['Subscription', c.subscription],
+                    ['Account', c.status], ['Joined', c.joined || '—'],
+                    ['Live logins', c.devices],
+                ].map(([k, v]) =>
+                    '<div class="bgo-kv"><span>' + k + '</span><b>' + esc(v) + '</b></div>'
+                ).join('');
+
+                const cards = c.cards.length
+                    ? c.cards.map(card => renderCard(card)).join('')
+                    : '<div class="bgo-empty">This client has not created any cards.</div>';
+
+                return '' +
+                    '<div class="bgo-client" data-search="' + esc((c.name + ' ' + c.email + ' ' +
+                        c.cards.map(x => x.title + ' ' + (x.link || '')).join(' ')).toLowerCase()) + '"' +
+                    ' data-images="' + c.image_count + '" data-videos="' + c.video_count +
+                    '" data-links="' + c.link_count + '">' +
+                    '<div class="bgo-client-head" onclick="toggleClient(this)">' +
+                        '<div class="bgo-av">' + esc(initial) + '</div>' +
+                        '<div class="bgo-client-id">' +
+                            '<strong>' + esc(c.name) + '</strong>' +
+                            '<span>' + esc(c.email) + '</span>' +
+                        '</div>' +
+                        '<div class="bgo-client-tallies">' +
+                            '<span title="Cards">🎂 ' + c.card_count + '</span>' +
+                            '<span title="Images">📸 ' + c.image_count + '</span>' +
+                            '<span title="Videos">🎥 ' + c.video_count + '</span>' +
+                            '<span title="Generated links">🔗 ' + c.link_count + '</span>' +
+                        '</div>' +
+                        '<div class="bgo-caret">▾</div>' +
+                    '</div>' +
+                    '<div class="bgo-client-body">' +
+                        '<div class="bgo-kv-grid">' + meta + '</div>' +
+                        cards +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        function renderCard(card) {
+            const link = card.link
+                ? '<div class="bgo-link"><span>🔗</span>' +
+                  '<a href="' + esc(card.link) + '" target="_blank" rel="noopener">' + esc(card.link) + '</a>' +
+                  '<button class="bgo-copy" onclick="copyLink(this, \'' + esc(card.link) + '\')">Copy</button></div>'
+                : '<div class="bgo-link none">No link generated yet</div>';
+
+            const images = card.images.length
+                ? '<div class="bgo-media-grid">' + card.images.map(img =>
+                    '<a class="bgo-media" href="' + esc(img.url) + '" target="_blank" rel="noopener">' +
+                    '<img src="' + esc(img.url) + '" alt="" loading="lazy">' +
+                    '<span>' + esc(img.slot) + '</span></a>'
+                ).join('') + '</div>'
+                : '<div class="bgo-empty">No images uploaded.</div>';
+
+            const videos = card.videos.length
+                ? '<div class="bgo-media-grid">' + card.videos.map(v =>
+                    '<div class="bgo-media video">' +
+                    '<video src="' + esc(v.url) + '" controls preload="metadata"></video>' +
+                    '<span>' + esc(v.slot) + '</span></div>'
+                ).join('') + '</div>'
+                : '<div class="bgo-empty">No videos uploaded.</div>';
+
+            const texts = card.texts.length
+                ? '<div class="bgo-texts">' + card.texts.map(t =>
+                    '<div class="bgo-text"><span>' + esc(t.label) + '</span><p>' + esc(t.value) + '</p></div>'
+                ).join('') + '</div>'
+                : '<div class="bgo-empty">Nothing typed in yet.</div>';
+
+            return '' +
+                '<div class="bgo-card">' +
+                    '<div class="bgo-card-head">' +
+                        '<strong>' + esc(card.title) + '</strong>' +
+                        '<span class="bgo-tag ' + (card.published ? 'done' : 'draft') + '">' +
+                            (card.published ? 'Completed' : 'Draft · step ' + card.step + '/10') + '</span>' +
+                        '<span class="bgo-tag plain">' + esc(card.theme || 'no theme') +
+                            (card.variant ? ' · design ' + card.variant : '') + '</span>' +
+                        '<span class="bgo-tag plain">💾 ' + esc(card.storage) + '</span>' +
+                        (card.lock_code ? '<span class="bgo-tag lock">🔒 PIN ' + esc(card.lock_code) + '</span>' : '') +
+                        '<span class="bgo-when">created ' + esc(card.created_at) +
+                            ' · edited ' + esc(card.updated_at) + '</span>' +
+                    '</div>' +
+                    link +
+                    '<div class="bgo-sub">📸 Images (' + card.images.length + ')</div>' + images +
+                    '<div class="bgo-sub">🎥 Videos (' + card.videos.length + ')</div>' + videos +
+                    '<div class="bgo-sub">📄 Content (' + card.texts.length + ' fields)</div>' + texts +
+                '</div>';
+        }
+
+        function toggleClient(head) {
+            head.parentElement.classList.toggle('open');
+        }
+
+        function copyLink(btn, url) {
+            event.stopPropagation();
+            navigator.clipboard.writeText(url).then(() => {
+                const original = btn.textContent;
+                btn.textContent = 'Copied ✓';
+                setTimeout(() => btn.textContent = original, 1600);
+            });
+        }
+
+        function setFilter(chip, filter) {
+            BGO_FILTER = filter;
+            document.querySelectorAll('.bgo-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            filterClients();
+        }
+
+        function filterClients() {
+            const q = document.getElementById('bgoSearch').value.toLowerCase().trim();
+
+            document.querySelectorAll('.bgo-client').forEach(el => {
+                const matchesText = !q || el.dataset.search.includes(q);
+                const matchesFilter = BGO_FILTER === 'all'
+                    || Number(el.dataset[BGO_FILTER] || 0) > 0;
+                el.style.display = (matchesText && matchesFilter) ? '' : 'none';
+            });
         }
     </script>
 </body>

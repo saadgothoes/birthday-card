@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Login — BirthdayCard</title>
+    <title>Create Account — BirthdayCard</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <style>
+<style>
         :root {
             --bg: #f7f5fc;
             --surface: #ffffff;
@@ -288,84 +288,135 @@
             }
         }
     </style>
+    <style>
+        /* Signup is a taller form than login — let the page scroll. */
+        body {
+            overflow-y: auto;
+            align-items: flex-start;
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+        }
+
+        .login-card {
+            max-width: 480px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .field-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .field-error {
+            color: #dc2626;
+            font-size: 0.72rem;
+            margin-top: 0.3rem;
+            display: block;
+        }
+
+        .alt-action {
+            text-align: center;
+            margin-top: 1.6rem;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .alt-action a {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+        }
+    </style>
 </head>
 
 <body>
-    <!-- Unicode-based Floating elements (Modern & Neutral) -->
     <span class="floater" style="top: 10%; left: 8%;">🎈</span>
     <span class="floater" style="bottom: 15%; right: 10%; animation-delay: 2s;">🎂</span>
     <span class="floater" style="top: 15%; right: 12%; animation-delay: 1s;">✨</span>
     <span class="floater" style="bottom: 12%; left: 14%; animation-delay: 3s;">🎁</span>
-    <span class="floater" style="top: 50%; left: 5%; animation-delay: 4s;">🎉</span>
 
     <div class="login-card">
 
         <a href="{{ url('/') }}" class="back-home">&larr; Back to home</a>
 
-        <h2>Welcome Back!</h2>
-        <p class="sub">Log in to create your magic</p>
+        <h2>Create Your Account</h2>
+        <p class="sub">Sign up free and build your first card</p>
 
-        @if(session('status'))
-        <div class="success-msg">
-            <span>✅</span> {{ session('status') }}
-        </div>
+        @if ($errors->any())
+            <div class="error-msg">
+                <span>⚠️</span> {{ $errors->first() }}
+            </div>
         @endif
 
-        @if($errors->any())
-        <div class="error-msg">
-            <span>⚠️</span> {{ $errors->first() }}
-        </div>
-        @endif
-
-        <form method="POST" action="{{ route('client.login.post') }}">
+        <form method="POST" action="{{ route('client.register.post') }}">
             @csrf
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="name" value="{{ old('name') }}" placeholder="Your name" required autofocus>
+                @error('name')<span class="field-error">{{ $message }}</span>@enderror
+            </div>
+
             <div class="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" value="{{ old('email') }}" placeholder="your@email.com" required
-                    autofocus>
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="your@email.com" required>
+                @error('email')<span class="field-error">{{ $message }}</span>@enderror
             </div>
 
-            <div class="form-group" style="margin-bottom: 0.5rem;">
+            <div class="field-row">
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" name="phone" value="{{ old('phone') }}" placeholder="03xx-xxxxxxx" required>
+                    @error('phone')<span class="field-error">{{ $message }}</span>@enderror
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city" value="{{ old('city') }}" placeholder="Your city" required>
+                    @error('city')<span class="field-error">{{ $message }}</span>@enderror
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" name="age" value="{{ old('age') }}" min="1" max="120" placeholder="e.g. 24"
+                    required>
+                @error('age')<span class="field-error">{{ $message }}</span>@enderror
+            </div>
+
+            <div class="form-group">
                 <label>Password</label>
                 <input type="password" name="password" placeholder="••••••••" required>
+                <p class="hint">At least 8 characters, with upper and lower case letters and a number.</p>
+                @error('password')<span class="field-error">{{ $message }}</span>@enderror
             </div>
 
-            <div style="text-align: right; margin-bottom: 2rem;">
-                <a href="{{ route('client.forgot-password') }}"
-                    style="font-size: 0.75rem; color: var(--accent); text-decoration: none; font-weight: 600;">Forgot
-                    Password?</a>
+            <div class="form-group" style="margin-bottom: 1.8rem;">
+                <label>Confirm Password</label>
+                <input type="password" name="password_confirmation" placeholder="••••••••" required>
             </div>
 
-            <button type="submit" class="submit-btn" id="loginSubmit">
-                <span>Sign In to Dashboard</span>
+            <button type="submit" class="submit-btn" id="signupSubmit">
+                <span>Create Account</span>
                 <span class="arrow">→</span>
             </button>
         </form>
 
-        <p style="text-align:center;margin-top:1.6rem;font-size:0.82rem;color:var(--text-muted);">
-            New here?
-            <a href="{{ route('client.register') }}"
-                style="color:var(--accent);font-weight:600;text-decoration:none;">Create an account</a>
+        <p class="alt-action">
+            Already have an account? <a href="{{ route('client.login') }}">Sign in</a>
         </p>
     </div>
-
-    <script>
-        (function () {
-            var btn = document.getElementById('loginSubmit');
-            if (!btn || window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
-
-            btn.addEventListener('mousemove', function (e) {
-                var rect = btn.getBoundingClientRect();
-                var relX = (e.clientX - rect.left - rect.width / 2) * 0.25;
-                var relY = (e.clientY - rect.top - rect.height / 2) * 0.35;
-                btn.style.transform = 'translate(' + relX + 'px,' + (relY - 2) + 'px)';
-            });
-
-            btn.addEventListener('mouseleave', function () {
-                btn.style.transform = '';
-            });
-        })();
-    </script>
 </body>
 
 </html>
