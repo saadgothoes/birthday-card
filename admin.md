@@ -145,7 +145,8 @@ $schedule->command('app:disable-expired-clients')->daily();
 #### Mail Configuration
 
 - Uses Laravel's mail system
-- Configurable SMTP/Mailpit settings
+- Local testing expects Mailpit on `127.0.0.1:1025` for SMTP and `http://127.0.0.1:8025` for the web UI
+- Set `MAIL_MAILER=smtp` so welcome emails are actually delivered to Mailpit instead of the log driver
 - Error reporting for failed sends
 
 ## User Interface Components
