@@ -40,10 +40,22 @@ class ClientController extends Controller
             ->groupBy('user_id')
             ->pluck('total', 'user_id');
 
+        $approvedCounts = SubscriptionRequest::where('status', SubscriptionRequest::APPROVED)
+            ->selectRaw('user_id, COUNT(*) as total')
+            ->groupBy('user_id')
+            ->pluck('total', 'user_id');
+
+        $approvedTotals = SubscriptionRequest::where('status', SubscriptionRequest::APPROVED)
+            ->selectRaw('user_id, SUM(plan_amount) as total')
+            ->groupBy('user_id')
+            ->pluck('total', 'user_id');
+
         return view('admin.clients.index', [
             'clients' => $clients,
             'sessionCounts' => $sessionCounts,
             'pendingCounts' => $pendingCounts,
+            'approvedCounts' => $approvedCounts,
+            'approvedTotals' => $approvedTotals,
         ]);
     }
 
@@ -62,6 +74,8 @@ class ClientController extends Controller
             'sessions' => $client->activeSessions(),
             'requests' => $client->subscriptionRequests()->with('reviewer')->get(),
             'plans' => SubscriptionPlans::all(),
+            'approvedPayments' => $client->subscriptionRequests()->where('status', SubscriptionRequest::APPROVED)->sum('plan_amount'),
+            'approvedPaymentCount' => $client->subscriptionRequests()->where('status', SubscriptionRequest::APPROVED)->count(),
         ]);
     }
 

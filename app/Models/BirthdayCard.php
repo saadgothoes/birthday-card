@@ -26,9 +26,12 @@ use Illuminate\Database\Eloquent\Model;
     'ending_data',
     'music_data',
     'qr_data',
+    'link_expires_at',
+    'link_disabled_at',
     'current_step',
     'slug',
     'is_published',
+    'is_revision',
     'last_opened_at',
 ])]
 class BirthdayCard extends Model
@@ -44,7 +47,10 @@ class BirthdayCard extends Model
             'ending_data' => 'array',
             'music_data' => 'array',
             'qr_data' => 'array',
+            'link_expires_at' => 'datetime',
+            'link_disabled_at' => 'datetime',
             'is_published' => 'boolean',
+            'is_revision' => 'boolean',
             'last_opened_at' => 'datetime',
         ];
     }
@@ -85,5 +91,22 @@ class BirthdayCard extends Model
     public function hasQr(): bool
     {
         return ! empty($this->qr_data['theme']);
+    }
+
+    public function linkIsExpired(): bool
+    {
+        return $this->link_expires_at?->isPast() ?? false;
+    }
+
+    public function linkIsDisabled(): bool
+    {
+        return $this->link_disabled_at !== null;
+    }
+
+    public function linkIsAvailable(): bool
+    {
+        return $this->is_published && $this->hasQr()
+            && ! $this->linkIsDisabled()
+            && ! $this->linkIsExpired();
     }
 }

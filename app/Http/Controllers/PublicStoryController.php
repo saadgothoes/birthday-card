@@ -40,7 +40,11 @@ class PublicStoryController extends Controller
     /** Look a story up by its slug, or 404. */
     private function story(string $slug): BirthdayCard
     {
-        return BirthdayCard::where('slug', $slug)->firstOrFail();
+        $card = BirthdayCard::where('slug', $slug)->firstOrFail();
+
+        abort_unless($card->linkIsAvailable(), 410, 'This birthday card link is no longer available.');
+
+        return $card;
     }
 
     /** Session key holding whether this browser has entered the right code. */

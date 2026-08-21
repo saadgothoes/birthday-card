@@ -856,7 +856,8 @@
                                     <td>{{ $req->created_at?->format('d M Y, g:i A') ?? '—' }}</td>
                                     <td>
                                         <form action="{{ route('admin.subscriptions.approve', $req->id) }}"
-                                            method="POST" style="display:inline;">
+                                            method="POST" style="display:inline;"
+                                            onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                                             @csrf @method('PATCH')
                                             <button type="submit" class="btn-toggle enable">Approve</button>
                                         </form>

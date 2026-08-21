@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BirthdayCard;
+use App\Models\SubscriptionRequest;
 use App\Models\User;
 use App\Support\CardInventory;
 use Illuminate\Http\Request;
@@ -14,7 +15,13 @@ class SuperAdminController extends Controller
     // Dashboard
     public function dashboard()
     {
-        return view('admin.dashboard');
+        $approved = SubscriptionRequest::where('status', SubscriptionRequest::APPROVED);
+
+        return view('admin.dashboard', [
+            'totalPayments' => (float) (clone $approved)->sum('plan_amount'),
+            'dailyPayments' => (float) (clone $approved)->whereDate('reviewed_at', today())->sum('plan_amount'),
+            'weeklyPayments' => (float) (clone $approved)->where('reviewed_at', '>=', now()->startOfWeek())->sum('plan_amount'),
+        ]);
     }
 
     // Login Page
@@ -169,6 +176,7 @@ class SuperAdminController extends Controller
     {
         $cards = BirthdayCard::with('user')
             ->whereNotNull('slug')
+            ->where('is_published', true)
             ->orderByDesc('updated_at')
             ->get();
 
@@ -183,6 +191,23 @@ class SuperAdminController extends Controller
             'cards' => $cards,
             'perClient' => $perClient,
         ]);
+    }
+
+    public function toggleCardLink(int $card)
+    {
+        $model = BirthdayCard::where('is_published', true)->findOrFail($card);
+
+        if ($model->linkIsDisabled()) {
+            if ($model->linkIsExpired()) {
+                return back()->with('error', 'This link expired after 15 days and cannot be enabled again.');
+            }
+
+            $model->forceFill(['link_disabled_at' => null])->save();
+            return back()->with('success', 'Card link enabled.');
+        }
+
+        $model->forceFill(['link_disabled_at' => now()])->save();
+        return back()->with('success', 'Card link disabled.');
     }
 
     // Verify BG Owner PIN

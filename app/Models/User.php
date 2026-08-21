@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 #[Fillable(['name', 'email', 'password', 'role', 'phone', 'city', 'age', 'plain_password', 'password_changed', 'status', 'subscription_start_date', 'subscription_fee', 'default_subscription_fee', 'bg_owner_pin', 'subscription_status', 'plan_amount', 'card_limit', 'subscription_activated_at'])]
@@ -118,7 +119,11 @@ class User extends Authenticatable
 
     public function cardsUsed(): int
     {
-        return $this->birthdayCards()->count();
+        if (! Schema::hasColumn('birthday_cards', 'is_revision')) {
+            return $this->birthdayCards()->count();
+        }
+
+        return $this->birthdayCards()->where('is_revision', false)->count();
     }
 
     public function cardsRemaining(): int

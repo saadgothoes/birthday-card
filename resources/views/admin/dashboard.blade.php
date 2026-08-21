@@ -667,7 +667,7 @@
                     <div class="stat-trend up">Total</div>
                 </div>
                 <div class="stat-num">
-                    {{ number_format(\App\Models\User::where('role', 'client')->sum('subscription_fee'), 2) }} PKR
+                    {{ number_format($totalPayments, 2) }} PKR
                 </div>
                 <div class="stat-label">Total Payments</div>
             </div>
@@ -677,7 +677,7 @@
                     <div class="stat-trend up">Today</div>
                 </div>
                 <div class="stat-num">
-                    {{ number_format(\App\Models\User::where('role', 'client')->whereDate('created_at', today())->sum('subscription_fee'), 2) }}
+                    {{ number_format($dailyPayments, 2) }}
                     PKR
                 </div>
                 <div class="stat-label">Daily Income</div>
@@ -688,7 +688,7 @@
                     <div class="stat-trend up">This Week</div>
                 </div>
                 <div class="stat-num">
-                    {{ number_format(\App\Models\User::where('role', 'client')->where('created_at', '>=', now()->startOfWeek())->sum('subscription_fee'), 2) }}
+                    {{ number_format($weeklyPayments, 2) }}
                     PKR
                 </div>
                 <div class="stat-label">Weekly Income</div>

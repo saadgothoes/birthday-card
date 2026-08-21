@@ -766,6 +766,7 @@
                         <th>Plan</th>
                         <th>Subscription</th>
                         <th>Cards</th>
+                        <th>Payments</th>
                         <th>Devices</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -778,6 +779,8 @@
                         $used = $client->birthday_cards_count;
                         $devices = (int) ($sessionCounts[$client->id] ?? 0);
                         $pending = (int) ($pendingCounts[$client->id] ?? 0);
+                        $paymentCount = (int) ($approvedCounts[$client->id] ?? 0);
+                        $paymentTotal = (float) ($approvedTotals[$client->id] ?? 0);
                     @endphp
                     <tr>
                         <td><span class="row-num">{{ str_pad($i+1,2,'0',STR_PAD_LEFT) }}</span></td>
@@ -814,6 +817,12 @@
                                 {{ max(0, $limit - $used) }} left
                             </span>
                         </td>
+                        <td>
+                            <span class="age-cell">Rs {{ number_format($paymentTotal) }}</span>
+                            <span style="display:block;font-size:.72rem;color:var(--text-dim)">
+                                {{ $paymentCount }} payment{{ $paymentCount === 1 ? '' : 's' }}
+                            </span>
+                        </td>
                         <td><span class="age-cell">{{ $devices }}</span></td>
                         <td><span class="status-badge {{ $client->status == 'active' ? 'active' : 'disabled' }}">{{ $client->status }}</span></td>
                         <td>
@@ -830,7 +839,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="empty-state">
                                 <div class="ei">👤</div>
                                 <h3>No clients yet</h3>

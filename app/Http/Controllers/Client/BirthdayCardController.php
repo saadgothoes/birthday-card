@@ -8,6 +8,7 @@ use App\Models\MusicTrack;
 use App\Support\QrRenderer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -35,6 +36,8 @@ class BirthdayCardController extends Controller
         if (! $card) {
             $card = $this->createCardForCurrentUser();
         }
+
+        abort_if($card->is_published, 403, 'Generated cards are read-only. Create a new card to make another version.');
 
         return $card;
     }
@@ -1195,6 +1198,11 @@ class BirthdayCardController extends Controller
             'theme' => (int) $data['theme'],
             'generated_at' => now()->toIso8601String(),
         ];
+        $card->link_expires_at = now()->addDays(15);
+        $card->link_disabled_at = null;
+        if (Schema::hasColumn('birthday_cards', 'is_revision')) {
+            $card->is_revision = false;
+        }
         $card->current_step = max($card->current_step, 10);
         // Generating the code is what finishes a card — it moves out of
         // Drafts and into the completed list from here.

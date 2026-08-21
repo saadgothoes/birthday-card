@@ -207,7 +207,8 @@
         .main {
             margin-left: var(--sidebar-w);
             padding: 2rem 2.2rem 4rem;
-            max-width: 1240px;
+            width: calc(100% - var(--sidebar-w));
+            max-width: none;
         }
 
         .topbar {
@@ -412,6 +413,13 @@
             border-radius: 999px;
         }
 
+        .section-note {
+            color: var(--text-muted);
+            font-size: .78rem;
+            line-height: 1.45;
+            margin: -.45rem 0 1rem;
+        }
+
         /* ── Subscription ──────────────────────────────────── */
         .sub-state {
             display: flex;
@@ -585,7 +593,70 @@
         .tile-actions {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: .25rem;
+            justify-content: flex-end;
+        }
+
+        .qr-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .35rem;
+            padding-top: .15rem;
+        }
+
+        .qr-block img {
+            width: 120px;
+            height: 120px;
+            display: block;
+        }
+
+        .qr-download {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            color: var(--accent);
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: .3rem .55rem;
+            font-size: .7rem;
+            font-weight: 600;
+            text-decoration: none;
+            background: var(--surface);
+        }
+
+        .qr-download:hover {
+            background: var(--accent-soft);
+        }
+
+        .share-row {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            min-width: 0;
+        }
+
+        .share-row .tile-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .copy-link {
+            flex-shrink: 0;
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: .3rem .55rem;
+            color: var(--accent);
+            background: var(--surface);
+            cursor: pointer;
+            font: inherit;
+            font-size: .7rem;
+            font-weight: 600;
+        }
+
+        .copy-link:hover {
+            background: var(--accent-soft);
         }
 
         .pill {
@@ -661,6 +732,9 @@
             font-size: .86rem;
             font-weight: 500;
             margin-bottom: 1.3rem;
+            width: 100%;
+            max-width: 100%;
+            overflow-wrap: anywhere;
         }
 
         .flash.success {
@@ -783,7 +857,29 @@
 
             .main {
                 margin-left: 0;
+                width: 100%;
                 padding: 1.4rem 1.1rem 3rem;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: .75rem;
+            }
+
+            .stat {
+                padding: 1rem;
+            }
+
+            .stat-num {
+                font-size: 1.45rem;
+            }
+
+            .stat-num.sm {
+                font-size: .92rem;
+            }
+
+            .panel {
+                padding: 1.1rem;
             }
 
             .menu-toggle {
@@ -886,6 +982,12 @@
         @if (session('error'))
             <div class="flash error">⚠️ {{ session('error') }}</div>
         @endif
+        @if (Auth::user()->needsTopUp())
+            <div class="flash error">
+                ⚠️ You have used all cards in your current subscription. Please subscribe to a new plan to create
+                another card or make a new version. Your completed links remain available below.
+            </div>
+        @endif
 
         {{-- ── At-a-glance numbers ── --}}
         <div class="stats">
@@ -983,6 +1085,8 @@
                         <h3>Completed</h3>
                         <span class="count">{{ $completed->count() }}</span>
                     </div>
+                    <p class="section-note">Completed QR codes and links remain visible here, but each share link
+                        automatically expires after 15 days.</p>
 
                     @if ($completed->isEmpty())
                         <div class="empty">Cards appear here once their QR code has been generated.</div>
@@ -1004,7 +1108,9 @@
                     </div>
 
                     <div class="sub-state">
-                        @if (Auth::user()->hasActiveSubscription())
+                        @if (Auth::user()->needsTopUp())
+                            <span class="badge pending">Cards used — subscribe again</span>
+                        @elseif (Auth::user()->hasActiveSubscription())
                             <span class="badge active">Active</span>
                         @elseif ($pendingRequest)
                             <span class="badge pending">Pending approval</span>
@@ -1023,7 +1129,12 @@
                         </div>
                     @endif
 
-                    @if (Auth::user()->hasActiveSubscription())
+                    @if (Auth::user()->needsTopUp())
+                        <p class="sub-note">⚠️ You have used all cards from this subscription. Request a new plan to
+                            create another card or version. Your completed links remain available.</p>
+                        <button class="btn" style="width:100%;justify-content:center;margin-top:.9rem;"
+                            onclick="openPlanModal()">Subscribe Again</button>
+                    @elseif (Auth::user()->hasActiveSubscription())
                         <p class="sub-note">✅ You can generate QR codes for your cards.</p>
                     @elseif ($pendingRequest)
                         <p class="sub-note">
@@ -1142,6 +1253,14 @@
             document.getElementById('renameModal').classList.add('open');
             input.focus();
             input.select();
+        }
+
+        function copyCardLink(button, url) {
+            navigator.clipboard.writeText(url).then(() => {
+                const original = button.textContent;
+                button.textContent = 'Copied';
+                setTimeout(() => button.textContent = original, 1400);
+            });
         }
 
         function closeRenameModal() {

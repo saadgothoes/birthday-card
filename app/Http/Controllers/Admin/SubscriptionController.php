@@ -36,19 +36,25 @@ class SubscriptionController extends Controller
 
     public function approve(Request $request, SubscriptionRequest $subscriptionRequest)
     {
-        abort_if(! $subscriptionRequest->isPending(), 422, 'This request has already been reviewed.');
+        if (! $subscriptionRequest->isPending()) {
+            return back()->with('success', 'This subscription request has already been reviewed.');
+        }
 
-        $cards = SubscriptionPlans::cardsFor($subscriptionRequest->plan_amount);
+        $newCards = SubscriptionPlans::cardsFor($subscriptionRequest->plan_amount);
+        $user = $subscriptionRequest->user;
+        $cards = $user->hasActiveSubscription()
+            ? $user->cardLimit() + $newCards
+            : $newCards;
 
         $subscriptionRequest->update([
             'status' => SubscriptionRequest::APPROVED,
-            'card_limit' => $cards,
+            'card_limit' => $newCards,
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
             'admin_note' => $request->input('admin_note'),
         ]);
 
-        $subscriptionRequest->user->forceFill([
+        $user->forceFill([
             'subscription_status' => User::SUB_ACTIVE,
             'plan_amount' => $subscriptionRequest->plan_amount,
             'card_limit' => $cards,

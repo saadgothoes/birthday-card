@@ -876,6 +876,11 @@
                 <div class="k">Active Logins</div>
                 <div class="v">{{ $sessions->count() }}</div>
             </div>
+            <div class="stat-tile">
+                <div class="k">Payments</div>
+                <div class="v sm">Rs {{ number_format($approvedPayments) }}</div>
+                <div class="k">{{ $approvedPaymentCount }} approved</div>
+            </div>
         </div>
 
         {{-- ── Account details ── --}}
@@ -960,7 +965,8 @@
                                     <td>
                                         @if ($req->isPending())
                                             <form action="{{ route('admin.subscriptions.approve', $req->id) }}"
-                                                method="POST" style="display:inline;">
+                                                method="POST" style="display:inline;"
+                                                onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                                                 @csrf @method('PATCH')
                                                 <button type="submit" class="btn-toggle enable">Approve</button>
                                             </form>
@@ -1005,6 +1011,8 @@
                                 <th>Theme</th>
                                 <th>Progress</th>
                                 <th>State</th>
+                                <th>Passcode</th>
+                                <th>Share Link</th>
                                 <th>Last Edited</th>
                             </tr>
                         </thead>
@@ -1018,6 +1026,15 @@
                                         <span class="status-badge {{ $card->isDraft() ? 'disabled' : 'active' }}">
                                             {{ $card->isDraft() ? 'draft' : 'completed' }}
                                         </span>
+                                    </td>
+                                    <td>{{ $card->lock_code ?? '—' }}</td>
+                                    <td>
+                                        @if ($card->is_published && $card->slug)
+                                            <a href="{{ \App\Support\CardInventory::shareUrl($card) }}" target="_blank"
+                                                rel="noopener">Open link</a>
+                                        @else
+                                            —
+                                        @endif
                                     </td>
                                     <td>{{ $card->updated_at?->diffForHumans() ?? '—' }}</td>
                                 </tr>

@@ -8,7 +8,9 @@ use App\Models\SubscriptionRequest;
 use App\Support\SubscriptionPlans;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * The card hub — the CapCut-style landing the client sees before the wizard.
@@ -29,14 +31,17 @@ class CardManagerController extends Controller
 
         $drafts = $cards->where('is_published', false)->values();
         $completed = $cards->where('is_published', true)->values();
+        $cardsUsed = Schema::hasColumn('birthday_cards', 'is_revision')
+            ? $cards->where('is_revision', false)->count()
+            : $cards->count();
 
         return view('client.cards', [
             'recent' => $cards->take(6),
             'drafts' => $drafts,
             'completed' => $completed,
-            'cardsUsed' => $cards->count(),
+            'cardsUsed' => $cardsUsed,
             'cardLimit' => $user->cardLimit(),
-            'cardsRemaining' => max(0, $user->cardLimit() - $cards->count()),
+            'cardsRemaining' => max(0, $user->cardLimit() - $cardsUsed),
             'plans' => SubscriptionPlans::all(),
             'pendingRequest' => $user->pendingSubscriptionRequest(),
             'latestRequest' => $user->subscriptionRequests()->first(),
@@ -109,6 +114,10 @@ class CardManagerController extends Controller
             'last_opened_at' => now(),
         ]);
 
+        if (Schema::hasColumn('birthday_cards', 'is_revision')) {
+            $card->forceFill(['is_revision' => false])->save();
+        }
+
         return redirect()->route('client.dashboard', ['card' => $card->id]);
     }
 
@@ -116,9 +125,68 @@ class CardManagerController extends Controller
     public function edit(int $card)
     {
         $model = BirthdayCard::where('user_id', Auth::id())->findOrFail($card);
+
+        if ($model->is_published) {
+            abort_unless(Auth::user()->canCreateCard(), 403,
+                'This generated card is read-only. You have no card slot available for a new version.');
+
+            $model = $this->duplicateCardForEditing($model);
+        }
+
         $model->forceFill(['last_opened_at' => now()])->save();
 
         return redirect()->route('client.dashboard', ['card' => $model->id]);
+    }
+
+    private function duplicateCardForEditing(BirthdayCard $source): BirthdayCard
+    {
+        $copy = $source->replicate();
+        $copy->title = $source->title ? $source->title . ' (New Version)' : null;
+        $copy->slug = null;
+        $copy->qr_data = null;
+        $copy->is_published = false;
+        $copy->current_step = 10;
+
+        if (Schema::hasColumn('birthday_cards', 'is_revision')) {
+            $copy->is_revision = true;
+        }
+        $copy->last_opened_at = now();
+
+        $copy->profile_image_path = $this->copyStoredFile($source->profile_image_path);
+        $copy->gift1_data = $this->copyPhotoData($source->gift1_data);
+        $copy->gift2_data = $this->copyPhotoData($source->gift2_data);
+        $copy->gift3_data = $this->copyPhotoData($source->gift3_data, true);
+        $copy->save();
+
+        return $copy;
+    }
+
+    private function copyPhotoData(?array $data, bool $withVideos = false): ?array
+    {
+        if (! $data) {
+            return $data;
+        }
+
+        $copy = $data;
+        $copy['photos'] = array_map(fn ($path) => $this->copyStoredFile($path), $data['photos'] ?? []);
+
+        if ($withVideos) {
+            $copy['videos'] = array_map(fn ($path) => $this->copyStoredFile($path), $data['videos'] ?? []);
+        }
+
+        return $copy;
+    }
+
+    private function copyStoredFile(?string $path): ?string
+    {
+        if (! $path || ! Storage::disk('public')->exists($path)) {
+            return $path;
+        }
+
+        $target = dirname($path) . '/' . Str::uuid() . '-' . basename($path);
+        Storage::disk('public')->copy($path, $target);
+
+        return $target;
     }
 
     public function rename(Request $request, int $card)
@@ -132,6 +200,25 @@ class CardManagerController extends Controller
         return back()->with('success', 'Card renamed.');
     }
 
+    public function toggleLink(int $card)
+    {
+        $model = BirthdayCard::where('user_id', Auth::id())
+            ->where('is_published', true)
+            ->findOrFail($card);
+
+        if ($model->linkIsDisabled()) {
+            if ($model->linkIsExpired()) {
+                return back()->with('error', 'This link expired after 15 days and cannot be enabled again.');
+            }
+
+            $model->forceFill(['link_disabled_at' => null])->save();
+            return back()->with('success', 'Card link enabled.');
+        }
+
+        $model->forceFill(['link_disabled_at' => now()])->save();
+        return back()->with('success', 'Card link disabled.');
+    }
+
     /**
      * Delete a card and the uploads that belong only to it, so a deleted card
      * gives its slot on the plan back cleanly.
@@ -139,6 +226,10 @@ class CardManagerController extends Controller
     public function destroy(int $card)
     {
         $model = BirthdayCard::where('user_id', Auth::id())->findOrFail($card);
+
+        if ($model->is_published) {
+            return back()->with('error', 'Generated cards and their share links cannot be deleted.');
+        }
 
         $paths = array_filter(array_merge(
             [$model->profile_image_path],

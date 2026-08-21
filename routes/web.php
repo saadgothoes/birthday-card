@@ -50,7 +50,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/bg-owner/data', [SuperAdminController::class, 'bgOwnerData'])->name('bg-owner.data');
 
         // ─── Generated links ──────────────────────────────────
-        Route::get('/links', [SuperAdminController::class, 'links'])->name('links.index');
+           Route::get('/links', [SuperAdminController::class, 'links'])->name('links.index');
+           Route::patch('/links/{card}/toggle', [SuperAdminController::class, 'toggleCardLink'])->name('links.toggle');
         Route::get('/music', [MusicController::class, 'index'])->name('music.index');
         Route::post('/music/chunk', [MusicController::class, 'uploadChunk'])->name('music.chunk');
         Route::post('/music/finalize', [MusicController::class, 'finalizeChunked'])->name('music.finalize');
@@ -76,6 +77,7 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::post('/cards', [CardManagerController::class, 'store'])->name('cards.store');
         Route::get('/cards/{card}/edit', [CardManagerController::class, 'edit'])->name('cards.edit');
         Route::patch('/cards/{card}/rename', [CardManagerController::class, 'rename'])->name('cards.rename');
+        Route::patch('/cards/{card}/link', [CardManagerController::class, 'toggleLink'])->name('cards.link.toggle');
         Route::delete('/cards/{card}', [CardManagerController::class, 'destroy'])->name('cards.destroy');
 
         // ─── Subscription request (no payment step yet) ────────

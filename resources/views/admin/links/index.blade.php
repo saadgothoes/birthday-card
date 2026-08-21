@@ -764,6 +764,13 @@
             <div class="count-pill"><strong>{{ $cards->count() }}</strong> links</div>
         </div>
 
+        @if (session('success'))
+            <div class="alert alert-success">✓ {{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-warning">⚠ {{ session('error') }}</div>
+        @endif
+
         {{-- ── Per-client tallies ── --}}
         <div class="tally-grid">
             @forelse ($perClient as $row)
@@ -798,7 +805,9 @@
                                 <th>Card</th>
                                 <th>Share Link</th>
                                 <th>QR</th>
+                                <th>Passcode</th>
                                 <th>Created</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -832,7 +841,23 @@
                                             {{ $card->is_published ? 'generated' : 'not yet' }}
                                         </span>
                                     </td>
+                                    <td>{{ $card->lock_code ?? '—' }}</td>
                                     <td>{{ $card->created_at?->format('d M Y') ?? '—' }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ route('admin.links.toggle', $card->id) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn-toggle {{ $card->linkIsDisabled() ? 'enable' : 'disable' }}">
+                                                {{ $card->linkIsDisabled() ? 'Enable' : 'Disable' }}
+                                            </button>
+                                        </form>
+                                        <small style="display:block;color:var(--text-dim);margin-top:.25rem;">
+                                            @if ($card->linkIsExpired()) Expired
+                                            @elseif ($card->linkIsDisabled()) Disabled
+                                            @else Until {{ $card->link_expires_at?->format('d M Y') ?? '—' }}
+                                            @endif
+                                        </small>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
