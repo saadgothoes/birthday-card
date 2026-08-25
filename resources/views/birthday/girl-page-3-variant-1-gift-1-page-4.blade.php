@@ -551,6 +551,80 @@
     }
 
     /* =========================================================
+       CARD PEEK — click the calendar or note to zoom it in over a
+       blurred backdrop, same as the polaroid lightbox does for
+       photos. Hover stays a small lift only; nothing zooms or
+       blurs until the item is actually clicked.
+       ========================================================= */
+
+    .mini-calendar,
+    .mini-note {
+        cursor: pointer;
+        transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+    }
+
+    .mini-calendar:hover,
+    .mini-calendar:focus-visible {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 12px 22px rgba(var(--shadow-rgb), .18);
+    }
+
+    .mini-note:hover,
+    .mini-note:focus-visible {
+        transform: rotate(1.5deg) translateY(-4px) scale(1.03);
+        box-shadow: 0 12px 22px rgba(var(--shadow-rgb), .18);
+    }
+
+    .peekbox {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(var(--bgdark1-rgb), .88);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .4s var(--ease);
+        padding: 8vw;
+    }
+
+    .peekbox.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .peek-inner {
+        transform: scale(.85);
+        transition: transform .4s var(--ease);
+    }
+
+    .peekbox.open .peek-inner {
+        transform: scale(1);
+    }
+
+    .peek-inner .peek-clone {
+        transform: none !important;
+        margin: 0 !important;
+        width: min(80vw, 380px) !important;
+        pointer-events: none;
+    }
+
+    .peek-inner .mini-calendar.peek-clone .cal-head {
+        font-size: 17px;
+    }
+
+    .peek-inner .mini-calendar.peek-clone .cal-grid span {
+        font-size: 15px;
+    }
+
+    .peek-inner .mini-note.peek-clone p {
+        font-size: 24px;
+    }
+
+    /* =========================================================
        LIGHTBOX — photo zoom
        ========================================================= */
 
@@ -630,6 +704,43 @@
 
         .stage {
             padding: 8vh 5vw;
+        }
+    }
+
+    @media (min-width:1024px) {
+        .scrapbook-card {
+            width: 580px;
+            padding: 6% 6% 5%;
+        }
+
+        .tag {
+            font-size: 14px;
+            padding: 9px 22px;
+        }
+
+        .polaroid figcaption {
+            font-size: 17px;
+        }
+
+        .cal-head {
+            font-size: 13px;
+        }
+
+        .cal-grid span {
+            font-size: 11px;
+        }
+
+        .mini-note p {
+            font-size: 18px;
+        }
+
+        .quote {
+            font-size: 19px;
+        }
+
+        .next-btn {
+            font-size: 16px;
+            padding: 12px 26px;
         }
     }
 
@@ -728,6 +839,12 @@
         <img id="lightboxImg" src="" alt="Zoomed memory">
     </div>
 
+    <!-- Card peek overlay (calendar & note) -->
+    <div class="peekbox" id="peekbox">
+        <button class="lightbox-close" id="peekboxClose" aria-label="Close">✕</button>
+        <div class="peek-inner" id="peekInner"></div>
+    </div>
+
     <script>
     (function() {
         'use strict';
@@ -787,8 +904,46 @@
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) closeLightbox();
         });
+
+        /* ---------------- Card peek (calendar & note) ---------------- */
+        const peekbox = document.getElementById('peekbox');
+        const peekInner = document.getElementById('peekInner');
+        const peekboxClose = document.getElementById('peekboxClose');
+        const peekTargets = document.querySelectorAll('.mini-calendar, .mini-note');
+
+        function openPeek(el) {
+            const clone = el.cloneNode(true);
+            clone.classList.add('peek-clone');
+            peekInner.innerHTML = '';
+            peekInner.appendChild(clone);
+            peekbox.classList.add('open');
+        }
+
+        function closePeek() {
+            peekbox.classList.remove('open');
+        }
+
+        peekTargets.forEach((el) => {
+            el.setAttribute('tabindex', '0');
+            el.addEventListener('click', () => openPeek(el));
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openPeek(el);
+                }
+            });
+        });
+
+        peekboxClose.addEventListener('click', closePeek);
+        peekbox.addEventListener('click', (e) => {
+            if (e.target === peekbox) closePeek();
+        });
+
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'Escape') {
+                closeLightbox();
+                closePeek();
+            }
         });
 
     })();

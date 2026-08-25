@@ -337,7 +337,105 @@
             font-size: 14px;
         }
     }
+
+    /* =========================================================
+       CARD PEEK — click a photo, the calendar or the note to zoom
+       it in over a blurred backdrop. Hover stays a small lift
+       only; nothing zooms or blurs until actually clicked.
+       ========================================================= */
+
+    .tile,
+    .note {
+        cursor: pointer;
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .tile:hover,
+    .tile:focus-visible,
+    .note:hover,
+    .note:focus-visible {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, .25);
+    }
+
+    .peekbox {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, .78);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .35s ease;
+        padding: 8vw;
+    }
+
+    .peekbox.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .peek-inner {
+        transform: scale(.85);
+        transition: transform .35s ease;
+    }
+
+    .peekbox.open .peek-inner {
+        transform: scale(1);
+    }
+
+    .peek-inner .peek-clone {
+        transform: none !important;
+        margin: 0 !important;
+        width: min(80vw, 380px) !important;
+        pointer-events: none;
+    }
+
+    .peek-inner .tile.peek-clone:not(.name):not(.cal) {
+        aspect-ratio: 4 / 3;
+    }
+
+    .peek-inner .tile.peek-clone.cal .cal-title {
+        font-size: 20px;
+    }
+
+    .peek-inner .tile.peek-clone.cal .cal-dow,
+    .peek-inner .tile.peek-clone.cal .cal-days {
+        font-size: 14px;
+    }
+
+    .peek-inner .note.peek-clone p {
+        font-size: 20px;
+    }
+
+    .peekbox-close {
+        position: absolute;
+        top: 5vh;
+        right: 6vw;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, .4);
+        background: rgba(255, 255, 255, .1);
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background .25s ease, transform .2s ease;
+    }
+
+    .peekbox-close:hover {
+        background: rgba(255, 255, 255, .22);
+    }
+
+    .peekbox-close:active {
+        transform: scale(.9);
+    }
     </style>
+
 </head>
 
 <body>
@@ -477,6 +575,57 @@
         </div>
     </div>
 
+
+    <!-- Card peek overlay (click a photo, calendar or note to zoom) -->
+    <div class="peekbox" id="peekbox">
+        <button class="peekbox-close" id="peekboxClose" aria-label="Close">✕</button>
+        <div class="peek-inner" id="peekInner"></div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        var peekbox = document.getElementById('peekbox');
+        var peekInner = document.getElementById('peekInner');
+        var peekboxClose = document.getElementById('peekboxClose');
+        var peekTargets = document.querySelectorAll('.tile, .note');
+
+        function openPeek(el) {
+            var clone = el.cloneNode(true);
+            clone.classList.add('peek-clone');
+            peekInner.innerHTML = '';
+            peekInner.appendChild(clone);
+            peekbox.classList.add('open');
+        }
+
+        function closePeek() {
+            peekbox.classList.remove('open');
+        }
+
+        peekTargets.forEach(function(el) {
+            el.setAttribute('tabindex', '0');
+            el.addEventListener('click', function() {
+                openPeek(el);
+            });
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openPeek(el);
+                }
+            });
+        });
+
+        peekboxClose.addEventListener('click', closePeek);
+        peekbox.addEventListener('click', function(e) {
+            if (e.target === peekbox) closePeek();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closePeek();
+        });
+    })();
+    </script>
 </body>
+
 
 </html>

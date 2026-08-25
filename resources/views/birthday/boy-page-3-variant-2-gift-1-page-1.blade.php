@@ -753,7 +753,89 @@
         width: 14px;
         height: 14px;
     }
+
+    /* =========================================================
+       CARD PEEK — click a polaroid to zoom it in over a blurred
+       backdrop. Hover stays a small lift only; nothing zooms or
+       blurs until the item is actually clicked.
+       ========================================================= */
+
+    .pol {
+        cursor: pointer;
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .pol:hover,
+    .pol:focus-visible {
+        box-shadow: 3px 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .peekbox {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, .78);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .35s ease;
+        padding: 8vw;
+    }
+
+    .peekbox.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .peek-inner {
+        transform: scale(.85);
+        transition: transform .35s ease;
+    }
+
+    .peekbox.open .peek-inner {
+        transform: scale(1);
+    }
+
+    .peek-inner .peek-clone {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        margin: 0 !important;
+        width: min(80vw, 360px) !important;
+        pointer-events: none;
+    }
+
+    .peekbox-close {
+        position: absolute;
+        top: 5vh;
+        right: 6vw;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, .4);
+        background: rgba(255, 255, 255, .1);
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background .25s ease, transform .2s ease;
+    }
+
+    .peekbox-close:hover {
+        background: rgba(255, 255, 255, .22);
+    }
+
+    .peekbox-close:active {
+        transform: scale(.9);
+    }
     </style>
+
 </head>
 
 <body>
@@ -912,6 +994,57 @@
                 stroke-linejoin="round" />
         </svg>
     </a>
+
+    <!-- Card peek overlay (click a polaroid to zoom) -->
+    <div class="peekbox" id="peekbox">
+        <button class="peekbox-close" id="peekboxClose" aria-label="Close">✕</button>
+        <div class="peek-inner" id="peekInner"></div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        var peekbox = document.getElementById('peekbox');
+        var peekInner = document.getElementById('peekInner');
+        var peekboxClose = document.getElementById('peekboxClose');
+        var peekTargets = document.querySelectorAll('.pol');
+
+        function openPeek(el) {
+            var clone = el.cloneNode(true);
+            clone.classList.add('peek-clone');
+            peekInner.innerHTML = '';
+            peekInner.appendChild(clone);
+            peekbox.classList.add('open');
+        }
+
+        function closePeek() {
+            peekbox.classList.remove('open');
+        }
+
+        peekTargets.forEach(function(el) {
+            el.setAttribute('tabindex', '0');
+            el.addEventListener('click', function() {
+                openPeek(el);
+            });
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openPeek(el);
+                }
+            });
+        });
+
+        peekboxClose.addEventListener('click', closePeek);
+        peekbox.addEventListener('click', function(e) {
+            if (e.target === peekbox) closePeek();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closePeek();
+        });
+    })();
+    </script>
 </body>
+
 
 </html>
