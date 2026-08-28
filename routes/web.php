@@ -129,6 +129,17 @@ Route::get('/girl/page/{page}/{variant}', function ($page, $variant) {
     return view($viewName);
 })->name('girl.page.variant');
 
+// ─── Anniversary Card Screens ─────────────────────────────────
+// Same pattern as boy/girl: variant 1 is the default view, any other
+// variant appends "-{variant}" to the view name. Static pages for now.
+Route::get('/anniversary/page/{page}/{variant}', function ($page, $variant) {
+    $viewName = 'birthday.anniversary-page-' . $page;
+    if ($variant != '1') {
+        $viewName .= '-' . $variant;
+    }
+    return view($viewName);
+})->name('anniversary.page.variant');
+
 // ─── Gift Pages (New Structure) ────────────────────────────────
 Route::get('/boy/page/{page}/{variant}/gift/{gift}/{giftPage}', function ($page, $variant, $gift, $giftPage) {
     $viewName = 'birthday.boy-page-' . $page . '-variant-' . $variant . '-gift-' . $gift . '-page-' . $giftPage;
