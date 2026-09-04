@@ -151,6 +151,15 @@ Route::get('/girl/page/{page}/{variant}/gift/{gift}/{giftPage}', function ($page
     return view($viewName);
 })->name('girl.page.gift');
 
+// Anniversary gifts — same URL shape as boy/girl so the public-story wiring
+// can hang off it later. `page` is 3 (the gift screen), `variant` 1-4 is the
+// gift-screen colour theme, `gift` 1-3 picks the gift, and `giftPage` 1-4 is
+// that gift's own colour theme. Gifts 1-3 have views.
+Route::get('/anniversary/page/{page}/{variant}/gift/{gift}/{giftPage}', function ($page, $variant, $gift, $giftPage) {
+    $viewName = 'birthday.anniversary-page-' . $page . '-variant-' . $variant . '-gift-' . $gift . '-page-' . $giftPage;
+    return view($viewName);
+})->name('anniversary.page.gift');
+
 // ─── Music ─────────────────────────────────────────────────────
 // Audio is served through the app rather than as a static file so that Range
 // requests are always answered — without them the player cannot seek, and a

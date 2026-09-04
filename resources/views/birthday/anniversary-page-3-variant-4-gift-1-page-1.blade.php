@@ -1,0 +1,2 @@
+{{-- Anniversary · gift-screen variant 4 · gift 1 · colour theme 1. Thin wrapper — the design lives in the shared partial. --}}
+@include('birthday.partials.anniversary-gift-1', ['giftTheme' => 1])

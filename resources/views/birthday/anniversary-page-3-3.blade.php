@@ -738,7 +738,9 @@
         loadingScreen.setAttribute('aria-hidden', 'false');
 
         setTimeout(function() {
-            window.location.href = '/anniversary/gift-1/' + pageNumber;
+            // pageNumber is the gift box (1-3); "/1" is that gift's colour theme.
+            // Gift-screen variant is fixed per file — this is variant 3.
+            window.location.href = '/anniversary/page/3/3/gift/' + pageNumber + '/1';
         }, 900);
     }
 
