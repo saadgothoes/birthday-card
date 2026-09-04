@@ -568,7 +568,7 @@
         loadingScreen.setAttribute('aria-hidden', 'false');
 
         setTimeout(function() {
-            window.location.href = '/girl/gift-1/' + pageNumber;
+            window.location.href = '/girl/page/3/2/gift/' + pageNumber + '/1';
         }, 900);
     }
 
@@ -581,6 +581,8 @@
         }
     });
     </script>
+
+    @include('birthday.partials._gift_reveal_fx')
 </body>
 
 </html>

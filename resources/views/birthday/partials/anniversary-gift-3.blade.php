@@ -627,6 +627,7 @@
         border-radius: 15px;
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
+        transform: translateZ(0);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -634,6 +635,12 @@
         gap: 12px;
         text-align: center;
         padding: 28px;
+    }
+
+    /* keep every child on the face's own plane so it hides with the backface */
+    .cover-face * {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
     }
 
     .cover-leather {
@@ -765,9 +772,14 @@
         transform: rotateY(-174deg) translateZ(0);
     }
 
-    /* end — quietly returns so only "The End" shows */
-    .cover-front.reclose {
-        transition-duration: 0.9s;
+    /* closing — front cover peels back off the left, then swings shut */
+    .cover-front.shutlift {
+        transition-duration: 0.34s;
+        transform: rotateY(-150deg) translateZ(44px);
+    }
+
+    .cover-front.shut {
+        transition-duration: 0.95s;
         transform: rotateY(0deg) translateZ(0);
     }
 
@@ -803,13 +815,14 @@
         transform-origin: right center;
         transform: rotateY(176deg);
         transform-style: preserve-3d;
-        transition: transform 1.15s var(--ease-turn), opacity 0.2s ease;
+        transition: transform 0.95s var(--ease-turn), opacity 0.25s ease;
         z-index: 70;
         pointer-events: none;
         opacity: 0;
     }
 
-    .cover-back.close {
+    /* closes in from the RIGHT, in step with the front cover */
+    .cover-back.shut {
         transform: rotateY(0deg);
         pointer-events: auto;
         opacity: 1;
@@ -1218,28 +1231,31 @@
         function closeBook() {
             busy = true;
             state = 'end';
+            // 1. the standing pop-ups fold back down onto the page
             spreads.forEach(function(s) { s.classList.remove('revealed'); });
             render();
 
-            // tuck the open front cover shut instantly — no leftward sweep, so the
-            // only motion the eye follows is the back cover coming in from the RIGHT
-            coverFront.style.transition = 'none';
-            coverFront.classList.remove('open', 'lift');
-            coverFront.classList.add('reclose');
-            void coverFront.offsetWidth;
-            coverFront.style.transition = '';
+            // 2. the front cover peels back off the left…
+            setTimeout(function() {
+                coverFront.classList.remove('open', 'lift');
+                coverFront.classList.add('shutlift');
+            }, 300);
 
-            requestAnimationFrame(function() {
-                coverBack.classList.add('close');      // swings shut from the RIGHT
-            });
-            setTimeout(function() { busy = false; }, T.close + 60);
+            // 3. …then BOTH covers swing in together and the book shuts on "The End"
+            setTimeout(function() {
+                coverFront.classList.remove('shutlift');
+                coverFront.classList.add('shut');
+                coverBack.classList.add('shut');
+            }, 300 + 340);
+
+            setTimeout(function() { busy = false; }, 300 + 340 + 1000);
         }
 
         function reset() {
             busy = true;
             state = 'cover';
-            coverBack.classList.remove('close');
-            coverFront.classList.remove('open', 'lift', 'reclose');
+            coverBack.classList.remove('shut');
+            coverFront.classList.remove('open', 'lift', 'shutlift', 'shut');
             spreads.forEach(function(s) { s.classList.remove('active', 'revealed'); });
             snapTurner();
             render();
@@ -1333,9 +1349,9 @@
                 state = 'end';
                 render();
                 coverFront.style.transition = 'none';
-                coverFront.classList.add('reclose');
+                coverFront.classList.add('shut');
                 coverBack.style.transition = 'none';
-                coverBack.classList.add('close');
+                coverBack.classList.add('shut');
                 void book.offsetWidth;
                 coverFront.style.transition = '';
                 coverBack.style.transition = '';

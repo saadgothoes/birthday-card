@@ -753,6 +753,8 @@
         }
     });
     </script>
+
+    @include('birthday.partials._gift_reveal_fx')
 </body>
 
 </html>

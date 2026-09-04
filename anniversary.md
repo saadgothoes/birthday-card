@@ -54,6 +54,17 @@ then navigates to:
 `{variant}` is hard-coded per file (page-3 → 1, page-3-2 → 2, page-3-3 → 3,
 page-3-4 → 4). `{n}` is the box (1-3). **Gifts 1-3 all have views** now.
 
+**Reveal flourish:** every page-3 file (boy ×2, girl ×2, anniversary ×4)
+`@include`s [resources/views/birthday/partials/_gift_reveal_fx.blade.php](resources/views/birthday/partials/_gift_reveal_fx.blade.php)
+right before `</body>`. It wraps `openGiftPage()` so a tap first plays a
+light-burst / box-opening animation over the tapped box — a golden bloom + rays
++ sparkles + a glint on the image hotspot (desktop), and the CSS box's lid + bow
+actually fly off with an inner glow (mobile) — then (~520 ms) hands off to the
+unchanged loading screen + redirect. The partial needs no config; it reads the
+tapped element's rect at runtime. The boy/girl page-3 files also had their
+redirect fixed here (stale `/boy/gift-1/{n}` · `/girl/gift-1/{n}` →
+`/{sex}/page/3/{variant}/gift/{n}/1`).
+
 ---
 
 ## Gift 1 — "Keepsake" memory page
@@ -185,9 +196,48 @@ stagger always reads.
 
 ---
 
+## Ending page — "Blow out the candles"
+
+- Shared design: [resources/views/birthday/partials/anniversary-ending.blade.php](resources/views/birthday/partials/anniversary-ending.blade.php)
+- 4 thin wrappers: `anniversary-page-4{,-2,-3,-4}.blade.php` — each `@include`s
+  the partial with an `endingTheme` (1-4). Same variant convention as boy/girl
+  (`/anniversary/page/4/{variant}`; variant 1 never appends a suffix).
+- Boy/girl use one self-contained file per theme (`boy-page-4*.blade.php`, an
+  envelope + handwritten letter). Anniversary uses the shared-partial shape
+  instead, matching the anniversary gifts.
+
+Two lit taper candles on an engraved base (`{years} years`). Tap anywhere (or
+the candles) → the flames blow out (a puff, a rising curl of smoke, the room
+dims via a `body::after` vignette) → a closing note fades up: the anniversary
+`message`, the years line, `signed`, and "the end". **Relight** replays it.
+Ambient: drifting sparks + a few floating hearts. Pure CSS/JS, no libraries;
+honors `prefers-reduced-motion`.
+
+### `endingTheme` palettes
+
+| # | Name | bg gradient (dim / candlelit) | wax | accent | flame glow |
+| - | --- | --- | --- | --- | --- |
+| 1 | Taupe & Charcoal | `#3b362d → #211f1a → #14130f` | `#f7f2ea` | `#c9bfa8` | warm amber |
+| 2 | Maroon & Gold | `#4d121a → #280910 → #170509` | `#f6ecd6` | `#c9a75c` | warm amber |
+| 3 | Ivory & Peach Gold | `#5b4632 → #332619 → #1f1710` | `#faf5ea` | `#e0a865` | warm amber |
+| 4 | Bright Red & White | `#5c1712 → #2c0a08 → #170403` | `#fdf6f2` | `#ff9a89` | warm amber |
+
+### Request params
+
+| Param | Meaning | Fallback |
+| --- | --- | --- |
+| `name_first`, `name_second` | the couple | Ayesha / Bilal |
+| `years` | base engraving + closing line | 5 |
+| `message`, `signed` | the closing note + signature | sample text |
+| `heading` | kicker over the names | Our Anniversary |
+| `wish_label`, `tap_label`, `end_label` | the three bits of chrome | Make a wish / tap to blow them out / the end |
+| `theme` | overrides `endingTheme` when included without one | 1 |
+| `preview_stage=out` | skip straight to the blown-out note (preview / wiring) | — |
+
+---
+
 ## TODO (later functionality)
 
 - Controller + wizard step so an anniversary card can be built and saved.
-- Wire `PublicStoryController` (`theme === 'anniversary'`) to serve pages 1-3,
-  the gifts, and an ending page through `/c/{slug}`.
-- Ending page (`anniversary-page-4*`).
+- Wire `PublicStoryController` (`theme === 'anniversary'`) to serve pages 1-4
+  and the gifts through `/c/{slug}`.

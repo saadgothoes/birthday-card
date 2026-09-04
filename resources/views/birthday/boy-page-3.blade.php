@@ -670,7 +670,7 @@
         loadingScreen.setAttribute('aria-hidden', 'false');
 
         setTimeout(function() {
-            window.location.href = '/boy/gift-1/' + pageNumber;
+            window.location.href = '/boy/page/3/1/gift/' + pageNumber + '/1';
         }, 900);
     }
 
@@ -683,6 +683,8 @@
         }
     });
     </script>
+
+    @include('birthday.partials._gift_reveal_fx')
 </body>
 
 </html>
