@@ -957,6 +957,35 @@
         pointer-events: none;
     }
 
+    /* gift 2 / 3 previews the client needs to click through */
+    .live-page-preview.interactive iframe {
+        pointer-events: auto;
+    }
+
+    .anniv-preview-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: -0.8rem 0 1.2rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    .anniv-preview-nav button {
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        border-radius: 8px;
+        padding: 5px 12px;
+        cursor: pointer;
+        font: inherit;
+        color: var(--text);
+    }
+
+    .anniv-preview-nav button:disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
+
     /* PIN entry */
     .pin-set-label {
         font-size: 0.78rem;
@@ -3291,10 +3320,332 @@
         margin-top: .1rem;
     }
 
+    /* ── Occasion picker — a pre-step tab in the dashboard ── */
+    .nav-occasion {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.75rem 0.85rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 0.35rem;
+        position: relative;
+    }
+
+    .nav-occasion:hover {
+        background: var(--surface2);
+    }
+
+    .nav-occasion.active {
+        background: var(--accent-soft);
+    }
+
+    .nav-occasion.active .nav-occasion-icon {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+
+    .nav-occasion.active .step-label {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .nav-occasion-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1.5px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        background: var(--surface2);
+        flex-shrink: 0;
+        transition: all 0.2s;
+    }
+
+    .nav-occasion-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 0.4rem 0.4rem 0.6rem;
+    }
+
+    /* the panel lives in the normal main flow, styled like every other step */
+    #occasionPanel {
+        display: none;
+    }
+
+    body.show-occasion #occasionPanel {
+        display: block;
+    }
+
+    body.show-occasion .step-panel,
+    body.show-occasion #anniversaryFlow {
+        display: none !important;
+    }
+
+    .occasion-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .occasion-choice {
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        padding: 2rem 1.5rem;
+        cursor: pointer;
+        transition: all 0.25s;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        background: var(--surface2);
+    }
+
+    .occasion-choice::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.25s;
+    }
+
+    .occasion-choice.birthday-occ::before {
+        background: linear-gradient(135deg, #fff0f6, #fce7f3);
+    }
+
+    .occasion-choice.anniversary-occ::before {
+        background: linear-gradient(135deg, #fffbf0, #f9ede0);
+    }
+
+    .occasion-choice:hover::before,
+    .occasion-choice.selected::before {
+        opacity: 1;
+    }
+
+    .occasion-choice:hover,
+    .occasion-choice.selected {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+    }
+
+    .occasion-choice.selected.birthday-occ {
+        border-color: var(--accent-girl);
+    }
+
+    .occasion-choice.selected.anniversary-occ {
+        border-color: var(--gold);
+    }
+
+    .occasion-choice .check {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        color: #fff;
+        opacity: 0;
+        transition: all 0.2s;
+    }
+
+    .occasion-choice.birthday-occ .check {
+        background: var(--accent-girl);
+    }
+
+    .occasion-choice.anniversary-occ .check {
+        background: var(--gold);
+    }
+
+    .occasion-choice.selected .check {
+        opacity: 1;
+    }
+
+    .occasion-choice .occasion-emoji {
+        font-size: 2.6rem;
+        position: relative;
+    }
+
+    .occasion-choice .occasion-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        position: relative;
+    }
+
+    .occasion-choice .occasion-desc {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        line-height: 1.45;
+        margin-top: 0.3rem;
+        position: relative;
+    }
+
+    /* not yet available */
+    .occasion-choice.soon {
+        cursor: default;
+        opacity: 0.6;
+        background: var(--bg);
+    }
+
+    .occasion-choice.soon:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .occasion-choice.soon::before {
+        display: none;
+    }
+
+    .occasion-choice .soon-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        padding: 3px 8px;
+        border-radius: 999px;
+    }
+
+    .occasion-note {
+        margin-top: 1.4rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 560px) {
+        .occasion-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ── Anniversary flow (its own panels; mirrors the boy/girl steps) ── */
+    #anniversaryFlow {
+        display: none;
+    }
+
+    body.occasion-anniversary #anniversaryFlow {
+        display: block;
+    }
+
+    .anniv-panel {
+        display: none;
+    }
+
+    .anniv-panel.active {
+        display: block;
+        animation: fadeIn 0.35s ease;
+    }
+
+    body.occasion-anniversary .step-panel,
+    body.occasion-anniversary .nav-steps .step-item,
+    body.occasion-anniversary #occasionSetupHeading,
+    body.occasion-anniversary .theme-switcher,
+    body.occasion-anniversary .progress-pill {
+        display: none !important;
+    }
+
+    /* while the occasion picker itself is open, dim the numbered steps */
+    body.show-occasion .nav-steps .step-item,
+    body.show-occasion #occasionSetupHeading {
+        opacity: 0.45;
+        pointer-events: none;
+    }
+
+    #anniversaryWizard .variant-section {
+        display: none;
+    }
+
+    #anniversaryWizard .variant-section.visible {
+        display: block;
+    }
+
+    .anniv-photo-thumb {
+        margin-top: 0.8rem;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        max-width: 220px;
+    }
+
+    .anniv-photo-thumb img {
+        display: block;
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    /* anniversary sidebar steps — same look as .step-item, different class so
+       the birthday goToStep() index math is untouched */
+    .nav-anniv {
+        display: none;
+    }
+
+    body.occasion-anniversary .nav-anniv {
+        display: block;
+    }
+
+    .anniv-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.75rem 0.85rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 0.2rem;
+    }
+
+    .anniv-nav-item:hover {
+        background: var(--surface2);
+    }
+
+    .anniv-nav-item.active {
+        background: var(--accent-soft);
+    }
+
+    .anniv-nav-item.active .step-num {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+
+    .anniv-nav-item.active .step-label {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .anniv-nav-item.done .step-num {
+        background: #d1fae5;
+        color: #059669;
+        border-color: #a7f3d0;
+    }
+
     </style>
 </head>
 
-<body>
+@php
+    // Existing drafts have no occasion yet; anything already past Step 1 is a
+    // birthday card in progress, so it skips the picker.
+    $cardOccasion = $card->occasion ?: ($card->current_step > 1 ? 'birthday' : null);
+    $bodyClass = trim(
+        (! $cardOccasion ? 'show-occasion ' : '')
+        . ($cardOccasion === 'anniversary' ? 'occasion-anniversary' : '')
+    );
+@endphp
+<body @if($bodyClass) class="{{ $bodyClass }}" @endif>
 
     <!-- ─── SIDEBAR ─── -->
     <aside class="sidebar">
@@ -3336,7 +3687,16 @@
         </div>
 
         <nav class="nav-steps">
-            <h4>Setup Steps</h4>
+            <h4>Get Started</h4>
+            <div class="nav-occasion" id="navOccasion" onclick="goToOccasion()">
+                <div class="nav-occasion-icon">🎉</div>
+                <div>
+                    <div class="step-label">Occasion</div>
+                    <div class="step-sub" id="navOccasionSub">Birthday or Anniversary</div>
+                </div>
+            </div>
+            <div class="nav-occasion-divider"></div>
+            <h4 id="occasionSetupHeading">Setup Steps</h4>
             <div class="step-item active" onclick="goToStep(1)">
                 <div class="step-num" id="sn1">1</div>
                 <div>
@@ -3405,6 +3765,81 @@
                 <div>
                     <div class="step-label">QR Select</div>
                     <div class="step-sub">Link & QR code</div>
+                </div>
+            </div>
+
+            <!-- anniversary sub-steps (only shown for an anniversary card) -->
+            <div class="nav-anniv">
+                <h4>Setup Steps</h4>
+                <div class="anniv-nav-item" id="annivNav1" onclick="goToAnnivStep(1)">
+                    <div class="step-num" id="asn1">1</div>
+                    <div>
+                        <div class="step-label">Theme</div>
+                        <div class="step-sub">Colour family &amp; design</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav2" onclick="goToAnnivStep(2)">
+                    <div class="step-num" id="asn2">2</div>
+                    <div>
+                        <div class="step-label">Lock Screen</div>
+                        <div class="step-sub">Photo &amp; code</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav3" onclick="goToAnnivStep(3)">
+                    <div class="step-num" id="asn3">3</div>
+                    <div>
+                        <div class="step-label">Welcome Screen</div>
+                        <div class="step-sub">Heading &amp; message</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav4" onclick="goToAnnivStep(4)">
+                    <div class="step-num" id="asn4">4</div>
+                    <div>
+                        <div class="step-label">Gift Box Screen</div>
+                        <div class="step-sub">Gift-selection design</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav5" onclick="goToAnnivStep(5)">
+                    <div class="step-num" id="asn5">5</div>
+                    <div>
+                        <div class="step-label">Gift 1</div>
+                        <div class="step-sub">Keepsake — photos &amp; letter</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav6" onclick="goToAnnivStep(6)">
+                    <div class="step-num" id="asn6">6</div>
+                    <div>
+                        <div class="step-label">Gift 2</div>
+                        <div class="step-sub">Scratch-to-reveal cards</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav7" onclick="goToAnnivStep(7)">
+                    <div class="step-num" id="asn7">7</div>
+                    <div>
+                        <div class="step-label">Gift 3</div>
+                        <div class="step-sub">Pop-up book</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav8" onclick="goToAnnivStep(8)">
+                    <div class="step-num" id="asn8">8</div>
+                    <div>
+                        <div class="step-label">Ending Page</div>
+                        <div class="step-sub">Blow out the candles</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav9" onclick="goToAnnivStep(9)">
+                    <div class="step-num" id="asn9">9</div>
+                    <div>
+                        <div class="step-label">Music</div>
+                        <div class="step-sub">A song for the story</div>
+                    </div>
+                </div>
+                <div class="anniv-nav-item" id="annivNav10" onclick="goToAnnivStep(10)">
+                    <div class="step-num" id="asn10">10</div>
+                    <div>
+                        <div class="step-label">Share Link &amp; QR</div>
+                        <div class="step-sub">Pick a design, generate</div>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -3521,6 +3956,819 @@
                 </div>
             </div>
             @endif
+
+            <!-- ── OCCASION — the very first choice (a pre-step, not numbered) ── -->
+            <div id="occasionPanel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎉</div>
+                        <div class="card-title">
+                            <h3>What are we celebrating?</h3>
+                            <p>Pick the kind of card you want to build — you can change this anytime</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="occasion-cards">
+                            <div class="occasion-choice birthday-occ" id="occChoiceBirthday"
+                                onclick="chooseOccasion('birthday')">
+                                <div class="check">✓</div>
+                                <div class="occasion-emoji">🎂</div>
+                                <div class="occasion-name">Birthday</div>
+                                <div class="occasion-desc">Boy or Girl style · lock screen, welcome, three gifts and an
+                                    ending</div>
+                            </div>
+                            <div class="occasion-choice anniversary-occ" id="occChoiceAnniversary"
+                                onclick="chooseOccasion('anniversary')">
+                                <div class="check">✓</div>
+                                <div class="occasion-emoji">💍</div>
+                                <div class="occasion-name">Anniversary</div>
+                                <div class="occasion-desc">White &amp; Cream or Rose &amp; Red — a keepsake for two</div>
+                            </div>
+                            <div class="occasion-choice soon" aria-disabled="true">
+                                <div class="soon-badge">Coming soon</div>
+                                <div class="occasion-emoji">💐</div>
+                                <div class="occasion-name">Proposal</div>
+                                <div class="occasion-desc">Will you marry me? A build-up that ends on the question</div>
+                            </div>
+                            <div class="occasion-choice soon" aria-disabled="true">
+                                <div class="soon-badge">Coming soon</div>
+                                <div class="occasion-emoji">💝</div>
+                                <div class="occasion-name">Valentine's Day</div>
+                                <div class="occasion-desc">A little love note experience for the 14th</div>
+                            </div>
+                        </div>
+                        <p class="occasion-note" id="occasionNote">
+                            Choose an occasion to start building your card.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ ANNIVERSARY FLOW (shown instead of the birthday wizard) ══ -->
+            <div id="anniversaryFlow">
+
+            <!-- Anniversary step 1 — theme picker -->
+            <div id="anniversaryWizard" class="anniv-panel active">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💍</div>
+                        <div class="card-title">
+                            <h3>Select Anniversary Theme</h3>
+                            <p>Choose a colour family, then a design</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="theme-cards">
+                            <div class="theme-choice" id="annivCatCream" onclick="selectAnnivCategory('cream')">
+                                <div class="check">✓</div>
+                                <span class="theme-emoji">🕊️</span>
+                                <div class="theme-name">White &amp; Cream</div>
+                                <div class="theme-desc">Soft taupe, ivory &amp; peach-gold tones</div>
+                            </div>
+                            <div class="theme-choice" id="annivCatRed" onclick="selectAnnivCategory('red')">
+                                <div class="check">✓</div>
+                                <span class="theme-emoji">🌹</span>
+                                <div class="theme-name">Rose &amp; Red</div>
+                                <div class="theme-desc">Maroon &amp; gold, and bright rose red</div>
+                            </div>
+                        </div>
+
+                        <!-- White & Cream designs -->
+                        <div class="variant-section" id="annivCreamVariants">
+                            <h4>Choose a White &amp; Cream design</h4>
+                            <div class="variant-grid">
+                                <div class="variant-choice" id="annivVariant1" onclick="selectAnnivVariant(1)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe data-src="{{ route('anniversary.page.variant',['page'=>1,'variant'=>1]) }}"
+                                            tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Taupe &amp; Charcoal</div>
+                                </div>
+                                <div class="variant-choice" id="annivVariant3" onclick="selectAnnivVariant(3)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe data-src="{{ route('anniversary.page.variant',['page'=>1,'variant'=>3]) }}"
+                                            tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Ivory &amp; Peach Gold</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rose & Red designs -->
+                        <div class="variant-section" id="annivRedVariants">
+                            <h4>Choose a Rose &amp; Red design</h4>
+                            <div class="variant-grid">
+                                <div class="variant-choice" id="annivVariant2" onclick="selectAnnivVariant(2)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe data-src="{{ route('anniversary.page.variant',['page'=>1,'variant'=>2]) }}"
+                                            tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Maroon &amp; Gold</div>
+                                </div>
+                                <div class="variant-choice" id="annivVariant4" onclick="selectAnnivVariant(4)">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb">
+                                        <iframe data-src="{{ route('anniversary.page.variant',['page'=>1,'variant'=>4]) }}"
+                                            tabindex="-1"></iframe>
+                                    </div>
+                                    <div class="variant-label">Bright Red &amp; White</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="step1-error" id="annivError"
+                            style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
+                            Please select a design to continue.</p>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToOccasion()">← Occasion</button>
+                            <button class="btn-next" id="annivContinueBtn" type="button"
+                                onclick="saveAnnivThemeAndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 2 — lock screen (photo + 4-digit code) -->
+            <div id="annivPanelLock" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔐</div>
+                        <div class="card-title">
+                            <h3>Lock Screen</h3>
+                            <p>Add a photo for the frame and set a 4-digit code</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="step2-grid">
+                            <div>
+                                <div class="form-group">
+                                    <label>Photo</label>
+                                    <div class="image-upload-zone"
+                                        onclick="document.getElementById('annivLockPhotoInput').click()">
+                                        <span class="upload-icon">📸</span>
+                                        <div class="upload-text">Drop image here or <strong>click to browse</strong></div>
+                                    </div>
+                                    <input type="file" id="annivLockPhotoInput" accept="image/*" style="display:none"
+                                        onchange="onAnnivLockPhotoSelected(event)">
+                                    <div class="anniv-photo-thumb" id="annivLockPhotoThumb" style="display:none;">
+                                        <img id="annivLockPhotoImg" alt="Selected photo">
+                                    </div>
+                                </div>
+
+                                <div class="pin-set-label" style="margin-top:1.4rem;">Set Code</div>
+                                <div class="pin-recommend-hint">
+                                    💡 <strong>Recommended:</strong> your anniversary date as <strong>DD-MM</strong> —
+                                    but any 4 digits work.
+                                </div>
+                                <div class="lock-display">
+                                    <div class="lock-icon">🔒</div>
+                                    <input type="text" class="pin-dob-input" id="annivLockPin" maxlength="5"
+                                        inputmode="numeric" placeholder="DD-MM" oninput="onAnnivLockPinInput(this)">
+                                    <div class="lock-label">4-Digit Unlock Code (DD-MM)</div>
+                                </div>
+
+                                <p class="step2-error" id="annivLockError"
+                                    style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.6rem;"></p>
+
+                                <div class="step-nav">
+                                    <button class="btn-prev" type="button" onclick="goToAnnivStep(1)">← Back</button>
+                                    <button class="btn-next" id="annivLockContinueBtn" type="button"
+                                        onclick="saveAnnivLockAndContinue()">Continue →</button>
+                                </div>
+                            </div>
+
+                            <div class="step2-preview-col">
+                                <div class="live-preview-label">Live Preview — Your Selected Design</div>
+                                <div class="live-page-preview">
+                                    <iframe id="annivLockPreview" src="about:blank" tabindex="-1"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 3 — welcome screen -->
+            <div id="annivPanelWelcome" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🌟</div>
+                        <div class="card-title">
+                            <h3>Welcome Screen</h3>
+                            <p>The first thing they see after unlocking</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @php $annivWelcomeLimits = \App\Http\Controllers\Client\BirthdayCardController::WELCOME_LIMITS; @endphp
+                        <div class="welcome-layout">
+                            <div>
+                                <div class="form-group">
+                                    <div class="field-head">
+                                        <label>Heading</label>
+                                        <span class="char-count" data-for="annivWelcomeHeading"></span>
+                                    </div>
+                                    <input type="text" id="annivWelcomeHeading" placeholder="e.g. Happy Anniversary, My Love"
+                                        maxlength="{{ $annivWelcomeLimits['heading'] }}"
+                                        oninput="updateAnnivWelcomePreview()" />
+                                </div>
+                                <div class="form-group">
+                                    <div class="field-head">
+                                        <label>Message</label>
+                                        <span class="char-count" data-for="annivWelcomeMessage"></span>
+                                    </div>
+                                    <textarea id="annivWelcomeMessage" placeholder="Write a heartfelt message…"
+                                        maxlength="{{ $annivWelcomeLimits['message'] }}" data-max-lines="4"
+                                        oninput="updateAnnivWelcomePreview()"></textarea>
+                                    <p class="field-hint">Shown in a large display face — a few short lines.</p>
+                                </div>
+                                <p class="step3-error" id="annivWelcomeError"
+                                    style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.6rem;"></p>
+                            </div>
+                            <div class="step2-preview-col">
+                                <div class="live-preview-label">Live Preview — Your Selected Design</div>
+                                <div class="live-page-preview">
+                                    <iframe id="annivWelcomePreview" src="about:blank" tabindex="-1"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToAnnivStep(2)">← Back</button>
+                            <button class="btn-next" id="annivWelcomeContinueBtn" type="button"
+                                onclick="saveAnnivWelcomeAndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 4 — gift-selection screen -->
+            <div id="annivPanelGiftScreen" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎁</div>
+                        <div class="card-title">
+                            <h3>Gift Box Screen</h3>
+                            <p>The screen where they choose which gift to open</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <h4 id="annivGiftScreenHeading">Choose a design</h4>
+                            <div class="variant-grid" id="annivGiftScreenGrid">
+                                <div class="variant-choice" id="annivGsChoiceA" onclick="selectAnnivGiftScreen('A')">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb gift-variant-thumb"><iframe id="annivGsFrameA" tabindex="-1"></iframe></div>
+                                    <div class="variant-label" id="annivGsLabelA">Design 1</div>
+                                </div>
+                                <div class="variant-choice" id="annivGsChoiceB" onclick="selectAnnivGiftScreen('B')">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb gift-variant-thumb"><iframe id="annivGsFrameB" tabindex="-1"></iframe></div>
+                                    <div class="variant-label" id="annivGsLabelB">Design 2</div>
+                                </div>
+                            </div>
+                            <p class="step5-error" id="annivGiftScreenError"
+                                style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
+                                Please choose a design to continue.</p>
+                        </div>
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToAnnivStep(3)">← Back</button>
+                            <button class="btn-next" id="annivGiftScreenContinueBtn" type="button"
+                                onclick="saveAnnivGiftScreenAndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 5 — Gift 1 (Keepsake) -->
+            <div id="annivPanelGift1" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🖼️</div>
+                        <div class="card-title">
+                            <h3>Gift 1 — Keepsake</h3>
+                            <p>A taped photo strip, a date medallion and a framed letter</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <h4 id="annivGift1ThemeHeading">Choose a Theme</h4>
+                            <div class="variant-grid" id="annivGift1ThemeGrid">
+                                <div class="variant-choice" id="annivGift1ChoiceA" onclick="selectAnnivGiftTheme(1,'A')">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb"><iframe id="annivGift1FrameA" tabindex="-1"></iframe></div>
+                                    <div class="variant-label" id="annivGift1LabelA">Theme 1</div>
+                                </div>
+                                <div class="variant-choice" id="annivGift1ChoiceB" onclick="selectAnnivGiftTheme(1,'B')">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb"><iframe id="annivGift1FrameB" tabindex="-1"></iframe></div>
+                                    <div class="variant-label" id="annivGift1LabelB">Theme 2</div>
+                                </div>
+                            </div>
+                            <p class="step5-error" id="annivGift1Error"
+                                style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
+                                Please choose a theme to continue.</p>
+                        </div>
+
+                        <div class="form-group gift2-field-row">
+                            <label>Photos (3)</label>
+                            <div class="image-slots">
+                                @foreach ([0, 1, 2] as $i)
+                                <div class="image-slot" id="annivGift1Slot{{ $i }}"
+                                    onclick="document.getElementById('annivGift1PhotoInput{{ $i }}').click()">
+                                    <img class="slot-preview" id="annivGift1PhotoPreview{{ $i }}" alt="">
+                                    <span class="slot-plus">+<span>Photo {{ $i + 1 }}</span></span>
+                                </div>
+                                @endforeach
+                            </div>
+                            @foreach ([0, 1, 2] as $i)
+                            <input type="file" id="annivGift1PhotoInput{{ $i }}" accept="image/*" style="display:none"
+                                onchange="onAnnivGift1Photo({{ $i }}, this)">
+                            @endforeach
+                        </div>
+
+                        <div class="welcome-layout">
+                            <div>
+                                <div class="form-group">
+                                    <label>Couple names</label>
+                                    <div style="display:flex; gap:0.6rem;">
+                                        <input type="text" id="annivGift1NameFirst" maxlength="20" placeholder="Name 1"
+                                            oninput="updateAnnivGift1Preview()">
+                                        <input type="text" id="annivGift1NameSecond" maxlength="20" placeholder="Name 2"
+                                            oninput="updateAnnivGift1Preview()">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Anniversary date</label>
+                                    <input type="date" id="annivGift1Date" oninput="updateAnnivGift1Preview()">
+                                    <p class="field-hint">The date medallion shows this month &amp; day.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Years together</label>
+                                    <input type="number" id="annivGift1Years" min="1" max="99" placeholder="5"
+                                        oninput="updateAnnivGift1Preview()" style="max-width:120px;">
+                                </div>
+                                <div class="form-group">
+                                    <div class="field-head">
+                                        <label>Letter</label>
+                                        <span class="char-count" data-for="annivGift1Message"></span>
+                                    </div>
+                                    <textarea id="annivGift1Message" rows="3" maxlength="300"
+                                        placeholder="Every year with you has been the one I would choose again…"
+                                        oninput="updateAnnivGift1Preview()"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Signature</label>
+                                    <input type="text" id="annivGift1Signed" maxlength="30" placeholder="— always yours"
+                                        oninput="updateAnnivGift1Preview()">
+                                </div>
+                            </div>
+                            <div class="step2-preview-col">
+                                <div class="live-preview-label">Live Preview</div>
+                                <div class="live-page-preview">
+                                    <iframe id="annivGift1Preview" src="about:blank" tabindex="-1"></iframe>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToAnnivStep(4)">← Back</button>
+                            <button class="btn-next" id="annivGift1ContinueBtn" type="button"
+                                onclick="saveAnnivGift1AndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 6 — Gift 2 (Scratch to reveal) -->
+            <div id="annivPanelGift2" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎴</div>
+                        <div class="card-title">
+                            <h3>Gift 2 — Scratch to Reveal</h3>
+                            <p id="annivGift2BeatTitle">Choose a theme</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="book-step-dots" id="annivGift2Dots">
+                            <span></span><span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="welcome-layout">
+                            <div>
+                                <!-- Beat 1 · theme + names -->
+                                <div class="book-page-panel active" id="annivG2Beat1">
+                                    <div class="variant-section visible" style="margin-top:0;">
+                                        <h4 id="annivGift2ThemeHeading">Choose a Theme</h4>
+                                        <div class="variant-grid" id="annivGift2ThemeGrid">
+                                            <div class="variant-choice" id="annivGift2ChoiceA" onclick="selectAnnivGiftTheme(2,'A')">
+                                                <div class="variant-check">✓</div>
+                                                <div class="variant-thumb"><iframe id="annivGift2FrameA" tabindex="-1"></iframe></div>
+                                                <div class="variant-label" id="annivGift2LabelA">Theme 1</div>
+                                            </div>
+                                            <div class="variant-choice" id="annivGift2ChoiceB" onclick="selectAnnivGiftTheme(2,'B')">
+                                                <div class="variant-check">✓</div>
+                                                <div class="variant-thumb"><iframe id="annivGift2FrameB" tabindex="-1"></iframe></div>
+                                                <div class="variant-label" id="annivGift2LabelB">Theme 2</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-top:0.8rem;">
+                                        <label>Couple names</label>
+                                        <div style="display:flex; gap:0.6rem;">
+                                            <input type="text" id="annivGift2NameFirst" maxlength="20" placeholder="Name 1" oninput="updateAnnivGift2Preview()">
+                                            <input type="text" id="annivGift2NameSecond" maxlength="20" placeholder="Name 2" oninput="updateAnnivGift2Preview()">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Beats 2-5 · memory cards -->
+                                @foreach ([1, 2, 3, 4] as $c)
+                                <div class="book-page-panel" id="annivG2Beat{{ $c + 1 }}">
+                                    <h4>Memory card {{ $c }}</h4>
+                                    <div class="form-group">
+                                        <div style="display:flex; gap:0.6rem;">
+                                            <input type="text" id="annivG2Date{{ $c - 1 }}" maxlength="40" placeholder="Date (e.g. June 2021)" style="flex:1;" oninput="updateAnnivGift2Preview()">
+                                            <input type="text" id="annivG2Title{{ $c - 1 }}" maxlength="40" placeholder="Title" style="flex:1;" oninput="updateAnnivGift2Preview()">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <textarea id="annivG2Text{{ $c - 1 }}" rows="2" maxlength="120" placeholder="A line about this memory…" oninput="updateAnnivGift2Preview()"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Photo</label>
+                                        <div class="image-slot" id="annivG2Slot{{ $c - 1 }}" style="max-width:150px; height:100px;" onclick="document.getElementById('annivG2Photo{{ $c - 1 }}').click()">
+                                            <img class="slot-preview" id="annivG2PhotoPreview{{ $c - 1 }}" alt="">
+                                            <span class="slot-plus">+<span>Photo</span></span>
+                                        </div>
+                                        <input type="file" id="annivG2Photo{{ $c - 1 }}" accept="image/*" style="display:none" onchange="onAnnivGift2MemPhoto({{ $c - 1 }}, this)">
+                                    </div>
+                                </div>
+                                @endforeach
+                                <!-- Beat 6 · closing letter -->
+                                <div class="book-page-panel" id="annivG2Beat6">
+                                    <h4>The closing letter</h4>
+                                    <div class="form-group">
+                                        <div class="field-head">
+                                            <label>Letter</label>
+                                            <span class="char-count" data-for="annivGift2Message"></span>
+                                        </div>
+                                        <textarea id="annivGift2Message" rows="3" maxlength="300"
+                                            placeholder="Every year with you has been the one I would choose again…" oninput="updateAnnivGift2Preview()"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Signature</label>
+                                        <input type="text" id="annivGift2Signed" maxlength="30" placeholder="— always yours" oninput="updateAnnivGift2Preview()">
+                                    </div>
+                                </div>
+
+                                <p class="step5-error" id="annivGift2Error"
+                                    style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.6rem;"></p>
+
+                                <div class="book-page-nav">
+                                    <button class="btn-prev" type="button" id="annivGift2PrevBeat" onclick="annivGift2Beat(-1)">← Back</button>
+                                    <button class="btn-next" type="button" id="annivGift2NextBeat" onclick="annivGift2Beat(1)">Next →</button>
+                                    <button class="btn-next" type="button" id="annivGift2ContinueBtn" style="display:none;" onclick="saveAnnivGift2AndContinue()">Continue →</button>
+                                </div>
+                            </div>
+                            <div class="step2-preview-col">
+                                <div class="live-preview-label">Live Preview — follows the card you're editing</div>
+                                <div class="live-page-preview">
+                                    <iframe id="annivGift2Preview" src="about:blank" tabindex="-1"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 7 — Gift 3 (Pop-up Book) -->
+            <div id="annivPanelGift3" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📖</div>
+                        <div class="card-title">
+                            <h3>Gift 3 — Pop-up Book</h3>
+                            <p id="annivGift3BeatTitle">Choose a theme</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="book-step-dots" id="annivGift3Dots">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="welcome-layout">
+                            <div>
+                                <!-- Beat 1 · theme + couple + date -->
+                                <div class="book-page-panel active" id="annivG3Beat1">
+                                    <div class="variant-section visible" style="margin-top:0;">
+                                        <h4 id="annivGift3ThemeHeading">Choose a Theme</h4>
+                                        <div class="variant-grid" id="annivGift3ThemeGrid">
+                                            <div class="variant-choice" id="annivGift3ChoiceA" onclick="selectAnnivGiftTheme(3,'A')">
+                                                <div class="variant-check">✓</div>
+                                                <div class="variant-thumb"><iframe id="annivGift3FrameA" tabindex="-1"></iframe></div>
+                                                <div class="variant-label" id="annivGift3LabelA">Theme 1</div>
+                                            </div>
+                                            <div class="variant-choice" id="annivGift3ChoiceB" onclick="selectAnnivGiftTheme(3,'B')">
+                                                <div class="variant-check">✓</div>
+                                                <div class="variant-thumb"><iframe id="annivGift3FrameB" tabindex="-1"></iframe></div>
+                                                <div class="variant-label" id="annivGift3LabelB">Theme 2</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-top:0.8rem;">
+                                        <label>Couple names <span style="color:var(--text-muted); font-weight:400;">— shown as initials on the cover, and in full on "The End"</span></label>
+                                        <div style="display:flex; gap:0.6rem;">
+                                            <input type="text" id="annivGift3NameFirst" maxlength="20" placeholder="Name 1" oninput="updateAnnivGift3Preview()">
+                                            <input type="text" id="annivGift3NameSecond" maxlength="20" placeholder="Name 2" oninput="updateAnnivGift3Preview()">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Beat 2 · spread 1 -->
+                                <div class="book-page-panel" id="annivG3Beat2">
+                                    <h4>Chapter one — How it began</h4>
+                                    <div class="form-group">
+                                        <label>Photo 1 (the standing cut-out)</label>
+                                        <div class="image-slot" id="annivGift3Slot0" style="max-width:150px; height:110px;" onclick="document.getElementById('annivGift3PhotoInput0').click()">
+                                            <img class="slot-preview" id="annivGift3PhotoPreview0" alt=""><span class="slot-plus">+<span>Photo 1</span></span>
+                                        </div>
+                                        <input type="file" id="annivGift3PhotoInput0" accept="image/*" style="display:none" onchange="onAnnivGift3Photo(0, this)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Anniversary date <span style="color:var(--text-muted); font-weight:400;">— the "Since {month} {day}" tag on this spread</span></label>
+                                        <input type="date" id="annivGift3Date" oninput="updateAnnivGift3Preview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Line under spread 1</label>
+                                        <input type="text" id="annivGift3Line1" maxlength="60" placeholder="Where every good thing started." oninput="updateAnnivGift3Preview()">
+                                    </div>
+                                </div>
+                                <!-- Beat 3 · spread 2 -->
+                                <div class="book-page-panel" id="annivG3Beat3">
+                                    <h4>Chapter two — The years between</h4>
+                                    <div class="form-group">
+                                        <label>Photo 2</label>
+                                        <div class="image-slot" id="annivGift3Slot1" style="max-width:150px; height:110px;" onclick="document.getElementById('annivGift3PhotoInput1').click()">
+                                            <img class="slot-preview" id="annivGift3PhotoPreview1" alt=""><span class="slot-plus">+<span>Photo 2</span></span>
+                                        </div>
+                                        <input type="file" id="annivGift3PhotoInput1" accept="image/*" style="display:none" onchange="onAnnivGift3Photo(1, this)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Years together <span style="color:var(--text-muted); font-weight:400;">— the "Together {n} years" medallion on this spread</span></label>
+                                        <input type="number" id="annivGift3Years" min="1" max="99" placeholder="e.g. 10" style="max-width:130px;" oninput="updateAnnivGift3Preview()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Line under spread 2</label>
+                                        <input type="text" id="annivGift3Line2" maxlength="60" placeholder="Every one of them, my favourite." oninput="updateAnnivGift3Preview()">
+                                    </div>
+                                </div>
+                                <!-- Beat 4 · spread 3 -->
+                                <div class="book-page-panel" id="annivG3Beat4">
+                                    <h4>Chapter three — Still us</h4>
+                                    <div class="form-group">
+                                        <label>Photo 3</label>
+                                        <div class="image-slot" id="annivGift3Slot2" style="max-width:150px; height:110px;" onclick="document.getElementById('annivGift3PhotoInput2').click()">
+                                            <img class="slot-preview" id="annivGift3PhotoPreview2" alt=""><span class="slot-plus">+<span>Photo 3</span></span>
+                                        </div>
+                                        <input type="file" id="annivGift3PhotoInput2" accept="image/*" style="display:none" onchange="onAnnivGift3Photo(2, this)">
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="field-head">
+                                            <label>Letter</label>
+                                            <span class="char-count" data-for="annivGift3Message"></span>
+                                        </div>
+                                        <textarea id="annivGift3Message" rows="3" maxlength="300" placeholder="Every year with you has been the one I would choose again…" oninput="updateAnnivGift3Preview()"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Signature</label>
+                                        <input type="text" id="annivGift3Signed" maxlength="30" placeholder="— always yours" oninput="updateAnnivGift3Preview()">
+                                    </div>
+                                </div>
+                                <!-- Beat 5 · the end -->
+                                <div class="book-page-panel" id="annivG3Beat5">
+                                    <h4>The End</h4>
+                                    <p style="font-size:0.86rem; color:var(--text-muted);">
+                                        The book closes on "The End" with the couple's initials. Nothing to fill —
+                                        check the preview, then continue.
+                                    </p>
+                                </div>
+
+                                <p class="step5-error" id="annivGift3Error"
+                                    style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.6rem;"></p>
+
+                                <div class="book-page-nav">
+                                    <button class="btn-prev" type="button" id="annivGift3PrevBeat" onclick="annivGift3Beat(-1)">← Back</button>
+                                    <button class="btn-next" type="button" id="annivGift3NextBeat" onclick="annivGift3Beat(1)">Next →</button>
+                                    <button class="btn-next" type="button" id="annivGift3ContinueBtn" style="display:none;" onclick="saveAnnivGift3AndContinue()">Continue →</button>
+                                </div>
+                            </div>
+                            <div class="step2-preview-col">
+                                <div class="live-preview-label">Live Preview — the book opens to the spread you're editing</div>
+                                <div class="live-page-preview">
+                                    <iframe id="annivGift3Preview" src="about:blank" tabindex="-1"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 8 — Ending page -->
+            <div id="annivPanelEnding" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🕯️</div>
+                        <div class="card-title">
+                            <h3>Ending Page</h3>
+                            <p>Two candles they blow out, then a closing note</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <h4 id="annivEndingThemeHeading">Choose a Theme</h4>
+                            <div class="variant-grid" id="annivEndingThemeGrid">
+                                <div class="variant-choice" id="annivEndingChoiceA" onclick="selectAnnivEndingTheme('A')">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb"><iframe id="annivEndingFrameA" tabindex="-1"></iframe></div>
+                                    <div class="variant-label" id="annivEndingLabelA">Theme 1</div>
+                                </div>
+                                <div class="variant-choice" id="annivEndingChoiceB" onclick="selectAnnivEndingTheme('B')">
+                                    <div class="variant-check">✓</div>
+                                    <div class="variant-thumb"><iframe id="annivEndingFrameB" tabindex="-1"></iframe></div>
+                                    <div class="variant-label" id="annivEndingLabelB">Theme 2</div>
+                                </div>
+                            </div>
+                            <p class="step5-error" id="annivEndingError"
+                                style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;">
+                                Please choose a theme to continue.</p>
+                        </div>
+
+                        <div class="welcome-layout">
+                            <div>
+                                <div class="form-group">
+                                    <label>Couple names &amp; years</label>
+                                    <div style="display:flex; gap:0.6rem;">
+                                        <input type="text" id="annivEndingNameFirst" maxlength="20" placeholder="Name 1"
+                                            oninput="updateAnnivEndingPreview()">
+                                        <input type="text" id="annivEndingNameSecond" maxlength="20" placeholder="Name 2"
+                                            oninput="updateAnnivEndingPreview()">
+                                        <input type="number" id="annivEndingYears" min="1" max="99" placeholder="Yrs"
+                                            oninput="updateAnnivEndingPreview()" style="max-width:90px;">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="field-head">
+                                        <label>Closing message</label>
+                                        <span class="char-count" data-for="annivEndingMessage"></span>
+                                    </div>
+                                    <textarea id="annivEndingMessage" rows="3" maxlength="240"
+                                        placeholder="Every year with you has been the one I would choose again…"
+                                        oninput="updateAnnivEndingPreview()"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Signature</label>
+                                    <input type="text" id="annivEndingSigned" maxlength="30" placeholder="— always yours"
+                                        oninput="updateAnnivEndingPreview()">
+                                </div>
+                            </div>
+                            <div class="step2-preview-col">
+                                <div class="live-preview-label">Live Preview</div>
+                                <div class="live-page-preview">
+                                    <iframe id="annivEndingPreview" src="about:blank" tabindex="-1"></iframe>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToAnnivStep(7)">← Back</button>
+                            <button class="btn-next" id="annivEndingContinueBtn" type="button"
+                                onclick="saveAnnivEndingAndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 9 — Music -->
+            <div id="annivPanelMusic" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎵</div>
+                        <div class="card-title">
+                            <h3>Story Music</h3>
+                            <p>A song that plays behind the story, from unlock to the ending</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="music-grid" id="annivMusicGrid">
+                            @forelse($musicTracks->groupBy('category') as $category => $tracks)
+                            @foreach($tracks as $track)
+                            <div class="music-choice" data-track-id="{{ $track->id }}"
+                                data-track-url="{{ $track->url }}"
+                                onclick="selectAnnivMusic({{ $track->id }}, this)">
+                                <strong>{{ $track->title }}</strong><small>{{ $category }}{{ $track->artist ? ' · '.$track->artist : '' }}</small>
+                                <audio controls preload="none" src="{{ $track->url }}" onclick="event.stopPropagation()"></audio>
+                            </div>
+                            @endforeach
+                            @empty
+                            <p>No songs available yet. Ask Super Admin to add one.</p>
+                            @endforelse
+                        </div>
+
+                        {{-- The clip picker itself lives in the birthday Step 9 panel; it is
+                             one element with one set of controls, and `openClipPicker` moves
+                             it into whichever step asked for it. Only one of the two flows is
+                             ever on screen, so there is nothing to duplicate. --}}
+                        <div id="annivMusicClipMount"></div>
+
+                        <p class="field-hint" style="margin-top:1.2rem">Only songs uploaded and approved by Super Admin
+                            are available here.</p>
+                        <p class="step5-error" id="annivMusicError"
+                            style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;"></p>
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToAnnivStep(8)">← Back</button>
+                            <button class="btn-prev" type="button" onclick="saveAnnivMusicAndContinue(true)">Skip</button>
+                            <button class="btn-next" type="button" id="annivMusicContinueBtn"
+                                onclick="saveAnnivMusicAndContinue(false)">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anniversary step 10 — QR link -->
+            @php
+            // The anniversary family is its own six designs (QR_THEMES['anniversary']).
+            // They are only rendered for an anniversary card, so a birthday
+            // dashboard doesn't carry six unused QR images.
+            $annivQrThemes = \App\Http\Controllers\Client\BirthdayCardController::qrThemes('anniversary');
+            $annivQrPreviews = ($cardOccasion === 'anniversary')
+            ? \App\Http\Controllers\Client\BirthdayCardController::qrPreviews('anniversary', $card->slug ?? null, 300)
+            : [];
+            $savedAnnivQrTheme = ($cardOccasion === 'anniversary') ? ($card->qr_data['theme'] ?? null) : null;
+            @endphp
+            <div id="annivPanelQr" class="anniv-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔗</div>
+                        <div class="card-title">
+                            <h3>Share Link &amp; QR</h3>
+                            <p>Pick a QR design, then generate the couple's link and code</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <h4>Choose a QR design</h4>
+                            <div class="qr-grid" id="annivQrThemeGrid">
+                                @foreach ($annivQrThemes as $n => $design)
+                                <div class="variant-choice" id="annivQrTheme{{ $n }}" onclick="selectAnnivQrTheme({{ $n }})">
+                                    <div class="variant-check">✓</div>
+                                    <div class="qr-thumb"><img id="annivQrThemeImg{{ $n }}"
+                                            src="{{ $annivQrPreviews[$n] ?? '' }}" alt="{{ $design['name'] }}"></div>
+                                    <div class="variant-label" id="annivQrThemeName{{ $n }}">{{ $design['name'] }}</div>
+                                    <div class="qr-blurb" id="annivQrThemeBlurb{{ $n }}">{{ $design['blurb'] }}</div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        @unless($hasSubscription)
+                        <div class="sub-gate" id="annivSubGate" style="border:1px solid var(--border); border-radius:14px; padding:1.2rem; margin:1.2rem 0; background:var(--surface2);">
+                            <p style="margin:0 0 0.6rem; font-weight:600;">A subscription is needed to generate the link.</p>
+                            <p style="margin:0; font-size:0.86rem; color:var(--text-muted);">
+                                Open <a href="{{ route('client.cards') }}">Main Dashboard</a> to request a plan. Your
+                                anniversary card is fully built and saved as a draft until then.
+                            </p>
+                        </div>
+                        @endunless
+
+                        <button class="generate-btn" id="annivQrGenerateBtn" type="button" onclick="annivGenerateQr()"
+                            @unless($hasSubscription) disabled @endunless>
+                            Generate Link &amp; QR
+                        </button>
+                        <p class="step5-error" id="annivQrError"
+                            style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.8rem;"></p>
+
+                        <div id="annivQrResult" style="display:none; margin-top:1.6rem;">
+                            <div class="url-box" style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+                                <code id="annivQrUrl" style="flex:1; min-width:220px; word-break:break-all; background:var(--surface2); padding:0.6rem 0.8rem; border-radius:8px; border:1px solid var(--border);"></code>
+                                <button type="button" class="btn-next" onclick="annivCopyQrUrl(this)">Copy Link</button>
+                            </div>
+                            <div style="margin-top:1.2rem; display:flex; gap:1.4rem; align-items:center; flex-wrap:wrap;">
+                                <img id="annivQrImg" alt="QR code" style="width:220px; height:220px; border:1px solid var(--border); border-radius:12px; background:#fff;">
+                                <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                                    <button type="button" class="btn-prev" onclick="annivDownloadQr('png')">Download PNG</button>
+                                    <button type="button" class="btn-prev" onclick="annivDownloadQr('svg')">Download SVG</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToAnnivStep(9)">← Back</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div><!-- /#anniversaryFlow -->
 
             <!-- ── STEP 1: Theme ── -->
             <div class="step-panel active" id="panel1">
@@ -4856,6 +6104,10 @@
                             @endforelse
                         </div>
 
+                        {{-- The picker is moved between the birthday and anniversary music
+                             steps by `openClipPicker`; this is where it starts and where the
+                             birthday step puts it back. --}}
+                        <div id="musicClipHome">
                         <div class="music-clip" id="musicClip" hidden>
                             <div class="music-clip-head">
                                 <div>
@@ -4893,6 +6145,7 @@
                                  while it fetches them. --}}
                             <audio id="musicClipAudio" preload="auto"></audio>
                         </div>
+                        </div>
 
                         <p class="field-hint" style="margin-top:1.2rem">Only songs uploaded and approved by Super Admin
                             are available here.</p>
@@ -4914,6 +6167,7 @@
             // are switched on, their previews appear here automatically.
             $qrPreviewsBySide = [];
             foreach (array_keys($qrThemeMeta) as $side) {
+            if ($side === 'anniversary') { continue; }
             $sideThemes = \App\Http\Controllers\Client\BirthdayCardController::qrThemes($side);
             if (\App\Http\Controllers\Client\BirthdayCardController::themeSideIsAvailable($sideThemes)) {
             $qrPreviewsBySide[$side] = \App\Http\Controllers\Client\BirthdayCardController::qrPreviews(
@@ -4926,7 +6180,7 @@
             $savedQrTheme = $card->qr_data['theme'] ?? null;
             $savedQrSvg = null;
             if ($savedQrTheme && $shareUrl) {
-            $savedSide = \App\Http\Controllers\Client\BirthdayCardController::qrThemes($card->theme ?? 'boy');
+            $savedSide = \App\Http\Controllers\Client\BirthdayCardController::qrThemesForCard($card);
             if (isset($savedSide[$savedQrTheme])) {
             $savedQrSvg = \App\Support\QrRenderer::svg($shareUrl, $savedSide[$savedQrTheme], 720);
             }
@@ -6764,12 +8018,19 @@
      * only arrives with the file's metadata — so the picker opens in a waiting
      * state and fills itself in once it lands.
      */
-    function openClipPicker(url) {
+    function openClipPicker(url, mountId) {
         const panel = document.getElementById('musicClip');
         const audio = document.getElementById('musicClipAudio');
         if (!panel || !audio) return;
 
         stopClipPreview();
+
+        // The picker is a single element with a single set of controls. Rather
+        // than a second copy for the anniversary step, it is moved to whichever
+        // step asked for it — only one of the two flows is ever on screen.
+        const mount = document.getElementById(mountId || 'musicClipHome');
+        if (mount && panel.parentElement !== mount) mount.appendChild(panel);
+
         panel.hidden = false;
         document.getElementById('musicClipPlayBtn').disabled = true;
         document.getElementById('musicClipState').textContent = 'Reading the song…';
@@ -7605,6 +8866,1054 @@
             'linear-gradient(135deg, #f76fa1, #ff9dcd)';
     }
 
+    // ── Occasion picker (a pre-step tab) ─────────────────────
+    // "birthday" leaves the boy/girl wizard exactly as it is; "anniversary"
+    // swaps in the anniversary theme picker. Neither touches the numbered
+    // step flow. The picker can be reopened any time from the sidebar.
+    const CARD_OCCASION_URL = @json(route('client.card.occasion'));
+    let cardOccasion = @json($cardOccasion ?? null);
+    let annivCategory = null;
+    let annivVariant = @json(($cardOccasion === 'anniversary') ? ($card->variant ?? null) : null);
+    let annivThumbsLoaded = false;
+
+    function goToOccasion() {
+        document.body.classList.add('show-occasion');
+        document.getElementById('navOccasion').classList.add('active');
+        document.querySelectorAll('.step-item.active').forEach(el => el.classList.remove('active'));
+        const pill = document.getElementById('progressText');
+        if (pill) pill.textContent = 'Choose Occasion';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function chooseOccasion(occ) {
+        cardOccasion = occ;
+
+        const body = new FormData();
+        body.append('occasion', occ);
+        fetch(CARD_OCCASION_URL, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+            body,
+        }).catch(() => { /* the choice still applies locally; a later save re-sends it */ });
+
+        document.getElementById('occChoiceBirthday').classList.toggle('selected', occ === 'birthday');
+        document.getElementById('occChoiceAnniversary').classList.toggle('selected', occ === 'anniversary');
+        document.getElementById('navOccasionSub').textContent = occ === 'anniversary' ? 'Anniversary' : 'Birthday';
+        document.getElementById('occasionNote').textContent =
+            'This card is set to ' + (occ === 'anniversary' ? 'Anniversary' : 'Birthday') +
+            '. Pick the other option here any time to switch.';
+
+        document.body.classList.remove('show-occasion');
+        document.getElementById('navOccasion').classList.remove('active');
+
+        if (occ === 'anniversary') {
+            document.body.classList.add('occasion-anniversary');
+            loadAnnivThumbs();
+            if (annivVariant) {
+                selectAnnivCategory(annivVariant === 2 || annivVariant === 4 ? 'red' : 'cream');
+                selectAnnivVariant(annivVariant);
+            }
+            goToAnnivStep(annivFurthest || 1);
+        } else {
+            document.body.classList.remove('occasion-anniversary');
+            goToStep(currentStep || 1);
+        }
+    }
+
+    // kept as an alias — the anniversary panel's "← Back" button calls this
+    function reopenOccasionGate() {
+        goToOccasion();
+    }
+
+    function loadAnnivThumbs() {
+        if (annivThumbsLoaded) return;
+        annivThumbsLoaded = true;
+        document.querySelectorAll('#anniversaryWizard .variant-thumb iframe').forEach(iframe => {
+            if (!iframe.src && iframe.dataset.src) {
+                iframe.addEventListener('load', () => iframe.classList.add('loaded'));
+                iframe.src = iframe.dataset.src;
+            }
+        });
+    }
+
+    function selectAnnivCategory(cat) {
+        annivCategory = cat;
+        document.getElementById('annivCatCream').classList.toggle('selected', cat === 'cream');
+        document.getElementById('annivCatRed').classList.toggle('selected', cat === 'red');
+        document.getElementById('annivCreamVariants').classList.toggle('visible', cat === 'cream');
+        document.getElementById('annivRedVariants').classList.toggle('visible', cat === 'red');
+        document.getElementById('annivError').style.display = 'none';
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    function selectAnnivVariant(n) {
+        annivVariant = n;
+        document.querySelectorAll('#anniversaryWizard .variant-choice')
+            .forEach(el => el.classList.remove('selected'));
+        document.getElementById('annivVariant' + n).classList.add('selected');
+        document.getElementById('annivError').style.display = 'none';
+    }
+
+    // ── Anniversary wizard (Theme → Lock → Welcome → Gift Screen → Gift 1-3 → Ending) ──
+    const ANNIV_STEPS = 10;
+    const ANNIV_THEME_URL = @json(route('client.card.anniversary.theme'));
+    const ANNIV_LOCK_URL = @json(route('client.card.anniversary.lock'));
+    const ANNIV_WELCOME_URL = @json(route('client.card.anniversary.welcome'));
+    const ANNIV_GIFTSCREEN_URL = @json(route('client.card.anniversary.gift-screen'));
+    const ANNIV_GIFT1_URL = @json(route('client.card.anniversary.gift1'));
+    const ANNIV_GIFT2_URL = @json(route('client.card.anniversary.gift2'));
+    const ANNIV_GIFT3_URL = @json(route('client.card.anniversary.gift3'));
+    const ANNIV_ENDING_URL = @json(route('client.card.anniversary.ending'));
+    const ANNIV_P1 = '/anniversary/page/1/';
+    const ANNIV_P2 = '/anniversary/page/2/';
+    const ANNIV_P3 = '/anniversary/page/3/';
+    const ANNIV_P4 = '/anniversary/page/4/';
+    const ANNIV_MONTHS = ['January','February','March','April','May','June','July',
+        'August','September','October','November','December'];
+    const ANNIV_THEME_LABELS = { 1: 'Taupe & Charcoal', 2: 'Maroon & Gold', 3: 'Ivory & Peach Gold', 4: 'Bright Red & White' };
+    const ANNIV_WELCOME_DEFAULT = {
+        heading: 'Happy Anniversary, My Love',
+        message: "Every year with you still feels like the first day.\nHere's to us, always.",
+    };
+    const ANNIV_GIFT1_DATA = @json(($cardOccasion === 'anniversary') ? ($card->gift1_data ?? null) : null);
+    const ANNIV_GIFT2_DATA = @json(($cardOccasion === 'anniversary') ? ($card->gift2_data ?? null) : null);
+    const ANNIV_GIFT3_DATA = @json(($cardOccasion === 'anniversary') ? ($card->gift3_data ?? null) : null);
+    const ANNIV_ENDING_DATA = @json(($cardOccasion === 'anniversary') ? ($card->ending_data ?? null) : null);
+
+    let annivStep = 1;
+    let annivFurthest = @json(($cardOccasion === 'anniversary') ? min(10, max(1, (int) $card->current_step)) : 1);
+    let annivLockPhotoFile = null;
+    let annivLockPhotoUrl = @json(($cardOccasion === 'anniversary' && $card->profile_image_path)
+        ? \Illuminate\Support\Facades\Storage::url($card->profile_image_path) : null);
+    let annivWelcomeDebounce = null;
+    let annivGiftScreenVariant = @json(($cardOccasion === 'anniversary')
+        ? ($card->gift_screen_variant ?? $card->variant ?? null) : null);
+    let annivGiftScreenLoaded = false;
+    let annivGift1Theme = ANNIV_GIFT1_DATA ? (ANNIV_GIFT1_DATA.theme || null) : null;
+    let annivGift1Files = [null, null, null];
+    // full URLs already computed in blade ($gift1PhotoUrls) and exposed as giftPhotoUrls.gift1
+    let annivGift1Urls = (cardOccasion === 'anniversary')
+        ? [giftPhotoUrls.gift1[0] || null, giftPhotoUrls.gift1[1] || null, giftPhotoUrls.gift1[2] || null]
+        : [null, null, null];
+    let annivGift1ThumbsLoaded = false;
+    let annivGift1Debounce = null;
+
+    // Gift 2 / 3 / Ending state
+    let annivGift2Theme = ANNIV_GIFT2_DATA ? (ANNIV_GIFT2_DATA.theme || null) : null;
+    let annivGift2Debounce = null, annivGift2ThumbsLoaded = false;
+    let annivGift2MemFiles = [null, null, null, null];
+    let annivGift3Theme = ANNIV_GIFT3_DATA ? (ANNIV_GIFT3_DATA.theme || null) : null;
+    let annivGift3Debounce = null, annivGift3ThumbsLoaded = false;
+    let annivGift3Files = [null, null, null];
+    let annivGift3Urls = (cardOccasion === 'anniversary')
+        ? [giftPhotoUrls.gift3[0] || null, giftPhotoUrls.gift3[1] || null, giftPhotoUrls.gift3[2] || null]
+        : [null, null, null];
+    let annivEndingTheme = ANNIV_ENDING_DATA ? (ANNIV_ENDING_DATA.theme || null) : null;
+    let annivEndingDebounce = null, annivEndingThumbsLoaded = false;
+
+    // the two designs / gift themes of the colour family picked at the Theme step
+    function annivFamilyVariants() {
+        return (annivVariant === 2 || annivVariant === 4) ? [2, 4] : [1, 3];
+    }
+
+    function goToAnnivStep(n) {
+        if (n < 1 || n > ANNIV_STEPS) return;
+        annivStep = n;
+        annivFurthest = Math.max(annivFurthest, n);
+
+        document.querySelectorAll('#anniversaryFlow .anniv-panel').forEach((p, i) => {
+            p.classList.toggle('active', i === n - 1);
+        });
+        document.querySelectorAll('.nav-anniv .anniv-nav-item').forEach((el, i) => {
+            el.classList.toggle('active', i === n - 1);
+            el.classList.toggle('done', i + 1 < annivFurthest && i + 1 !== n);
+        });
+
+        if (n === 2) updateAnnivLockPreview();
+        if (n === 3) { ensureAnnivWelcomeDefaults(); updateAnnivWelcomePreview(true); }
+        if (n === 4) loadAnnivGiftScreenThumbs();
+        if (n === 5) { loadAnnivGiftThemeThumbs(1); updateAnnivGift1Preview(true); }
+        if (n === 6) { annivBuildGift2(); annivPrefillNames(6); loadAnnivGiftThemeThumbs(2); annivGift2GoBeat(1); }
+        if (n === 7) { annivPrefillNames(7); loadAnnivGiftThemeThumbs(3); annivGift3GoBeat(1); }
+        if (n === 8) { annivPrefillNames(8); loadAnnivEndingThumbs(); updateAnnivEndingPreview(true); }
+        if (n === 9) annivSyncMusicStep();
+        if (n === 10) annivSyncQrStep();
+        requestAnimationFrame(scaleVariantThumbs);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // couple names + date + years carry across the gifts + ending so the client
+    // types them once; only fields the client hasn't filled are pre-populated.
+    function annivPrefillNames(step) {
+        const src = (ANNIV_GIFT1_DATA && (ANNIV_GIFT1_DATA.name_first || ANNIV_GIFT1_DATA.name_second))
+            ? ANNIV_GIFT1_DATA
+            : { name_first: document.getElementById('annivGift1NameFirst').value,
+                name_second: document.getElementById('annivGift1NameSecond').value,
+                cal_date: document.getElementById('annivGift1Date').value,
+                years: document.getElementById('annivGift1Years').value };
+        const map = {
+            6: ['annivGift2NameFirst', 'annivGift2NameSecond', null, null],
+            7: ['annivGift3NameFirst', 'annivGift3NameSecond', 'annivGift3Date', 'annivGift3Years'],
+            8: ['annivEndingNameFirst', 'annivEndingNameSecond', null, 'annivEndingYears'],
+        }[step];
+        if (!map) return;
+        const set = (id, val) => { const el = id && document.getElementById(id); if (el && !el.value && val) el.value = val; };
+        set(map[0], src.name_first);
+        set(map[1], src.name_second);
+        set(map[2], src.cal_date);
+        set(map[3], src.years);
+    }
+
+    function saveAnnivThemeAndContinue() {
+        if (!annivVariant) {
+            document.getElementById('annivError').style.color = '#dc2626';
+            document.getElementById('annivError').textContent = 'Please select a design to continue.';
+            document.getElementById('annivError').style.display = 'block';
+            return;
+        }
+        const btn = document.getElementById('annivContinueBtn');
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = 'Saving…';
+
+        const body = new FormData();
+        body.append('variant', annivVariant);
+        fetch(ANNIV_THEME_URL, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                body,
+            })
+            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+            .then(() => { goToAnnivStep(2); })
+            .catch(() => {
+                document.getElementById('annivError').style.color = '#dc2626';
+                document.getElementById('annivError').textContent = 'Could not save. Please try again.';
+                document.getElementById('annivError').style.display = 'block';
+            })
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    function onAnnivLockPinInput(el) {
+        const digits = el.value.replace(/[^0-9]/g, '').slice(0, 4);
+        el.value = digits.length > 2 ? digits.slice(0, 2) + '-' + digits.slice(2) : digits;
+    }
+
+    function annivPinValue() {
+        return document.getElementById('annivLockPin').value.replace(/[^0-9]/g, '');
+    }
+
+    function onAnnivLockPhotoSelected(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        annivLockPhotoFile = file;
+        if (annivLockPhotoUrl && annivLockPhotoUrl.startsWith('blob:')) URL.revokeObjectURL(annivLockPhotoUrl);
+        annivLockPhotoUrl = URL.createObjectURL(file);
+        const thumb = document.getElementById('annivLockPhotoThumb');
+        document.getElementById('annivLockPhotoImg').src = annivLockPhotoUrl;
+        thumb.style.display = 'block';
+        updateAnnivLockPreview();
+    }
+
+    function updateAnnivLockPreview() {
+        const frame = document.getElementById('annivLockPreview');
+        if (!frame || !annivVariant) return;
+        const base = ANNIV_P1 + annivVariant;
+        frame.src = annivLockPhotoUrl ? (base + '?photo=' + encodeURIComponent(annivLockPhotoUrl)) : base;
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    function saveAnnivLockAndContinue() {
+        const pin = annivPinValue();
+        const err = document.getElementById('annivLockError');
+        if (pin.length !== 4) {
+            err.textContent = 'Enter a 4-digit code.';
+            err.style.display = 'block';
+            return;
+        }
+        err.style.display = 'none';
+        const btn = document.getElementById('annivLockContinueBtn');
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = 'Saving…';
+
+        const body = new FormData();
+        body.append('lock_code', pin);
+        if (annivLockPhotoFile) body.append('photo', annivLockPhotoFile);
+
+        fetch(ANNIV_LOCK_URL, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                body,
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || 'Save failed');
+                if (data.profile_image_url) {
+                    if (annivLockPhotoUrl && annivLockPhotoUrl.startsWith('blob:')) URL.revokeObjectURL(annivLockPhotoUrl);
+                    annivLockPhotoUrl = data.profile_image_url;
+                    annivLockPhotoFile = null;
+                }
+                goToAnnivStep(3);
+            })
+            .catch(e => {
+                err.textContent = e.message || 'Could not save. Please try again.';
+                err.style.display = 'block';
+            })
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    function ensureAnnivWelcomeDefaults() {
+        const h = document.getElementById('annivWelcomeHeading');
+        const m = document.getElementById('annivWelcomeMessage');
+        if (!h.value) h.value = ANNIV_WELCOME_DEFAULT.heading;
+        if (!m.value) m.value = ANNIV_WELCOME_DEFAULT.message;
+    }
+
+    function updateAnnivWelcomePreview(immediate) {
+        const frame = document.getElementById('annivWelcomePreview');
+        if (!frame || !annivVariant) return;
+        clearTimeout(annivWelcomeDebounce);
+        const render = () => {
+            const params = new URLSearchParams({
+                heading: document.getElementById('annivWelcomeHeading').value,
+                message: document.getElementById('annivWelcomeMessage').value,
+            });
+            frame.src = ANNIV_P2 + annivVariant + '?' + params.toString();
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render();
+        else annivWelcomeDebounce = setTimeout(render, 250);
+    }
+
+    function saveAnnivWelcomeAndContinue() {
+        const btn = document.getElementById('annivWelcomeContinueBtn');
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = 'Saving…';
+
+        const body = new FormData();
+        body.append('heading', document.getElementById('annivWelcomeHeading').value);
+        body.append('message', document.getElementById('annivWelcomeMessage').value);
+
+        fetch(ANNIV_WELCOME_URL, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                body,
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || 'Save failed');
+                document.getElementById('annivWelcomeError').style.display = 'none';
+                goToAnnivStep(4);
+            })
+            .catch(e => {
+                const err = document.getElementById('annivWelcomeError');
+                err.style.color = '#dc2626';
+                err.textContent = e.message || 'Could not save. Please try again.';
+                err.style.display = 'block';
+            })
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ── Anniversary step 4 — gift-selection screen ──────────
+    function loadAnnivGiftScreenThumbs() {
+        const [va, vb] = annivFamilyVariants();
+        const family = (annivVariant === 2 || annivVariant === 4) ? 'Rose & Red' : 'White & Cream';
+        document.getElementById('annivGiftScreenHeading').textContent = 'Choose a ' + family + ' design';
+        const labels = { 1: 'Taupe & Charcoal', 2: 'Maroon & Gold', 3: 'Ivory & Peach Gold', 4: 'Bright Red & White' };
+        document.getElementById('annivGsLabelA').textContent = labels[va];
+        document.getElementById('annivGsLabelB').textContent = labels[vb];
+
+        if (!annivGiftScreenVariant || (annivGiftScreenVariant !== va && annivGiftScreenVariant !== vb)) {
+            annivGiftScreenVariant = annivVariant || va;
+        }
+        document.getElementById('annivGsChoiceA').classList.toggle('selected', annivGiftScreenVariant === va);
+        document.getElementById('annivGsChoiceB').classList.toggle('selected', annivGiftScreenVariant === vb);
+
+        if (!annivGiftScreenLoaded) {
+            annivGiftScreenLoaded = true;
+            const fa = document.getElementById('annivGsFrameA');
+            const fb = document.getElementById('annivGsFrameB');
+            fa.addEventListener('load', () => fa.classList.add('loaded'), { once: true });
+            fb.addEventListener('load', () => fb.classList.add('loaded'), { once: true });
+            fa.src = ANNIV_P3 + va;
+            fb.src = ANNIV_P3 + vb;
+        }
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    function selectAnnivGiftScreen(which) {
+        const [va, vb] = annivFamilyVariants();
+        annivGiftScreenVariant = which === 'A' ? va : vb;
+        document.getElementById('annivGsChoiceA').classList.toggle('selected', which === 'A');
+        document.getElementById('annivGsChoiceB').classList.toggle('selected', which === 'B');
+        document.getElementById('annivGiftScreenError').style.display = 'none';
+    }
+
+    function saveAnnivGiftScreenAndContinue() {
+        if (!annivGiftScreenVariant) {
+            document.getElementById('annivGiftScreenError').style.display = 'block';
+            return;
+        }
+        const btn = document.getElementById('annivGiftScreenContinueBtn');
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = 'Saving…';
+        const body = new FormData();
+        body.append('gift_screen_variant', annivGiftScreenVariant);
+        fetch(ANNIV_GIFTSCREEN_URL, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                body,
+            })
+            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+            .then(() => { goToAnnivStep(5); })
+            .catch(() => {
+                const err = document.getElementById('annivGiftScreenError');
+                err.textContent = 'Could not save. Please try again.';
+                err.style.display = 'block';
+            })
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ── Anniversary gifts 1-3 — shared theme picker (2 of the 4, per family) ──
+    function annivGiftBaseUrl(giftNum, themePage) {
+        const v = annivGiftScreenVariant || annivVariant || 1;
+        return ANNIV_P3 + v + '/gift/' + giftNum + '/' + themePage;
+    }
+
+    const annivGiftTheme = {
+        get 1() { return annivGift1Theme; }, set 1(v) { annivGift1Theme = v; },
+        get 2() { return annivGift2Theme; }, set 2(v) { annivGift2Theme = v; },
+        get 3() { return annivGift3Theme; }, set 3(v) { annivGift3Theme = v; },
+    };
+    const annivGiftThumbsLoaded = { 1: false, 2: false, 3: false };
+
+    function loadAnnivGiftThemeThumbs(giftNum) {
+        const [pa, pb] = annivFamilyVariants();
+        document.getElementById('annivGift' + giftNum + 'LabelA').textContent = ANNIV_THEME_LABELS[pa];
+        document.getElementById('annivGift' + giftNum + 'LabelB').textContent = ANNIV_THEME_LABELS[pb];
+        const family = (annivVariant === 2 || annivVariant === 4) ? 'Rose & Red' : 'White & Cream';
+        document.getElementById('annivGift' + giftNum + 'ThemeHeading').textContent = 'Choose a ' + family + ' theme';
+
+        // if no theme yet, default to the first family theme
+        if (!annivGiftTheme[giftNum]) annivGiftTheme[giftNum] = pa;
+        document.getElementById('annivGift' + giftNum + 'ChoiceA').classList.toggle('selected', annivGiftTheme[giftNum] === pa);
+        document.getElementById('annivGift' + giftNum + 'ChoiceB').classList.toggle('selected', annivGiftTheme[giftNum] === pb);
+
+        if (!annivGiftThumbsLoaded[giftNum]) {
+            annivGiftThumbsLoaded[giftNum] = true;
+            const fa = document.getElementById('annivGift' + giftNum + 'FrameA');
+            const fb = document.getElementById('annivGift' + giftNum + 'FrameB');
+            fa.addEventListener('load', () => fa.classList.add('loaded'), { once: true });
+            fb.addEventListener('load', () => fb.classList.add('loaded'), { once: true });
+            fa.src = annivGiftBaseUrl(giftNum, pa);
+            fb.src = annivGiftBaseUrl(giftNum, pb);
+        }
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    function selectAnnivGiftTheme(giftNum, which) {
+        const [pa, pb] = annivFamilyVariants();
+        annivGiftTheme[giftNum] = which === 'A' ? pa : pb;
+        document.getElementById('annivGift' + giftNum + 'ChoiceA').classList.toggle('selected', which === 'A');
+        document.getElementById('annivGift' + giftNum + 'ChoiceB').classList.toggle('selected', which === 'B');
+        document.getElementById('annivGift' + giftNum + 'Error').style.display = 'none';
+        if (giftNum === 1) updateAnnivGift1Preview(true);
+        else if (giftNum === 2) updateAnnivGift2Preview(true);
+        else updateAnnivGift3Preview(true);
+    }
+
+    function annivDateParams(params, dateVal) {
+        if (!dateVal) return;
+        const dt = new Date(dateVal + 'T00:00:00');
+        if (isNaN(dt)) return;
+        params.set('cal_month', ANNIV_MONTHS[dt.getMonth()]);
+        params.set('cal_day', String(dt.getDate()));
+    }
+
+    function annivSaveDone(errId, msg, stepDone) {
+        annivFurthest = Math.max(annivFurthest, stepDone + 1);
+        const err = document.getElementById(errId);
+        err.style.color = 'var(--text-muted)';
+        err.textContent = msg;
+        err.style.display = 'block';
+        document.querySelectorAll('.nav-anniv .anniv-nav-item').forEach((el, i) => {
+            if (i + 1 <= stepDone) el.classList.add('done');
+        });
+    }
+    function annivSaveErr(errId, e) {
+        const err = document.getElementById(errId);
+        err.style.color = '#dc2626';
+        err.textContent = (e && e.message) || 'Could not save. Please try again.';
+        err.style.display = 'block';
+    }
+
+    // ── Gift 1 (Keepsake) ──────────────────────────────────
+    function onAnnivGift1Photo(i, input) {
+        const file = input.files[0];
+        if (!file) return;
+        annivGift1Files[i] = file;
+        const url = URL.createObjectURL(file);
+        annivGift1Urls[i] = url;
+        document.getElementById('annivGift1PhotoPreview' + i).src = url;
+        document.getElementById('annivGift1Slot' + i).classList.add('filled');
+        updateAnnivGift1Preview();
+    }
+
+    function updateAnnivGift1Preview(immediate) {
+        const frame = document.getElementById('annivGift1Preview');
+        if (!frame || !annivGift1Theme) return;
+        clearTimeout(annivGift1Debounce);
+        const render = () => {
+            const p = new URLSearchParams();
+            annivGift1Urls.forEach((u, i) => { if (u) p.set('photo' + (i + 1), u); });
+            const nf = document.getElementById('annivGift1NameFirst').value;
+            const ns = document.getElementById('annivGift1NameSecond').value;
+            if (nf) p.set('name_first', nf);
+            if (ns) p.set('name_second', ns);
+            annivDateParams(p, document.getElementById('annivGift1Date').value);
+            const y = document.getElementById('annivGift1Years').value; if (y) p.set('years', y);
+            const m = document.getElementById('annivGift1Message').value; if (m) p.set('message', m);
+            const s = document.getElementById('annivGift1Signed').value; if (s) p.set('signed', s);
+            frame.src = annivGiftBaseUrl(1, annivGift1Theme) + (p.toString() ? '?' + p.toString() : '');
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render(); else annivGift1Debounce = setTimeout(render, 260);
+    }
+
+    // shared mandatory-field guard: shows the message on `errId`, returns false to block
+    function annivRequire(cond, errId, msg) {
+        const err = document.getElementById(errId);
+        if (cond) { err.style.display = 'none'; return true; }
+        err.style.color = '#dc2626';
+        err.textContent = msg;
+        err.style.display = 'block';
+        return false;
+    }
+
+    function saveAnnivGift1AndContinue() {
+        if (!annivRequire(annivGift1Theme, 'annivGift1Error', 'Please choose a theme.')) return;
+        if (!annivRequire(annivGift1Urls.every(Boolean), 'annivGift1Error', 'Please add all 3 photos before continuing.')) return;
+        const btn = document.getElementById('annivGift1ContinueBtn');
+        btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Saving…';
+        const body = new FormData();
+        body.append('theme', annivGift1Theme);
+        annivGift1Files.forEach((f, i) => { if (f) body.append('photos[' + i + ']', f); });
+        body.append('name_first', document.getElementById('annivGift1NameFirst').value);
+        body.append('name_second', document.getElementById('annivGift1NameSecond').value);
+        body.append('cal_date', document.getElementById('annivGift1Date').value);
+        body.append('years', document.getElementById('annivGift1Years').value);
+        body.append('message', document.getElementById('annivGift1Message').value);
+        body.append('signed', document.getElementById('annivGift1Signed').value);
+        fetch(ANNIV_GIFT1_URL, { method: 'POST', headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' }, body })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || 'Save failed');
+                (data.photo_urls || []).forEach((u, i) => { if (u) annivGift1Urls[i] = u; });
+                annivGift1Files = [null, null, null];
+                document.getElementById('annivGift1Error').style.display = 'none';
+                goToAnnivStep(6);
+            })
+            .catch(e => annivSaveErr('annivGift1Error', e))
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ══ Gift 2 (Scratch to Reveal) — walked one memory card at a time ══
+    // 6 beats: 1 theme+names · 2-5 the four memory cards · 6 the closing letter.
+    // The preview auto-opens to the card being edited (?preview_card=N) — the
+    // client never has to scratch or press Next inside the card.
+    const ANNIV_G2_BEATS = 6;
+    const ANNIV_G2_TITLES = ['Theme & names', 'Memory card 1', 'Memory card 2',
+        'Memory card 3', 'Memory card 4', 'The closing letter'];
+    const ANNIV_G2_MEM_DEFAULTS = [
+        { date: 'August 2019', title: 'The first hello', text: 'A crowded room, and somehow only one conversation that mattered.' },
+        { date: 'December 2019', title: 'The first trip', text: 'We got lost twice and did not mind once.' },
+        { date: 'June 2021', title: 'Our first home', text: 'Two boxes, one lamp, and a floor picnic that lasted till morning.' },
+        { date: 'September 2022', title: 'The proposal', text: 'You said the speech was too long. You still said yes.' },
+    ];
+    let annivG2Beat = 1;
+    let annivG2Built = false;
+    let annivGift2MemPreviewUrls = [null, null, null, null];
+
+    function annivBuildGift2() {
+        if (annivG2Built) return;
+        annivG2Built = true;
+        const saved = (ANNIV_GIFT2_DATA && ANNIV_GIFT2_DATA.memories && ANNIV_GIFT2_DATA.memories.length)
+            ? ANNIV_GIFT2_DATA.memories : ANNIV_G2_MEM_DEFAULTS;
+        for (let i = 0; i < 4; i++) {
+            const m = saved[i] || {};
+            const d = document.getElementById('annivG2Date' + i);
+            if (d && !d.value) d.value = m.date || '';
+            const t = document.getElementById('annivG2Title' + i);
+            if (t && !t.value) t.value = m.title || '';
+            const x = document.getElementById('annivG2Text' + i);
+            if (x && !x.value) x.value = m.text || '';
+            if (m.photo) {
+                annivGift2MemPreviewUrls[i] = m.photo;
+                document.getElementById('annivG2PhotoPreview' + i).src = m.photo;
+                document.getElementById('annivG2Slot' + i).classList.add('filled');
+            }
+        }
+        if (ANNIV_GIFT2_DATA) {
+            const g = ANNIV_GIFT2_DATA;
+            const mm = document.getElementById('annivGift2Message');
+            const ss = document.getElementById('annivGift2Signed');
+            if (g.message && !mm.value) mm.value = g.message;
+            if (g.signed && !ss.value) ss.value = g.signed;
+        }
+        wireCharCounters(document.getElementById('annivPanelGift2'));
+    }
+
+    function annivGift2GoBeat(n) {
+        n = Math.max(1, Math.min(ANNIV_G2_BEATS, n));
+        // gate: theme is required before leaving beat 1
+        if (annivG2Beat === 1 && n > 1 && !annivRequire(annivGift2Theme, 'annivGift2Error', 'Please choose a theme.')) return;
+        annivG2Beat = n;
+        for (let b = 1; b <= ANNIV_G2_BEATS; b++) {
+            document.getElementById('annivG2Beat' + b).classList.toggle('active', b === n);
+        }
+        document.querySelectorAll('#annivGift2Dots span').forEach((dot, i) => {
+            dot.classList.toggle('active', i === n - 1);
+            dot.classList.toggle('done', i < n - 1);
+        });
+        document.getElementById('annivGift2BeatTitle').textContent = ANNIV_G2_TITLES[n - 1];
+        document.getElementById('annivGift2PrevBeat').style.visibility = n === 1 ? 'hidden' : 'visible';
+        document.getElementById('annivGift2NextBeat').style.display = n === ANNIV_G2_BEATS ? 'none' : '';
+        document.getElementById('annivGift2ContinueBtn').style.display = n === ANNIV_G2_BEATS ? '' : 'none';
+        document.getElementById('annivGift2Error').style.display = 'none';
+        updateAnnivGift2Preview(true);
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+    function annivGift2Beat(dir) { annivGift2GoBeat(annivG2Beat + dir); }
+
+    function onAnnivGift2MemPhoto(i, input) {
+        const file = input.files[0];
+        if (!file) return;
+        annivGift2MemFiles[i] = file;
+        const url = URL.createObjectURL(file);
+        annivGift2MemPreviewUrls[i] = url;
+        document.getElementById('annivG2PhotoPreview' + i).src = url;
+        document.getElementById('annivG2Slot' + i).classList.add('filled');
+        updateAnnivGift2Preview();
+    }
+
+    function annivGift2MemoriesJson() {
+        const out = [];
+        for (let i = 0; i < 4; i++) {
+            const t = document.getElementById('annivG2Title' + i);
+            if (!t) break;
+            const title = t.value, text = document.getElementById('annivG2Text' + i).value;
+            if (!title && !text && !annivGift2MemPreviewUrls[i]) continue;
+            out.push({
+                date: document.getElementById('annivG2Date' + i).value,
+                title, text,
+                photo: annivGift2MemPreviewUrls[i] || null,
+            });
+        }
+        return out;
+    }
+
+    function updateAnnivGift2Preview(immediate) {
+        const frame = document.getElementById('annivGift2Preview');
+        if (!frame || !annivGift2Theme) return;
+        clearTimeout(annivGift2Debounce);
+        const render = () => {
+            const p = new URLSearchParams();
+            const nf = document.getElementById('annivGift2NameFirst').value;
+            const ns = document.getElementById('annivGift2NameSecond').value;
+            if (nf) p.set('name_first', nf);
+            if (ns) p.set('name_second', ns);
+            const m = document.getElementById('annivGift2Message').value; if (m) p.set('message', m);
+            const s = document.getElementById('annivGift2Signed').value; if (s) p.set('signed', s);
+            const mem = annivGift2MemoriesJson();
+            if (mem.length) p.set('memories', JSON.stringify(mem));
+            // beats 2-5 open straight to that card; beat 6 opens the final card
+            const card = (annivG2Beat >= 2 && annivG2Beat <= 5) ? (annivG2Beat - 1)
+                : (annivG2Beat === 6 ? (mem.length + 1) : 1);
+            p.set('preview_card', String(card));
+            frame.src = annivGiftBaseUrl(2, annivGift2Theme) + '?' + p.toString();
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render(); else annivGift2Debounce = setTimeout(render, 300);
+    }
+
+    function saveAnnivGift2AndContinue() {
+        if (!annivRequire(annivGift2Theme, 'annivGift2Error', 'Please choose a theme.')) return;
+        const btn = document.getElementById('annivGift2ContinueBtn');
+        btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Saving…';
+        const body = new FormData();
+        body.append('theme', annivGift2Theme);
+        body.append('name_first', document.getElementById('annivGift2NameFirst').value);
+        body.append('name_second', document.getElementById('annivGift2NameSecond').value);
+        body.append('message', document.getElementById('annivGift2Message').value);
+        body.append('signed', document.getElementById('annivGift2Signed').value);
+        for (let i = 0; i < 4; i++) {
+            if (!document.getElementById('annivG2Title' + i)) break;
+            body.append('memories[' + i + '][date]', document.getElementById('annivG2Date' + i).value);
+            body.append('memories[' + i + '][title]', document.getElementById('annivG2Title' + i).value);
+            body.append('memories[' + i + '][text]', document.getElementById('annivG2Text' + i).value);
+            if (annivGift2MemFiles[i]) body.append('photos[' + i + ']', annivGift2MemFiles[i]);
+        }
+        fetch(ANNIV_GIFT2_URL, { method: 'POST', headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' }, body })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || 'Save failed');
+                (data.photo_urls || []).forEach((u, i) => { if (u) annivGift2MemPreviewUrls[i] = u; });
+                annivGift2MemFiles = [null, null, null, null];
+                document.getElementById('annivGift2Error').style.display = 'none';
+                goToAnnivStep(7);
+            })
+            .catch(e => annivSaveErr('annivGift2Error', e))
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ══ Gift 3 (Pop-up Book) — walked one spread at a time ══
+    // 5 beats: 1 theme+couple · 2-4 the three spreads · 5 "The End".
+    // The book preview auto-opens to the spread being edited (open=sN).
+    const ANNIV_G3_BEATS = 5;
+    const ANNIV_G3_TITLES = ['The cover — theme & names', 'Chapter one — How it began',
+        'Chapter two — The years between', 'Chapter three — Still us', 'The End'];
+    const ANNIV_G3_OPEN = ['', 's1', 's2', 's3', 'end'];
+    let annivG3Beat = 1;
+
+    function annivGift3GoBeat(n) {
+        n = Math.max(1, Math.min(ANNIV_G3_BEATS, n));
+        if (annivG3Beat === 1 && n > 1 && !annivRequire(annivGift3Theme, 'annivGift3Error', 'Please choose a theme.')) return;
+        // each spread beat needs its photo before moving on
+        if (n > annivG3Beat && annivG3Beat >= 2 && annivG3Beat <= 4) {
+            const idx = annivG3Beat - 2;
+            if (!annivRequire(annivGift3Urls[idx], 'annivGift3Error', 'Please add this spread’s photo before continuing.')) return;
+        }
+        annivG3Beat = n;
+        for (let b = 1; b <= ANNIV_G3_BEATS; b++) {
+            document.getElementById('annivG3Beat' + b).classList.toggle('active', b === n);
+        }
+        document.querySelectorAll('#annivGift3Dots span').forEach((dot, i) => {
+            dot.classList.toggle('active', i === n - 1);
+            dot.classList.toggle('done', i < n - 1);
+        });
+        document.getElementById('annivGift3BeatTitle').textContent = ANNIV_G3_TITLES[n - 1];
+        document.getElementById('annivGift3PrevBeat').style.visibility = n === 1 ? 'hidden' : 'visible';
+        document.getElementById('annivGift3NextBeat').style.display = n === ANNIV_G3_BEATS ? 'none' : '';
+        document.getElementById('annivGift3ContinueBtn').style.display = n === ANNIV_G3_BEATS ? '' : 'none';
+        document.getElementById('annivGift3Error').style.display = 'none';
+        updateAnnivGift3Preview(true);
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+    function annivGift3Beat(dir) { annivGift3GoBeat(annivG3Beat + dir); }
+
+    function onAnnivGift3Photo(i, input) {
+        const file = input.files[0];
+        if (!file) return;
+        annivGift3Files[i] = file;
+        const url = URL.createObjectURL(file);
+        annivGift3Urls[i] = url;
+        document.getElementById('annivGift3PhotoPreview' + i).src = url;
+        document.getElementById('annivGift3Slot' + i).classList.add('filled');
+        updateAnnivGift3Preview();
+    }
+
+    function updateAnnivGift3Preview(immediate) {
+        const frame = document.getElementById('annivGift3Preview');
+        if (!frame || !annivGift3Theme) return;
+        clearTimeout(annivGift3Debounce);
+        const render = () => {
+            const p = new URLSearchParams();
+            annivGift3Urls.forEach((u, i) => { if (u) p.set('photo' + (i + 1), u); });
+            const nf = document.getElementById('annivGift3NameFirst').value;
+            const ns = document.getElementById('annivGift3NameSecond').value;
+            if (nf) p.set('name_first', nf);
+            if (ns) p.set('name_second', ns);
+            annivDateParams(p, document.getElementById('annivGift3Date').value);
+            const y = document.getElementById('annivGift3Years').value; if (y) p.set('years', y);
+            const l1 = document.getElementById('annivGift3Line1').value; if (l1) p.set('line1', l1);
+            const l2 = document.getElementById('annivGift3Line2').value; if (l2) p.set('line2', l2);
+            const m = document.getElementById('annivGift3Message').value; if (m) p.set('message', m);
+            const s = document.getElementById('annivGift3Signed').value; if (s) p.set('signed', s);
+            const open = ANNIV_G3_OPEN[annivG3Beat - 1];
+            if (open) p.set('open', open);
+            frame.src = annivGiftBaseUrl(3, annivGift3Theme) + '?' + p.toString();
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render(); else annivGift3Debounce = setTimeout(render, 260);
+    }
+
+    function saveAnnivGift3AndContinue() {
+        if (!annivRequire(annivGift3Theme, 'annivGift3Error', 'Please choose a theme.')) return;
+        if (!annivRequire(annivGift3Urls.every(Boolean), 'annivGift3Error', 'Please add all 3 photos before continuing.')) return;
+        const btn = document.getElementById('annivGift3ContinueBtn');
+        btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Saving…';
+        const body = new FormData();
+        body.append('theme', annivGift3Theme);
+        annivGift3Files.forEach((f, i) => { if (f) body.append('photos[' + i + ']', f); });
+        body.append('name_first', document.getElementById('annivGift3NameFirst').value);
+        body.append('name_second', document.getElementById('annivGift3NameSecond').value);
+        body.append('cal_date', document.getElementById('annivGift3Date').value);
+        body.append('years', document.getElementById('annivGift3Years').value);
+        body.append('line1', document.getElementById('annivGift3Line1').value);
+        body.append('line2', document.getElementById('annivGift3Line2').value);
+        body.append('message', document.getElementById('annivGift3Message').value);
+        body.append('signed', document.getElementById('annivGift3Signed').value);
+        fetch(ANNIV_GIFT3_URL, { method: 'POST', headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' }, body })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || 'Save failed');
+                (data.photo_urls || []).forEach((u, i) => { if (u) annivGift3Urls[i] = u; });
+                annivGift3Files = [null, null, null];
+                document.getElementById('annivGift3Error').style.display = 'none';
+                goToAnnivStep(8);
+            })
+            .catch(e => annivSaveErr('annivGift3Error', e))
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ── Ending page ("Blow out the candles") ───────────────
+    function loadAnnivEndingThumbs() {
+        const [pa, pb] = annivFamilyVariants();
+        document.getElementById('annivEndingLabelA').textContent = ANNIV_THEME_LABELS[pa];
+        document.getElementById('annivEndingLabelB').textContent = ANNIV_THEME_LABELS[pb];
+        const family = (annivVariant === 2 || annivVariant === 4) ? 'Rose & Red' : 'White & Cream';
+        document.getElementById('annivEndingThemeHeading').textContent = 'Choose a ' + family + ' theme';
+        if (!annivEndingTheme) annivEndingTheme = pa;
+        document.getElementById('annivEndingChoiceA').classList.toggle('selected', annivEndingTheme === pa);
+        document.getElementById('annivEndingChoiceB').classList.toggle('selected', annivEndingTheme === pb);
+        if (!annivEndingThumbsLoaded) {
+            annivEndingThumbsLoaded = true;
+            const fa = document.getElementById('annivEndingFrameA');
+            const fb = document.getElementById('annivEndingFrameB');
+            fa.addEventListener('load', () => fa.classList.add('loaded'), { once: true });
+            fb.addEventListener('load', () => fb.classList.add('loaded'), { once: true });
+            fa.src = ANNIV_P4 + pa + '?preview_stage=out';
+            fb.src = ANNIV_P4 + pb + '?preview_stage=out';
+        }
+        requestAnimationFrame(scaleVariantThumbs);
+    }
+
+    function selectAnnivEndingTheme(which) {
+        const [pa, pb] = annivFamilyVariants();
+        annivEndingTheme = which === 'A' ? pa : pb;
+        document.getElementById('annivEndingChoiceA').classList.toggle('selected', which === 'A');
+        document.getElementById('annivEndingChoiceB').classList.toggle('selected', which === 'B');
+        document.getElementById('annivEndingError').style.display = 'none';
+        updateAnnivEndingPreview(true);
+    }
+
+    function updateAnnivEndingPreview(immediate) {
+        const frame = document.getElementById('annivEndingPreview');
+        if (!frame || !annivEndingTheme) return;
+        clearTimeout(annivEndingDebounce);
+        const render = () => {
+            const p = new URLSearchParams();
+            const nf = document.getElementById('annivEndingNameFirst').value;
+            const ns = document.getElementById('annivEndingNameSecond').value;
+            if (nf) p.set('name_first', nf);
+            if (ns) p.set('name_second', ns);
+            const y = document.getElementById('annivEndingYears').value; if (y) p.set('years', y);
+            const m = document.getElementById('annivEndingMessage').value; if (m) p.set('message', m);
+            const s = document.getElementById('annivEndingSigned').value; if (s) p.set('signed', s);
+            p.set('preview_stage', 'out');
+            frame.src = ANNIV_P4 + annivEndingTheme + '?' + p.toString();
+            requestAnimationFrame(scaleVariantThumbs);
+        };
+        if (immediate) render(); else annivEndingDebounce = setTimeout(render, 260);
+    }
+
+    function saveAnnivEndingAndContinue() {
+        if (!annivEndingTheme) { document.getElementById('annivEndingError').style.display = 'block'; return; }
+        const btn = document.getElementById('annivEndingContinueBtn');
+        btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Saving…';
+        const body = new FormData();
+        body.append('theme', annivEndingTheme);
+        body.append('name_first', document.getElementById('annivEndingNameFirst').value);
+        body.append('name_second', document.getElementById('annivEndingNameSecond').value);
+        body.append('years', document.getElementById('annivEndingYears').value);
+        body.append('message', document.getElementById('annivEndingMessage').value);
+        body.append('signed', document.getElementById('annivEndingSigned').value);
+        fetch(ANNIV_ENDING_URL, { method: 'POST', headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' }, body })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || 'Save failed');
+                document.getElementById('annivEndingError').style.display = 'none';
+                goToAnnivStep(9);
+            })
+            .catch(e => annivSaveErr('annivEndingError', e))
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ── Anniversary step 9 — Music ─────────────────────────
+    // The song, the clip window and the save endpoint are all the birthday
+    // step's: one card has one `music_data`, so the anniversary step reuses
+    // that state and `saveStep9` rather than keeping a parallel copy of it.
+    function selectAnnivMusic(trackId, element) {
+        const isNewTrack = selectedMusicTrackId !== trackId;
+
+        selectedMusicSource = 'library';
+        selectedMusicTrackId = trackId;
+        selectedMusicPath = null;
+        selectedMusicUrl = element.dataset.trackUrl;
+
+        document.querySelectorAll('#annivMusicGrid .music-choice')
+            .forEach(choice => choice.classList.remove('selected'));
+        element.classList.add('selected');
+        document.getElementById('annivMusicError').style.display = 'none';
+
+        // A different song opens on its own opening stretch; re-picking the one
+        // already chosen keeps the window the client settled on.
+        if (isNewTrack) {
+            musicClipStart = null;
+            musicClipEnd = null;
+        }
+        openClipPicker(element.dataset.trackUrl, 'annivMusicClipMount');
+    }
+
+    /** Re-select the saved song when the step is opened or resumed. */
+    function annivSyncMusicStep() {
+        if (selectedMusicSource !== 'library' || !selectedMusicTrackId) return;
+        const choice = document.querySelector('#annivMusicGrid [data-track-id="' + selectedMusicTrackId + '"]');
+        if (!choice) return;
+        choice.classList.add('selected');
+        openClipPicker(choice.dataset.trackUrl, 'annivMusicClipMount');
+    }
+
+    /**
+     * Save the chosen song and move on. Skipping leaves `music_data` alone and
+     * simply advances — a silent story is a valid one, and the endpoint has no
+     * "no song" to send.
+     */
+    function saveAnnivMusicAndContinue(skip) {
+        const err = document.getElementById('annivMusicError');
+        err.style.display = 'none';
+        stopClipPreview();
+
+        if (skip) { goToAnnivStep(10); return; }
+
+        if (selectedMusicSource !== 'library' || !selectedMusicTrackId) {
+            err.textContent = 'Please choose a song, or use Skip to leave the story silent.';
+            err.style.display = 'block';
+            return;
+        }
+
+        const btn = document.getElementById('annivMusicContinueBtn');
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = 'Saving…';
+
+        const body = new FormData();
+        body.append('source', selectedMusicSource);
+        body.append('track_id', selectedMusicTrackId);
+        if (musicClipEnd !== null) {
+            body.append('trim_start', musicClipStart || 0);
+            body.append('trim_end', musicClipEnd);
+        }
+
+        fetch(CARD_STEP9_URL, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                body,
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || data.message || 'Could not save music.');
+                goToAnnivStep(10);
+            })
+            .catch(e => annivSaveErr('annivMusicError', e))
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ── Anniversary step 10 — QR / share link ──────────────
+    let annivQrSvg = null;
+    let selectedAnnivQrTheme = @json($savedAnnivQrTheme);
+    const ANNIV_QR_DONE = @json(($cardOccasion === 'anniversary' && $card->qr_data) ? true : false);
+    const ANNIV_QR_SHARE = @json(($cardOccasion === 'anniversary' && $card->slug)
+        ? \App\Http\Controllers\Client\BirthdayCardController::shareUrl($card->slug) : null);
+
+    /** Highlight one of the six anniversary QR designs. */
+    function selectAnnivQrTheme(n) {
+        selectedAnnivQrTheme = n;
+        document.querySelectorAll('#annivQrThemeGrid .variant-choice')
+            .forEach(el => el.classList.remove('selected'));
+        const chosen = document.getElementById('annivQrTheme' + n);
+        if (chosen) chosen.classList.add('selected');
+        document.getElementById('annivQrError').style.display = 'none';
+    }
+
+    function annivSyncQrStep() {
+        if (selectedAnnivQrTheme) selectAnnivQrTheme(selectedAnnivQrTheme);
+
+        if (ANNIV_QR_DONE && ANNIV_QR_SHARE && !annivQrSvg) {
+            document.getElementById('annivQrUrl').textContent = ANNIV_QR_SHARE;
+            document.getElementById('annivQrResult').style.display = 'block';
+            // regenerate the code image against the already-fixed link, in the
+            // design the card was generated with
+            fetch(CARD_STEP10_URL, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    body: (() => { const f = new FormData(); f.append('theme', selectedAnnivQrTheme || 1); return f; })(),
+                })
+                .then(r => r.ok ? r.json() : null)
+                .then(d => { if (d && d.qr_svg) { annivQrSvg = d.qr_svg; document.getElementById('annivQrImg').src = svgDataUri(d.qr_svg); } })
+                .catch(() => {});
+        }
+    }
+
+    function annivGenerateQr() {
+        const err = document.getElementById('annivQrError');
+        err.style.display = 'none';
+        if (!HAS_SUBSCRIPTION) {
+            err.textContent = 'An active subscription is required to generate the link.';
+            err.style.display = 'block';
+            return;
+        }
+        if (!selectedAnnivQrTheme) {
+            err.textContent = 'Please choose a QR design first.';
+            err.style.display = 'block';
+            document.getElementById('annivQrThemeGrid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        const btn = document.getElementById('annivQrGenerateBtn');
+        btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Generating…';
+        const f = new FormData();
+        f.append('theme', selectedAnnivQrTheme);
+        fetch(CARD_STEP10_URL, { method: 'POST', headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }, body: f })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(data.message || 'Could not generate the link.');
+                annivQrSvg = data.qr_svg;
+                document.getElementById('annivQrUrl').textContent = data.share_url;
+                document.getElementById('annivQrImg').src = svgDataUri(data.qr_svg);
+                document.getElementById('annivQrResult').style.display = 'block';
+                document.getElementById('annivQrResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            })
+            .catch(e => { err.textContent = e.message || 'Could not generate the link.'; err.style.display = 'block'; })
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    function annivCopyQrUrl(btn) {
+        navigator.clipboard.writeText(document.getElementById('annivQrUrl').textContent).then(() => {
+            const t = btn.textContent; btn.textContent = 'Copied ✓';
+            setTimeout(() => btn.textContent = t, 1800);
+        });
+    }
+
+    function annivDownloadQr(format) {
+        if (!annivQrSvg) return;
+        if (format === 'svg') {
+            saveBlob(new Blob([annivQrSvg], { type: 'image/svg+xml' }), 'anniversary-qr.svg');
+            return;
+        }
+        const img = new Image();
+        img.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = c.height = 720;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 720, 720);
+            ctx.drawImage(img, 0, 0, 720, 720);
+            c.toBlob(b => saveBlob(b, 'anniversary-qr.png'), 'image/png');
+        };
+        img.src = svgDataUri(annivQrSvg);
+    }
+
     // Prevent scrolling when sidebar is open on mobile
     function preventScroll(e) {
         e.preventDefault();
@@ -7625,6 +9934,86 @@
             if (savedVariant) {
                 selectVariant(savedVariant);
             }
+        }
+
+        // Occasion state on load. The body class(es) are already set server-side
+        // (show-occasion / occasion-anniversary), so nothing here changes what is
+        // visible — it just syncs the picker's own highlight and the sidebar sub-label.
+        if (cardOccasion === 'anniversary') {
+            document.getElementById('occChoiceAnniversary').classList.add('selected');
+            document.getElementById('navOccasionSub').textContent = 'Anniversary';
+            document.getElementById('occasionNote').textContent =
+                'This card is set to Anniversary. Pick the other option here any time to switch.';
+            loadAnnivThumbs();
+            if (annivVariant) {
+                selectAnnivCategory(annivVariant === 2 || annivVariant === 4 ? 'red' : 'cream');
+                selectAnnivVariant(annivVariant);
+            }
+            // restore any saved lock photo thumbnail + welcome text
+            if (annivLockPhotoUrl) {
+                document.getElementById('annivLockPhotoImg').src = annivLockPhotoUrl;
+                document.getElementById('annivLockPhotoThumb').style.display = 'block';
+            }
+            const savedH = @json($card->heading ?? null);
+            const savedM = @json($card->welcome_message ?? null);
+            if (savedH) document.getElementById('annivWelcomeHeading').value = savedH;
+            if (savedM) document.getElementById('annivWelcomeMessage').value = savedM;
+            const savedC = @json($card->lock_code ?? null);
+            if (savedC) {
+                const d = savedC.replace(/[^0-9]/g, '').slice(0, 4);
+                document.getElementById('annivLockPin').value = d.length > 2 ? d.slice(0, 2) + '-' + d.slice(2) : d;
+            }
+
+            // Gift 1-3 + Ending form values + photo thumbnails
+            // (the theme A/B highlight is set by each step's thumb loader)
+            annivGift1Urls.forEach((u, i) => {
+                if (!u) return;
+                document.getElementById('annivGift1PhotoPreview' + i).src = u;
+                document.getElementById('annivGift1Slot' + i).classList.add('filled');
+            });
+            annivGift3Urls.forEach((u, i) => {
+                if (!u) return;
+                document.getElementById('annivGift3PhotoPreview' + i).src = u;
+                document.getElementById('annivGift3Slot' + i).classList.add('filled');
+            });
+            const setV = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
+            if (ANNIV_GIFT1_DATA) {
+                const g = ANNIV_GIFT1_DATA;
+                setV('annivGift1NameFirst', g.name_first); setV('annivGift1NameSecond', g.name_second);
+                setV('annivGift1Date', g.cal_date); setV('annivGift1Years', g.years);
+                setV('annivGift1Message', g.message); setV('annivGift1Signed', g.signed);
+            }
+            if (ANNIV_GIFT2_DATA) {
+                const g = ANNIV_GIFT2_DATA;
+                setV('annivGift2NameFirst', g.name_first); setV('annivGift2NameSecond', g.name_second);
+                setV('annivGift2Message', g.message); setV('annivGift2Signed', g.signed);
+            }
+            if (ANNIV_GIFT3_DATA) {
+                const g = ANNIV_GIFT3_DATA;
+                setV('annivGift3NameFirst', g.name_first); setV('annivGift3NameSecond', g.name_second);
+                setV('annivGift3Date', g.cal_date); setV('annivGift3Years', g.years);
+                setV('annivGift3Line1', g.line1); setV('annivGift3Line2', g.line2);
+                setV('annivGift3Message', g.message); setV('annivGift3Signed', g.signed);
+            }
+            if (ANNIV_ENDING_DATA) {
+                const g = ANNIV_ENDING_DATA;
+                setV('annivEndingNameFirst', g.name_first); setV('annivEndingNameSecond', g.name_second);
+                setV('annivEndingYears', g.years); setV('annivEndingMessage', g.message);
+                setV('annivEndingSigned', g.signed);
+            }
+
+            // land on the furthest anniversary step reached
+            goToAnnivStep(annivFurthest || 1);
+        } else if (cardOccasion === 'birthday') {
+            document.getElementById('occChoiceBirthday').classList.add('selected');
+            document.getElementById('navOccasionSub').textContent = 'Birthday';
+            document.getElementById('occasionNote').textContent =
+                'This card is set to Birthday. Pick the other option here any time to switch.';
+        } else {
+            // no occasion yet — the picker is showing (server set body.show-occasion)
+            document.getElementById('navOccasion').classList.add('active');
+            const pill = document.getElementById('progressText');
+            if (pill) pill.textContent = 'Choose Occasion';
         }
 
         const savedPin = @json($card->lock_code ?? null);

@@ -1773,6 +1773,251 @@ cards table.
 
 ---
 
+## 33. Occasion Picker + Anniversary Wizard (Theme → Lock → Welcome)
+
+The card builder now opens with an **occasion choice** before Step 1, and — for an
+anniversary card — its own three-step wizard. This is the anniversary flow
+(`anniversary.md`) being wired into the dashboard, one chunk at a time; so far:
+occasion picker, then anniversary **Theme → Lock Screen → Welcome Screen**, each
+with a live preview of the real anniversary page. Welcome's Continue is parked
+("coming soon") — that is where the build currently stops.
+
+**The birthday flow is completely untouched.** No step was renumbered,
+`totalSteps` is still 10, every existing `saveStep*` handler/panel and the resume
+logic are unchanged, and a fresh birthday card was re-run through Steps 1-3 to
+confirm it. The occasion picker and the anniversary panels sit *outside* the
+numbered wizard (`#occasionPanel`, `#anniversaryFlow`, class `.anniv-nav-item`
+not `.step-item`).
+
+### 33.1 Database
+
+`2026_09_07_000000_add_occasion_to_birthday_cards_table.php` — adds `occasion`
+(string, nullable) after `theme`, guarded with `Schema::hasColumn`. `'occasion'`
+added to the model's `#[Fillable]`. Birthday cards keep `theme` = `boy`/`girl` as
+before; an anniversary card carries `occasion = 'anniversary'`.
+
+### 33.2 Backend
+
+| Piece      | Detail                                                                    |
+| ---------- | ----------------------------------------------------------------------- |
+| `POST /client/card/occasion`             | `saveOccasion` — `in:birthday,anniversary`, no `current_step` change |
+| `POST /client/card/anniversary/theme`    | `variant` 1-4, `occasion='anniversary'`, step→2 |
+| `POST /client/card/anniversary/lock`     | `lock_code` digits:4 + optional `photo`, step→3 |
+| `POST /client/card/anniversary/welcome`  | `heading` / `message` (WELCOME_LIMITS), step→4 |
+| `POST /client/card/anniversary/gift-screen` | `gift_screen_variant` 1-4, step→5 |
+| `POST /client/card/anniversary/gift-1`   | `gift1_data` — theme, 3 photos, names, date, years, letter, signature, step→6 |
+| `POST /client/card/anniversary/gift-2`   | `gift2_data` — theme, names, up to 4 memory cards (date/title/text/photo), letter, step→7 |
+| `POST /client/card/anniversary/gift-3`   | `gift3_data` — theme, 3 photos, names, date, years, two spread lines, letter, step→8 |
+| `POST /client/card/anniversary/ending`   | `ending_data` — theme, names, years, message, signature, step→9 |
+
+The anniversary endpoints **reuse the generic columns** (`variant`, `lock_code`,
+`profile_image_path`, `heading`, `welcome_message`, `gift_screen_variant`,
+`gift{1,2,3}_data`, `ending_data`) and `current_step` — a card is one occasion or
+the other, and `occasion` decides which flow renders. The boy/girl `saveStep*`
+methods are untouched.
+
+### 33.3 Dashboard
+
+`resources/views/client/dashboard.blade.php` — the occasion picker is a **pre-step
+tab inside the dashboard** (not a full-screen overlay; the first version was, and
+looked detached):
+
+- **Sidebar** — a `.nav-occasion` item ("Occasion · Birthday or Anniversary")
+  above the numbered `.step-item`s, under a **Get Started** heading. It is a
+  distinct class, so `goToStep()`'s `.step-item[currentStep-1]` index math is
+  untouched. Clickable any time to switch occasion.
+- **`#occasionPanel`** — a normal `.card` in the main flow, styled exactly like
+  the other steps (four `.occasion-choice` cards: **Birthday**, **Anniversary**,
+  and **Proposal** / **Valentine's Day** marked *Coming soon* and inert).
+  Visibility is `body.show-occasion` (server-set when `$cardOccasion` is null).
+- **Birthday** → `chooseOccasion('birthday')` saves, drops `show-occasion`,
+  `goToStep(currentStep)`. The 10-step wizard is untouched.
+- **Anniversary** → adds `body.occasion-anniversary`, which hides `.step-panel`,
+  the numbered steps, `.theme-switcher` and `.progress-pill`, and shows
+  **`#anniversaryFlow`** — ten `.anniv-panel`s (only `.active` visible), with
+  their own `.nav-anniv` sidebar list (`.anniv-nav-item`, a distinct class so
+  `goToStep()`'s `.step-item` index math is untouched):
+
+  | # | Panel                    | Saves               | Live preview                              |
+  | - | ------------------------ | ------------------- | ---------------------------------------- |
+  | 1 | `#anniversaryWizard`     | `variant` (1-4)     | design thumbnails `/anniversary/page/1/{v}` |
+  | 2 | `#annivPanelLock`        | code + photo        | `/anniversary/page/1/{v}?photo=…`         |
+  | 3 | `#annivPanelWelcome`     | heading, message    | `/anniversary/page/2/{v}?heading=…`       |
+  | 4 | `#annivPanelGiftScreen`  | `gift_screen_variant` | the family's 2 `/anniversary/page/3/{v}` (image, not the CSS fallback — `.gift-variant-thumb`) |
+  | 5 | `#annivPanelGift1`       | gift1_data          | `/anniversary/page/3/{gsv}/gift/1/{t}?…`  |
+  | 6 | `#annivPanelGift2`       | gift2_data          | `…/gift/2/{t}?…&memories=[…]&preview_card=N` |
+  | 7 | `#annivPanelGift3`       | gift3_data          | `…/gift/3/{t}?…&open=sN`                  |
+  | 8 | `#annivPanelEnding`      | ending_data         | `/anniversary/page/4/{t}?…&preview_stage=out` |
+  | 9 | `#annivPanelMusic`       | `music_data` (via `saveStep9`) | — the shared clip picker |
+  | 10 | `#annivPanelQr`         | `qr_data` (via `saveStep10`) + `slug`, `is_published` | — the generated link + QR |
+
+  Colour families: **White & Cream** = variants 1 & 3, **Rose & Red** = 2 & 4.
+  Each gift + the ending offers only the **two themes of the chosen family**
+  (`annivFamilyVariants()`), not all four. `goToAnnivStep(n)` drives the panels +
+  sidebar; `annivPrefillNames()` carries the couple names, date and years from
+  Gift 1 forward into 2/3/ending (empty fields only). Resume: `min(10, current_step)`.
+
+  **Gifts 2 & 3 are beat sub-wizards** (like the boy book / girl Gift 2). Each
+  "beat" holds one card / spread's fields, the progress dots track position,
+  **Continue only appears on the last beat**, and the live preview auto-opens to
+  the thing being edited — `preview_card=N` reveals memory card N for Gift 2
+  (added to `anniversary-gift-2`), `open=sN` opens the pop-up book to spread N
+  for Gift 3 — so the client never scratches or turns pages inside the preview.
+
+  **Mandatory fields**: `annivRequire()` blocks the beat's Next / the step's
+  Continue and shows an inline message — theme on every gift, all 3 photos on
+  Gift 1 and Gift 3 (per-spread on the beat, all-3 at save), theme on Gift 2.
+
+  **Music (step 9)** reuses `saveStep9` and the `music_data` column as they are.
+  It also reuses the *element*: the clip picker is one node with one set of
+  controls, and `openClipPicker(url, mountId)` moves it into whichever step
+  asked for it (`musicClipHome` on the birthday side, `annivMusicClipMount` on
+  the anniversary one) — only one of the two flows is ever on screen, so a
+  second copy of the slider, preview and volume controls would have been two
+  things to keep in step. **Skip** advances without writing `music_data`; the
+  endpoint has no "no song" to send, and a silent story is a valid one. Public
+  playback needed nothing: `PublicStoryController::musicClip()` reads
+  `music_data` without caring about the occasion.
+
+  **QR (step 10)** reuses the existing `saveStep10` endpoint (subscription-gated,
+  `is_published=true`, `ensureSlug`, `QrRenderer`). `ensureSlug` now also reads
+  `gift1_data['name_first']` and falls back to `anniversary-…` for the stem.
+
+  Anniversary cards choose from **six** designs of their own —
+  `QR_THEMES['anniversary']`: *Taupe Vow*, *Maroon & Gold*, *Peach Gold*,
+  *Crimson & White*, *Ivory Minimal*, *Midnight Vow*. Which family a card gets
+  is now a question of **occasion, not `theme`**: an anniversary card carries a
+  `variant` and no `theme` at all, so `qrThemes($card->theme)` silently handed it
+  the boy set. `qrThemesForCard($card)` resolves it instead, and `saveStep10`
+  validates the chosen number against *that card's* set rather than a fixed
+  `in:1,2,3,4` — so birthday stays at four and anniversary accepts 1-6. The same
+  resolver fixes the card tile, which would have thrown on a saved design of 5
+  or 6. The six previews are rendered only for an anniversary card, so a
+  birthday dashboard doesn't carry six QR images it never shows.
+
+### 33.4 The public anniversary story
+
+`PublicStoryController` now renders an `occasion === 'anniversary'` card at
+`/c/{slug}` — same "templates read their own params" approach as boy/girl:
+
+- `isAnniversary()` / `isLive()` gate; `pageView()` / `giftView()` use the
+  `anniversary-…` view prefix; `annivGift{1,2,3}Params()` + `annivCoupleParams()`
+  map the stored JSON; the ending reads `ending_data` directly.
+- `StoryChrome` needed almost nothing — the anniversary lock screen already uses
+  `.boy2-*` classes so the lock chrome matches; welcome falls back to the
+  floating Next; gifts reuses `openGiftPage`. Added: 4 `.story-lock-modal`
+  anniversary palettes and a `.np.side-anniversary` badge colour.
+
+### 33.5 Verified
+
+Real browser (headless Chrome / CDP), logged in as a client:
+
+- **Birthday regression**: fresh card → `panel1` active, no body class,
+  `totalSteps` 10; Step 1 save → Step 2; Step 4 gift thumbs load. No errors.
+- **Anniversary full run** Theme → Lock → Welcome → Gift Box Screen (real gift
+  image) → Gift 1 → Gift 2 (6 beats, dots, preview follows the card) → Gift 3
+  (5 beats, book auto-opens per spread) → Ending → **QR generated** (link + code
+  + PNG/SVG download). Reload resumes at the furthest step, everything restored.
+- **Mandatory guards**: Gift 1 Continue blocked "add all 3 photos"; Gift 2 Next
+  blocked "choose a theme"; Gift 3 per-spread "add this spread's photo".
+- **Public story**: link opens the anniversary lock screen; code `4444`
+  unlocks → welcome (anniversary heading) → NEXT → gifts (image + `openGiftPage`)
+  → gift 1 / gift 3 / ending all render the anniversary designs with the saved
+  content. No console errors.
+
+### 33.6 Not included
+
+- Payment for the subscription that gates the QR (as everywhere — manual admin
+  approval).
+- The photo crop/position the birthday lock step has (anniversary uses a plain
+  upload the templates `object-fit: cover`).
+
+---
+
+## 34. The Public Story — Gift Gating, Side Nav, and the Curtain
+
+Three things about the story a recipient actually opens, all of them in
+[app/Support/StoryChrome.php](app/Support/StoryChrome.php). The card designs are
+untouched: they are standalone documents the dashboard previews at the very same
+URLs, so the chrome is still injected after rendering rather than written into
+seventy-odd files.
+
+### 34.1 Two Next buttons, one of them wrong
+
+A gift that pages through beats had **two Next buttons on screen at once** — its
+own, which turns to the next scratch card or book spread, and the story's, which
+leaves the gift for good. They sat within a thumb's width of each other, and the
+wrong one skipped most of the gift.
+
+The story's button is now held back until the gift has been played out. What
+"played out" means is read off the markers each design already keeps for its own
+dots and buttons — there is nothing new in the designs to maintain:
+
+| Gift | Markers in the page | Done when |
+| --- | --- | --- |
+| Anniversary gift 2 (scratch cards) | `#dots` | the last dot is `active` — the closing letter |
+| Anniversary gift 3 (pop-up book) | `#book` + `#dots` | `#book.ended` |
+| Birthday gift 3 (paged storybook) | `#book` + `#pageDots` + `#nextBtn` | last dot `active`, or its own Next `disabled` |
+| Birthday girl gift 3 (camera roll) | `#gallery` | `#gallery.active` — the cover is open |
+| Gift 1, birthday gift 2 | none | at once; a single page has nothing to finish |
+
+The order of those branches matters. The pop-up book carries **both** `#book` and
+`#dots`, but its dots only track the three spreads — the book is not finished
+until it is shut again on "The End". Testing `#dots` first would have opened the
+gate a spread early, so `#book` is checked first and the paged storybook is told
+apart from the pop-up book by `#pageDots`, which only the former has.
+
+A `MutationObserver` on `class`, `disabled` and `hidden` catches every way the
+designs change state, with a 400 ms poll behind it for anything that finishes
+without touching an observed node. A design none of the rules fit falls into the
+last row and is never gated at all; a three-minute failsafe reveals the button
+regardless, so no recipient is ever shut inside a gift with no way out.
+
+### 34.2 The button moved to the side
+
+`.story-nav` was pinned bottom-right, which is where every design puts its own
+controls — the scratch cards' Next and dots, the book's page arrows, the "Open
+the book" button. It now sits **centred on the right edge**, stacked vertically,
+which is the one area clear in all of them.
+
+### 34.3 The ending is the end
+
+The ending page offered "← Back to the gifts". That turned the last page into
+another stop on a loop and the ending never landed, so **the chrome adds no
+navigation there at all**.
+
+In its place a **theatre curtain** closes over the page. It does not run on a
+timer: all three ending families raise a closing line of their own when they are
+done — the boy letter's `#theEnd`, the girl keepsake's `#keepsakeEnd`, the
+anniversary `#farewell` once the candles are out — and each is a class being
+added to an element already in the page. The curtain takes that as its cue,
+holds 2.6 s so the line can be read, then draws two velvet panels across (2.15 s)
+and fades "The End" up on them. The wording is lifted from the design's own
+closing element, so a client who reworded it keeps their wording.
+
+The panels are 53% wide each, so they overlap rather than meeting on a seam, and
+the closed curtain takes the taps: every ending design offers a replay of its own
+(relight the candles, read the letter again), and the point of the curtain is
+that the story does not go round again. `prefers-reduced-motion` gets the same
+curtain without the sweep.
+
+### 34.4 Verified
+
+Headless Chrome over CDP, against the real rendered pages:
+
+- **Gate, all six gift shapes** — hidden at the start, revealed on the design's
+  own completion marker; the pop-up book specifically **not** fooled by its
+  spread dots reaching the last spread; all three single-page gifts revealed
+  immediately.
+- **Nav placement** — 14 px from the right edge, centred vertically, `opacity: 0`
+  and `visibility: hidden` while gated (so it cannot be tapped through).
+- **Curtain, all three ending families** — open on arrival, closed after the
+  design's finale, "The End" up, panels covering past the centre line.
+- **Live story** (`/c/{slug}`, unlocked): gifts screen no nav · gift 1 plain nav ·
+  gifts 2 and 3 gated · ending no nav and a curtain.
+
+---
+
 ## Final Summary
 
 ### Completed

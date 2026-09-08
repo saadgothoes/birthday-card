@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class BirthdayCardController extends Controller
 {
@@ -94,6 +95,309 @@ class BirthdayCardController extends Controller
     protected function normaliseNewlines(?string $value): ?string
     {
         return $value === null ? null : str_replace(["\r\n", "\r"], "\n", $value);
+    }
+
+    // Occasion — the very first choice, before Step 1. "birthday" leaves the
+    // existing boy/girl wizard exactly as it is; "anniversary" swaps in the
+    // anniversary theme picker. Does not touch current_step — it sits before it.
+    public function saveOccasion(Request $request)
+    {
+        $data = $request->validate([
+            'occasion' => 'required|in:birthday,anniversary',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = $data['occasion'];
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+        ]);
+    }
+
+    // ─── Anniversary wizard ──────────────────────────────────────────────
+    // Its own endpoints so the boy/girl steps stay exactly as they are. They
+    // reuse the same generic columns (variant, lock_code, profile_image_path,
+    // heading, welcome_message) and `current_step` — a card is one occasion or
+    // the other, and `occasion` decides which flow the dashboard renders.
+
+    // Anniversary step 1 — the chosen design (variant 1-4).
+    public function saveAnniversaryTheme(Request $request)
+    {
+        $data = $request->validate([
+            'variant' => 'required|integer|in:1,2,3,4',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'anniversary';
+        $card->variant = $data['variant'];
+        $card->current_step = max($card->current_step, 2);
+        $card->save();
+
+        return response()->json(['success' => true, 'card_id' => $card->id]);
+    }
+
+    // Anniversary step 2 — lock screen: 4-digit code + framed photo.
+    public function saveAnniversaryLock(Request $request)
+    {
+        $data = $request->validate([
+            'lock_code' => 'required|digits:4',
+            'photo' => 'nullable|image|max:5120',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'anniversary';
+        $card->lock_code = $data['lock_code'];
+
+        if ($request->hasFile('photo')) {
+            if ($card->profile_image_path) {
+                Storage::disk('public')->delete($card->profile_image_path);
+            }
+            $card->profile_image_path = $request->file('photo')->store('birthday-cards/profile', 'public');
+        }
+
+        $card->current_step = max($card->current_step, 3);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'profile_image_url' => $card->profile_image_path ? Storage::url($card->profile_image_path) : null,
+        ]);
+    }
+
+    // Anniversary step 3 — welcome screen: heading + message.
+    public function saveAnniversaryWelcome(Request $request)
+    {
+        $data = $request->validate([
+            'heading' => 'nullable|string|max:' . self::WELCOME_LIMITS['heading'],
+            'message' => 'nullable|string|max:' . self::WELCOME_LIMITS['message'],
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'anniversary';
+        $card->heading = $data['heading'] ?? null;
+        $card->welcome_message = $this->normaliseNewlines($data['message'] ?? null);
+        $card->current_step = max($card->current_step, 4);
+        $card->save();
+
+        return response()->json(['success' => true, 'card_id' => $card->id]);
+    }
+
+    // Anniversary step 4 — which of the chosen colour family's two designs the
+    // gift-selection screen uses.
+    public function saveAnniversaryGiftScreen(Request $request)
+    {
+        $data = $request->validate([
+            'gift_screen_variant' => 'required|integer|in:1,2,3,4',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'anniversary';
+        $card->gift_screen_variant = $data['gift_screen_variant'];
+        $card->current_step = max($card->current_step, 5);
+        $card->save();
+
+        return response()->json(['success' => true, 'card_id' => $card->id]);
+    }
+
+    // Anniversary step 5 — Gift 1 ("Keepsake"): design + 3 photos + couple names,
+    // date, years and the framed letter. Stored in gift1_data with anniversary
+    // keys (a card is one occasion or the other, so no clash with the boy/girl shape).
+    public function saveAnniversaryGift1(Request $request)
+    {
+        $data = $request->validate([
+            'theme' => 'required|integer|in:1,2,3,4',
+            'photos' => 'nullable|array|max:3',
+            'photos.*' => 'nullable|image|max:5120',
+            'name_first' => 'nullable|string|max:20',
+            'name_second' => 'nullable|string|max:20',
+            'cal_date' => 'nullable|date',
+            'years' => 'nullable|integer|min:1|max:99',
+            'message' => 'nullable|string|max:300',
+            'signed' => 'nullable|string|max:30',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'anniversary';
+
+        $existing = $card->gift1_data ?? [];
+        $photos = $existing['photos'] ?? [null, null, null];
+        foreach ($request->file('photos', []) as $i => $file) {
+            if (! $file) {
+                continue;
+            }
+            if (! empty($photos[$i])) {
+                Storage::disk('public')->delete($photos[$i]);
+            }
+            $photos[$i] = $file->store('birthday-cards/gift1', 'public');
+        }
+
+        $card->gift1_data = [
+            'theme' => (int) $data['theme'],
+            'photos' => $photos,
+            'name_first' => $data['name_first'] ?? null,
+            'name_second' => $data['name_second'] ?? null,
+            'cal_date' => $data['cal_date'] ?? null,
+            'years' => $data['years'] ?? null,
+            'message' => $this->normaliseNewlines($data['message'] ?? null),
+            'signed' => $data['signed'] ?? null,
+        ];
+        $card->current_step = max($card->current_step, 6);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+        ]);
+    }
+
+    // Anniversary step 6 — Gift 2 ("Scratch to reveal"): design + names + up to
+    // 4 memory cards + closing letter. Stored in gift2_data.
+    public function saveAnniversaryGift2(Request $request)
+    {
+        $data = $request->validate([
+            'theme' => 'required|integer|in:1,2,3,4',
+            'name_first' => 'nullable|string|max:20',
+            'name_second' => 'nullable|string|max:20',
+            'message' => 'nullable|string|max:300',
+            'signed' => 'nullable|string|max:30',
+            'memories' => 'nullable|array|max:6',
+            'memories.*.date' => 'nullable|string|max:40',
+            'memories.*.title' => 'nullable|string|max:40',
+            'memories.*.text' => 'nullable|string|max:120',
+            'photos' => 'nullable|array|max:6',
+            'photos.*' => 'nullable|image|max:5120',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'anniversary';
+
+        $existing = $card->gift2_data ?? [];
+        $photos = $existing['photos'] ?? array_fill(0, 6, null);
+        foreach ($request->file('photos', []) as $i => $file) {
+            if (! $file) {
+                continue;
+            }
+            if (! empty($photos[$i])) {
+                Storage::disk('public')->delete($photos[$i]);
+            }
+            $photos[$i] = $file->store('birthday-cards/gift2', 'public');
+        }
+
+        $memories = [];
+        foreach ($data['memories'] ?? [] as $i => $m) {
+            $memories[] = [
+                'date' => $m['date'] ?? null,
+                'title' => $m['title'] ?? null,
+                'text' => $this->normaliseNewlines($m['text'] ?? null),
+                'photo' => $photos[$i] ? Storage::url($photos[$i]) : null,
+            ];
+        }
+
+        $card->gift2_data = [
+            'theme' => (int) $data['theme'],
+            'photos' => $photos,
+            'name_first' => $data['name_first'] ?? null,
+            'name_second' => $data['name_second'] ?? null,
+            'message' => $this->normaliseNewlines($data['message'] ?? null),
+            'signed' => $data['signed'] ?? null,
+            'memories' => $memories,
+        ];
+        $card->current_step = max($card->current_step, 7);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+        ]);
+    }
+
+    // Anniversary step 7 — Gift 3 ("Pop-up Book"): design + 3 photos + names,
+    // date, years, the two spread lines and the letter. Stored in gift3_data.
+    public function saveAnniversaryGift3(Request $request)
+    {
+        $data = $request->validate([
+            'theme' => 'required|integer|in:1,2,3,4',
+            'photos' => 'nullable|array|max:3',
+            'photos.*' => 'nullable|image|max:5120',
+            'name_first' => 'nullable|string|max:20',
+            'name_second' => 'nullable|string|max:20',
+            'cal_date' => 'nullable|date',
+            'years' => 'nullable|integer|min:1|max:99',
+            'line1' => 'nullable|string|max:60',
+            'line2' => 'nullable|string|max:60',
+            'message' => 'nullable|string|max:300',
+            'signed' => 'nullable|string|max:30',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'anniversary';
+
+        $existing = $card->gift3_data ?? [];
+        $photos = $existing['photos'] ?? [null, null, null];
+        foreach ($request->file('photos', []) as $i => $file) {
+            if (! $file) {
+                continue;
+            }
+            if (! empty($photos[$i])) {
+                Storage::disk('public')->delete($photos[$i]);
+            }
+            $photos[$i] = $file->store('birthday-cards/gift3', 'public');
+        }
+
+        $card->gift3_data = [
+            'theme' => (int) $data['theme'],
+            'photos' => $photos,
+            'name_first' => $data['name_first'] ?? null,
+            'name_second' => $data['name_second'] ?? null,
+            'cal_date' => $data['cal_date'] ?? null,
+            'years' => $data['years'] ?? null,
+            'line1' => $data['line1'] ?? null,
+            'line2' => $data['line2'] ?? null,
+            'message' => $this->normaliseNewlines($data['message'] ?? null),
+            'signed' => $data['signed'] ?? null,
+        ];
+        $card->current_step = max($card->current_step, 8);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+        ]);
+    }
+
+    // Anniversary step 8 — Ending page ("Blow out the candles"): design + names,
+    // years, closing message + signature. Stored in ending_data.
+    public function saveAnniversaryEnding(Request $request)
+    {
+        $data = $request->validate([
+            'theme' => 'required|integer|in:1,2,3,4',
+            'name_first' => 'nullable|string|max:20',
+            'name_second' => 'nullable|string|max:20',
+            'years' => 'nullable|integer|min:1|max:99',
+            'message' => 'nullable|string|max:240',
+            'signed' => 'nullable|string|max:30',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'anniversary';
+        $card->ending_data = [
+            'theme' => (int) $data['theme'],
+            'name_first' => $data['name_first'] ?? null,
+            'name_second' => $data['name_second'] ?? null,
+            'years' => $data['years'] ?? null,
+            'message' => $this->normaliseNewlines($data['message'] ?? null),
+            'signed' => $data['signed'] ?? null,
+        ];
+        $card->current_step = max($card->current_step, 9);
+        $card->save();
+
+        return response()->json(['success' => true, 'card_id' => $card->id]);
     }
 
     // Step 1 — save theme + variant selection
@@ -863,6 +1167,118 @@ class BirthdayCardController extends Controller
                 'radius' => 0.09,
             ],
         ],
+        // Anniversary is its own family of six rather than the boy/girl four:
+        // the palettes follow the four anniversary card variants (taupe,
+        // maroon, peach gold, bright red) and two darker cards round the set
+        // out, so a couple picks a code that matches the story it opens.
+        'anniversary' => [
+            1 => [
+                'name' => 'Taupe Vow',
+                'blurb' => 'Charcoal squares on a warm ivory card',
+                'available' => true,
+                'bg' => '#EFEAE0',
+                'plate' => '#FBF8F2',
+                'module' => '#141312',
+                'eye_frame' => '#5A5147',
+                'eye_ball' => '#141312',
+                'shape' => 'square',
+                'frame' => 'solid',
+                'frame_color' => '#C7BCA6',
+                'label' => 'Scan to open',
+                'label_color' => '#5A5147',
+                'radius' => 0.06,
+            ],
+            2 => [
+                'name' => 'Maroon & Gold',
+                'blurb' => 'Rounded modules, gold double border, hearts',
+                'available' => true,
+                'bg' => '#F6ECD6',
+                'plate' => '#FFFCF4',
+                'module' => '#5C1420',
+                'module_alt' => '#8F2230',
+                'eye_frame' => '#A3792F',
+                'eye_ball' => '#5C1420',
+                'shape' => 'rounded',
+                'frame' => 'double',
+                'frame_color' => '#A3792F',
+                'label' => 'Our story',
+                'label_color' => '#8F2230',
+                'motif' => 'heart',
+                'motif_color' => '#A3792F',
+                'radius' => 0.10,
+            ],
+            3 => [
+                'name' => 'Peach Gold',
+                'blurb' => 'Soft dots on ivory, petal corners',
+                'available' => true,
+                'bg' => '#FAF3E8',
+                'plate' => '#FFFFFF',
+                'module' => '#7F5A30',
+                'module_alt' => '#B8853F',
+                'eye_frame' => '#E0A865',
+                'eye_ball' => '#7F5A30',
+                'shape' => 'dot',
+                'frame' => 'solid',
+                'frame_color' => '#E0A865',
+                'label' => 'Scan for us',
+                'label_color' => '#9C7C52',
+                'motif' => 'petal',
+                'motif_color' => '#E0A865',
+                'radius' => 0.12,
+            ],
+            4 => [
+                'name' => 'Crimson & White',
+                'blurb' => 'Bright red rounded modules, heart corners',
+                'available' => true,
+                'bg' => '#FDF2EF',
+                'plate' => '#FFFFFF',
+                'module' => '#A3140B',
+                'module_alt' => '#E8281A',
+                'eye_frame' => '#E8281A',
+                'eye_ball' => '#A3140B',
+                'shape' => 'rounded',
+                'frame' => 'double',
+                'frame_color' => '#E8281A',
+                'label' => 'Open our story',
+                'label_color' => '#C4291C',
+                'motif' => 'heart',
+                'motif_color' => '#E8281A',
+                'radius' => 0.09,
+            ],
+            5 => [
+                'name' => 'Ivory Minimal',
+                'blurb' => 'Plain squares, no border — quiet and clean',
+                'available' => true,
+                'bg' => '#FFFFFF',
+                'plate' => '#FFFFFF',
+                'module' => '#2F2B26',
+                'eye_frame' => '#2F2B26',
+                'eye_ball' => '#8F7F65',
+                'shape' => 'square',
+                'frame' => 'none',
+                'label' => '',
+                'radius' => 0.03,
+            ],
+            6 => [
+                'name' => 'Midnight Vow',
+                'blurb' => 'Dark card, rose gold dots, sparkle corners',
+                'available' => true,
+                'bg' => '#17110F',
+                'plate' => '#FBF4EE',
+                'module' => '#2C1D18',
+                'module_alt' => '#6B4438',
+                'eye_frame' => '#A3792F',
+                'eye_ball' => '#2C1D18',
+                'shape' => 'dot',
+                'frame' => 'double',
+                'frame_color' => '#A3792F',
+                'label' => 'Scan me',
+                'label_color' => '#E4C79A',
+                'motif' => 'sparkle',
+                'motif_color' => '#C99B57',
+                'radius' => 0.11,
+            ],
+        ],
     ];
 
     /** Path the published story will live under — see the share URL below. */
@@ -906,6 +1322,21 @@ class BirthdayCardController extends Controller
         return self::QR_THEMES[$theme] ?? self::QR_THEMES['boy'];
     }
 
+    /**
+     * The QR designs a given card may choose from.
+     *
+     * An anniversary card has no boy/girl `theme` at all — it carries a
+     * `variant` instead — so keying off `theme` alone would silently hand it
+     * the boy set. The occasion decides the family first, and only a birthday
+     * card falls through to its side's designs.
+     */
+    public static function qrThemesForCard(BirthdayCard $card): array
+    {
+        return $card->occasion === 'anniversary'
+            ? self::QR_THEMES['anniversary']
+            : self::qrThemes($card->theme);
+    }
+
     /** Whether a side's designs are wired up yet (girl is not, for now). */
     public static function themeSideIsAvailable(array $themes): bool
     {
@@ -939,7 +1370,12 @@ class BirthdayCardController extends Controller
             return $card->slug;
         }
 
-        $stem = Str::slug((string) ($card->gift3_data['to_name'] ?? $card->recipient_name ?? '')) ?: 'birthday';
+        $stem = Str::slug((string) (
+            $card->gift3_data['to_name']
+            ?? $card->gift1_data['name_first']
+            ?? $card->recipient_name
+            ?? ''
+        )) ?: ($card->occasion === 'anniversary' ? 'anniversary' : 'birthday');
 
         do {
             $slug = $stem . '-' . Str::lower(Str::random(6));
@@ -1187,12 +1623,22 @@ class BirthdayCardController extends Controller
         }
 
         $data = $request->validate([
-            'theme' => 'required|integer|in:1,2,3,4',
+            'theme' => 'required|integer|min:1',
         ]);
 
         $card = $this->currentDraft();
+        $designs = self::qrThemesForCard($card);
+
+        // Birthday cards offer four designs, anniversary cards six, so which
+        // numbers are valid is a property of the card rather than a fixed list.
+        if (! isset($designs[(int) $data['theme']])) {
+            throw ValidationException::withMessages([
+                'theme' => 'That QR design is not one of the designs for this card.',
+            ]);
+        }
+
         $slug = self::ensureSlug($card);
-        $design = self::qrThemes($card->theme)[(int) $data['theme']];
+        $design = $designs[(int) $data['theme']];
 
         $card->qr_data = [
             'theme' => (int) $data['theme'],

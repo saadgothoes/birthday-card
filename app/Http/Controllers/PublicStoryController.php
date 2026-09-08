@@ -37,6 +37,18 @@ class PublicStoryController extends Controller
     /** Sides whose public story is wired up. */
     private const LIVE_THEMES = ['boy', 'girl'];
 
+    /** An anniversary card carries `occasion`, not a boy/girl `theme`. */
+    private function isAnniversary(BirthdayCard $card): bool
+    {
+        return $card->occasion === 'anniversary';
+    }
+
+    /** Can this card's story be rendered at all? */
+    private function isLive(BirthdayCard $card): bool
+    {
+        return $this->isAnniversary($card) || in_array($card->theme, self::LIVE_THEMES, true);
+    }
+
     /** Look a story up by its slug, or 404. */
     private function story(string $slug): BirthdayCard
     {
@@ -65,7 +77,7 @@ class PublicStoryController extends Controller
      */
     private function guard(Request $request, BirthdayCard $card)
     {
-        if (! in_array($card->theme, self::LIVE_THEMES, true)) {
+        if (! $this->isLive($card)) {
             abort(404);
         }
 
@@ -143,14 +155,17 @@ class PublicStoryController extends Controller
      */
     private function pageView(BirthdayCard $card, int $page, int $design): string
     {
-        $view = 'birthday.' . $card->theme . '-page-' . $page;
+        $prefix = $this->isAnniversary($card) ? 'anniversary' : $card->theme;
+        $view = 'birthday.' . $prefix . '-page-' . $page;
 
         return $design > 1 ? $view . '-' . $design : $view;
     }
 
     private function giftView(BirthdayCard $card, int $gift, int $design): string
     {
-        return 'birthday.' . $card->theme
+        $prefix = $this->isAnniversary($card) ? 'anniversary' : $card->theme;
+
+        return 'birthday.' . $prefix
             . '-page-3-variant-' . $this->giftScreenVariant($card)
             . '-gift-' . $gift
             . '-page-' . $design;
@@ -194,8 +209,8 @@ class PublicStoryController extends Controller
             'lockPath' => route('story.lock', $card->slug, false),
             'music' => $this->musicClip($card),
             'storageKey' => 'story-music:' . $card->slug,
-            'title' => $card->heading ?: 'A Birthday Surprise',
-            'side' => $card->theme,
+            'title' => $card->heading ?: ($this->isAnniversary($card) ? 'An Anniversary' : 'A Birthday Surprise'),
+            'side' => $this->isAnniversary($card) ? 'anniversary' : $card->theme,
         ])->render());
     }
 
@@ -233,7 +248,7 @@ class PublicStoryController extends Controller
     {
         $card = $this->story($slug);
 
-        if (! in_array($card->theme, self::LIVE_THEMES, true)) {
+        if (! $this->isLive($card)) {
             abort(404);
         }
 
@@ -252,7 +267,7 @@ class PublicStoryController extends Controller
                 csrf_token(),
                 $this->photoUrl($card->profile_image_path),
                 $request->session()->pull('story_lock_error'),
-                $card->theme . '-' . $this->variant($card)
+                ($this->isAnniversary($card) ? 'anniversary' : $card->theme) . '-' . $this->variant($card)
             )
         );
     }
@@ -265,7 +280,7 @@ class PublicStoryController extends Controller
     {
         $card = $this->story($slug);
 
-        if (! in_array($card->theme, self::LIVE_THEMES, true)) {
+        if (! $this->isLive($card)) {
             abort(404);
         }
 
@@ -349,17 +364,30 @@ class PublicStoryController extends Controller
             $design = 1;
         }
 
-        $params = match ($gift) {
-            1 => $this->gift1Params($data),
-            2 => $this->gift2Params($data),
-            3 => $card->theme === 'girl' ? $this->gift3GirlParams($data) : $this->gift3Params($data),
-        };
+        if ($this->isAnniversary($card)) {
+            $params = match ($gift) {
+                1 => $this->annivGift1Params($data),
+                2 => $this->annivGift2Params($data),
+                3 => $this->annivGift3Params($data),
+            };
+        } else {
+            $params = match ($gift) {
+                1 => $this->gift1Params($data),
+                2 => $this->gift2Params($data),
+                3 => $card->theme === 'girl' ? $this->gift3GirlParams($data) : $this->gift3Params($data),
+            };
+        }
 
         // Gifts 1 and 2 come back to the gift screen; the book is the last of
         // the three, so finishing it goes on to the ending page.
+        //
+        // Gift 2 deals out a stack of cards on the anniversary side, so its way
+        // back is held until the last one is reached — otherwise the story's
+        // Next sits alongside the gift's own and the two get confused. Gift 1
+        // is a single page with nothing to finish.
         $chrome = $gift === 3
             ? StoryChrome::book(route('story.ending', $card->slug), route('story.gifts', $card->slug), $this->musicClip($card))
-            : StoryChrome::gift(route('story.gifts', $card->slug), $this->musicClip($card));
+            : StoryChrome::gift(route('story.gifts', $card->slug), $this->musicClip($card), $gift === 2);
 
         return $this->render($request, $card, $this->giftView($card, $gift, $design), $params, $chrome);
     }
@@ -467,6 +495,63 @@ class PublicStoryController extends Controller
         return $params;
     }
 
+    // ── Anniversary gift params ────────────────────────────────────────
+    // The anniversary gifts share a couple of shapes: names + a date that
+    // prints as a month name + day, and the letter/signature.
+    private function annivCoupleParams(array $data): array
+    {
+        $p = [
+            'name_first' => $data['name_first'] ?? null,
+            'name_second' => $data['name_second'] ?? null,
+            'years' => isset($data['years']) ? (string) $data['years'] : null,
+            'message' => $data['message'] ?? null,
+            'signed' => $data['signed'] ?? null,
+        ];
+        if (! empty($data['cal_date']) && ($ts = strtotime($data['cal_date']))) {
+            $p['cal_month'] = date('F', $ts);
+            $p['cal_day'] = (string) date('j', $ts);
+        }
+        return $p;
+    }
+
+    // Gift 1 — Keepsake: 3 photos + couple + date + years + letter.
+    private function annivGift1Params(array $data): array
+    {
+        $p = $this->annivCoupleParams($data);
+        foreach (array_values($data['photos'] ?? []) as $i => $path) {
+            $p['photo' . ($i + 1)] = $this->photoUrl($path);
+        }
+        return $p;
+    }
+
+    // Gift 2 — Scratch cards: couple + letter + the memory JSON (its photo
+    // URLs were already resolved to /storage paths on save).
+    private function annivGift2Params(array $data): array
+    {
+        $p = [
+            'name_first' => $data['name_first'] ?? null,
+            'name_second' => $data['name_second'] ?? null,
+            'message' => $data['message'] ?? null,
+            'signed' => $data['signed'] ?? null,
+        ];
+        if (! empty($data['memories'])) {
+            $p['memories'] = json_encode(array_values($data['memories']));
+        }
+        return $p;
+    }
+
+    // Gift 3 — Pop-up Book: 3 photos + couple + date + years + two lines + letter.
+    private function annivGift3Params(array $data): array
+    {
+        $p = $this->annivCoupleParams($data);
+        foreach (array_values($data['photos'] ?? []) as $i => $path) {
+            $p['photo' . ($i + 1)] = $this->photoUrl($path);
+        }
+        $p['line1'] = $data['line1'] ?? null;
+        $p['line2'] = $data['line2'] ?? null;
+        return $p;
+    }
+
     // ── The ending page ─────────────────────────────────────────────────
 
     public function ending(Request $request, string $slug)
@@ -482,9 +567,19 @@ class PublicStoryController extends Controller
             $design = 1;
         }
 
-        $params = [];
-        foreach (array_keys(BirthdayCardController::endingLimits($card->theme)) as $key) {
-            $params[$key] = $ending[$key] ?? null;
+        if ($this->isAnniversary($card)) {
+            $params = [
+                'name_first' => $ending['name_first'] ?? null,
+                'name_second' => $ending['name_second'] ?? null,
+                'years' => isset($ending['years']) ? (string) $ending['years'] : null,
+                'message' => $ending['message'] ?? null,
+                'signed' => $ending['signed'] ?? null,
+            ];
+        } else {
+            $params = [];
+            foreach (array_keys(BirthdayCardController::endingLimits($card->theme)) as $key) {
+                $params[$key] = $ending[$key] ?? null;
+            }
         }
 
         return $this->render(
@@ -492,7 +587,7 @@ class PublicStoryController extends Controller
             $card,
             $this->pageView($card, 4, $design),
             $params,
-            StoryChrome::ending(route('story.gifts', $card->slug), $this->musicClip($card))
+            StoryChrome::ending($this->musicClip($card))
         );
     }
 }

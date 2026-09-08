@@ -554,6 +554,12 @@
         var drawing = false;
         var lastPt = null;
 
+        // Dashboard preview: skip the scratching so the client can see the
+        // memory (and the photo they uploaded) on every card straight away.
+        // ?preview_card=N opens straight to that card (1-based).
+        var PREVIEW = @json((bool) request('preview') || request('preview_card') !== null);
+        var PREVIEW_CARD = @json((int) request('preview_card', 0));
+
         // ---- progress dots ----
         STEPS.forEach(function() {
             dotsWrap.appendChild(document.createElement('span'));
@@ -710,6 +716,13 @@
             nextBtn.textContent = i >= STEPS.length - 1 ? 'Read again' : 'Next';
             nextBtn.classList.toggle('final', i >= STEPS.length - 1);
 
+            if (PREVIEW) {
+                cleared = true;
+                foil.classList.add('cleared');
+                hint.classList.add('hide');
+                nextBtn.classList.add('show');
+            }
+
             paintDots();
             requestAnimationFrame(sizeFoil);
         }
@@ -726,7 +739,8 @@
             if (!cleared) sizeFoil();
         });
 
-        loadStep(0);
+        var startAt = (PREVIEW_CARD > 0) ? Math.min(PREVIEW_CARD - 1, STEPS.length - 1) : 0;
+        loadStep(startAt);
     })();
     </script>
 </body>

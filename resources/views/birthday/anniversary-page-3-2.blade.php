@@ -281,39 +281,6 @@
         font-family: Arial, sans-serif;
     }
 
-    /* ================= NEXT BUTTON (static) ================= */
-
-    .next-btn {
-        position: fixed;
-        left: 50%;
-        bottom: clamp(20px, 5vh, 40px);
-        transform: translateX(-50%);
-        z-index: 15;
-        background: transparent;
-        color: var(--ink);
-        border: 1px solid var(--accent-line);
-        padding: 12px 40px;
-        border-radius: 60px;
-        font-family: Arial, sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.25s;
-    }
-
-    .next-btn:hover {
-        background: var(--accent-wash);
-        border-color: var(--accent);
-        transform: translateX(-50%) translateY(-2px);
-    }
-
-    .next-btn::after {
-        content: ' \2192';
-        opacity: 0.5;
-    }
-
     @media (max-width: 767px) {
         .mobile-gifts-card {
             aspect-ratio: auto;
@@ -696,9 +663,6 @@
 
         </div>
     </div>
-
-    <!-- Static next button -->
-    <button class="next-btn" type="button">NEXT</button>
 
     <div class="loading-screen" id="loadingScreen" aria-hidden="true">
         <div class="loading-card">

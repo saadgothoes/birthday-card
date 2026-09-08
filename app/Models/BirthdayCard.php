@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
     'user_id',
     'title',
     'theme',
+    'occasion',
     'variant',
     'heading',
     'dob',

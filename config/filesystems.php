@@ -41,7 +41,12 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Relative so uploaded images resolve against whatever host is
+            // serving the page — the dashboard preview, the public story frame
+            // and a card opened for editing are not always on APP_URL's host
+            // (e.g. `php artisan serve` on a port). An absolute ASSET_URL still
+            // wins when one is set (CDN / separate asset domain).
+            'url' => env('ASSET_URL') ? rtrim(env('ASSET_URL'), '/').'/storage' : '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

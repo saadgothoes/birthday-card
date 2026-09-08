@@ -88,6 +88,17 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::post('/logout', [ClientAuthController::class, 'logout'])->name('logout');
 
         // ─── Birthday Card Builder (wizard) ────────────────────
+        // Occasion picker — sits before Step 1 (birthday vs anniversary).
+        Route::post('/card/occasion', [BirthdayCardController::class, 'saveOccasion'])->name('card.occasion');
+        // Anniversary wizard — separate endpoints so the boy/girl steps are untouched.
+        Route::post('/card/anniversary/theme', [BirthdayCardController::class, 'saveAnniversaryTheme'])->name('card.anniversary.theme');
+        Route::post('/card/anniversary/lock', [BirthdayCardController::class, 'saveAnniversaryLock'])->name('card.anniversary.lock');
+        Route::post('/card/anniversary/welcome', [BirthdayCardController::class, 'saveAnniversaryWelcome'])->name('card.anniversary.welcome');
+        Route::post('/card/anniversary/gift-screen', [BirthdayCardController::class, 'saveAnniversaryGiftScreen'])->name('card.anniversary.gift-screen');
+        Route::post('/card/anniversary/gift-1', [BirthdayCardController::class, 'saveAnniversaryGift1'])->name('card.anniversary.gift1');
+        Route::post('/card/anniversary/gift-2', [BirthdayCardController::class, 'saveAnniversaryGift2'])->name('card.anniversary.gift2');
+        Route::post('/card/anniversary/gift-3', [BirthdayCardController::class, 'saveAnniversaryGift3'])->name('card.anniversary.gift3');
+        Route::post('/card/anniversary/ending', [BirthdayCardController::class, 'saveAnniversaryEnding'])->name('card.anniversary.ending');
         Route::post('/card/step1', [BirthdayCardController::class, 'saveStep1'])->name('card.step1');
         Route::post('/card/step2', [BirthdayCardController::class, 'saveStep2'])->name('card.step2');
         Route::post('/card/step3', [BirthdayCardController::class, 'saveStep3'])->name('card.step3');

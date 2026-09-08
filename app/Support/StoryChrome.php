@@ -45,15 +45,46 @@ final class StoryChrome
     {
         return <<<'CSS'
         <style>
+        /*
+         * The bottom-right corner, out of the reading line. The middle of the
+         * right edge was tried and is worse: on a gift that fills the width it
+         * lands beside the heading at eye level and reads as part of the card.
+         *
+         * The corner is not always empty either — boy gift 1 puts its own Next
+         * there, and the storybook's page nav lands there on a phone — so
+         * `navPlacement()` lifts this above anything it would cover.
+         */
         .story-nav {
             position: fixed;
-            right: max(18px, env(safe-area-inset-right));
-            bottom: max(18px, env(safe-area-inset-bottom));
+            right: max(16px, env(safe-area-inset-right));
+            bottom: max(16px, env(safe-area-inset-bottom));
             z-index: 9999;
             display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
             gap: 10px;
             align-items: center;
+            max-width: calc(100vw - 32px);
             font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        /*
+         * A gift that pages through beats hides the way onward until the last
+         * one, so the recipient isn't choosing between two Next buttons that
+         * do very different things. `is-ready` is added by the gate script.
+         */
+        .story-nav.is-gated {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: opacity 0.45s ease, transform 0.45s ease, visibility 0s linear 0.45s;
+        }
+
+        .story-nav.is-gated.is-ready {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            transition: opacity 0.45s ease, transform 0.45s ease;
         }
 
         .story-nav a {
@@ -82,9 +113,21 @@ final class StoryChrome
         }
 
         @media (max-width: 560px) {
+            .story-nav {
+                gap: 8px;
+            }
+
             .story-nav a {
-                padding: 10px 16px;
-                font-size: 13px;
+                padding: 9px 14px;
+                font-size: 12.5px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .story-nav.is-gated,
+            .story-nav.is-gated.is-ready {
+                transition: opacity 0.01s linear;
+                transform: none;
             }
         }
 
@@ -180,6 +223,10 @@ final class StoryChrome
         .story-lock-modal.theme-boy-2 { --story-modal-bg: linear-gradient(145deg, #182d52, #0b1428); --story-modal-border: rgba(119, 178, 255, .58); --story-modal-text: #eef6ff; --story-modal-accent: #8dc5ff; --story-modal-glow: rgba(80, 145, 255, .24); }
         .story-lock-modal.theme-girl-1 { --story-modal-bg: linear-gradient(145deg, #fff2f7, #f5d9e6); --story-modal-border: rgba(220, 83, 139, .38); --story-modal-text: #5a2640; --story-modal-accent: #d9558f; --story-modal-glow: rgba(217, 85, 143, .2); }
         .story-lock-modal.theme-girl-2 { --story-modal-bg: linear-gradient(145deg, #332044, #170e26); --story-modal-border: rgba(201, 155, 255, .58); --story-modal-text: #fbf4ff; --story-modal-accent: #d1aaff; --story-modal-glow: rgba(174, 112, 255, .24); }
+        .story-lock-modal.theme-anniversary-1 { --story-modal-bg: linear-gradient(145deg, #3b352b, #1c1a15); --story-modal-border: rgba(201, 191, 168, .55); --story-modal-text: #f4efe4; --story-modal-accent: #c9bfa8; --story-modal-glow: rgba(180, 160, 130, .2); }
+        .story-lock-modal.theme-anniversary-2 { --story-modal-bg: linear-gradient(145deg, #4d121a, #24070c); --story-modal-border: rgba(201, 167, 92, .58); --story-modal-text: #f6ecd6; --story-modal-accent: #c9a75c; --story-modal-glow: rgba(255, 196, 120, .22); }
+        .story-lock-modal.theme-anniversary-3 { --story-modal-bg: linear-gradient(145deg, #5b4632, #33261a); --story-modal-border: rgba(224, 168, 101, .55); --story-modal-text: #faf5ea; --story-modal-accent: #e0a865; --story-modal-glow: rgba(255, 214, 150, .22); }
+        .story-lock-modal.theme-anniversary-4 { --story-modal-bg: linear-gradient(145deg, #5c1712, #2c0a08); --story-modal-border: rgba(255, 154, 137, .58); --story-modal-text: #fdf6f2; --story-modal-accent: #ff9a89; --story-modal-glow: rgba(255, 140, 100, .24); }
 
         .story-lock-modal-icon {
             width: 56px;
@@ -453,7 +500,7 @@ final class StoryChrome
             }
         })();
         </script>
-        HTML . self::music($music);
+        HTML . self::navPlacement() . self::music($music);
     }
 
     /**
@@ -680,12 +727,193 @@ final class StoryChrome
         HTML . self::music($music);
     }
 
-    /** Gifts 1 and 2 — a way back to the gift screen. */
-    public static function gift(string $backUrl, ?array $music = null): string
+    /**
+     * Keep the floating button clear of whatever the design already put there.
+     *
+     * The bottom-right corner is the right place for it — out of the reading
+     * line, where a floating button is expected — but it is not always empty.
+     * Boy gift 1 puts its own Next in that corner, and the storybook's page
+     * arrows land there on a phone, so a fixed offset covers a control the
+     * recipient needs on some designs and floats in clear space on others.
+     *
+     * So the offset is measured rather than guessed: anything interactive that
+     * would sit under the button pushes it up above itself. Designs change
+     * shape as they are played — a book opens, a nav row appears — so this is
+     * re-run on resize and while the page is being used.
+     */
+    private static function navPlacement(): string
+    {
+        return <<<'HTML'
+        <script>
+        (function () {
+            const nav = document.querySelector('.story-nav');
+            if (!nav) return;
+
+            const GAP = 12;
+            const BASE = 16;
+
+            function place() {
+                nav.style.bottom = '';
+                const own = nav.getBoundingClientRect();
+                if (!own.width) return;
+
+                let lift = 0;
+                document.querySelectorAll('button, a, input, select, [onclick], [role="button"]').forEach((el) => {
+                    if (nav.contains(el)) return;
+
+                    const style = getComputedStyle(el);
+                    if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0') return;
+
+                    const box = el.getBoundingClientRect();
+                    if (box.width < 8 || box.height < 8) return;
+
+                    // Only what actually sits under the button, not beside it.
+                    if (box.right < own.left - GAP || box.left > own.right + GAP) return;
+                    if (box.bottom < own.top - GAP) return;
+
+                    lift = Math.max(lift, window.innerHeight - box.top + GAP);
+                });
+
+                // A design whose whole page is one big button would otherwise
+                // push this off the top; half the screen is as far as it goes.
+                lift = Math.min(lift, window.innerHeight * 0.5);
+                nav.style.bottom = lift > BASE ? lift + 'px' : '';
+            }
+
+            place();
+            window.addEventListener('resize', place);
+            window.addEventListener('orientationchange', place);
+
+            // The designs grow their controls as they are played through, so
+            // the corner is measured again as the page changes rather than once.
+            new MutationObserver(place).observe(document.body, {
+                subtree: true,
+                childList: true,
+                attributes: true,
+                attributeFilter: ['class', 'style', 'hidden', 'disabled'],
+            });
+            setTimeout(place, 600);
+            setTimeout(place, 2000);
+        })();
+        </script>
+        HTML;
+    }
+
+    /**
+     * Hold the way onward back until the gift has actually been played out.
+     *
+     * A gift that pages through beats ends up with two Next buttons on screen
+     * at once — its own, which turns to the next card or spread, and the
+     * story's, which leaves the gift altogether — and the recipient taps the
+     * wrong one and skips half the gift. So the story's button is hidden until
+     * the design says it is done.
+     *
+     * The designs are standalone documents this class only ever adds to, so
+     * "done" is read off the markers each one already keeps for its own
+     * progress dots and buttons. There are five shapes of gift and each branch
+     * below names the one it serves; anything else is a single-page gift with
+     * nothing to finish, and its button is shown at once.
+     */
+    private static function giftGate(): string
+    {
+        return <<<'HTML'
+        <script>
+        (function () {
+            const nav = document.querySelector('.story-nav');
+            if (!nav) return;
+
+            const book = document.getElementById('book');
+            const dots = document.getElementById('dots');
+            const pageDots = document.getElementById('pageDots');
+            const gallery = document.getElementById('gallery');
+
+            /** Is the last dot of a progress row the one being shown? */
+            function lastDotReached(row) {
+                if (!row || !row.children.length) return false;
+                const last = row.children[row.children.length - 1];
+                return last.classList.contains('active') || last.classList.contains('done');
+            }
+
+            let finished;
+
+            if (book && pageDots) {
+                // Birthday gift 3 — the paged storybook. It disables its own
+                // Next on the last page and marks the last dot.
+                const next = document.getElementById('nextBtn');
+                finished = () => lastDotReached(pageDots) || !!(next && next.disabled);
+            } else if (book) {
+                // Anniversary gift 3 — the pop-up book. Its dots only track the
+                // three spreads, and the book is not done until it is shut
+                // again on "The End", which is what `ended` marks.
+                finished = () => book.classList.contains('ended');
+            } else if (dots) {
+                // Anniversary gift 2 — the scratch cards. The last card is the
+                // letter, and its dot goes active when the letter is reached.
+                finished = () => lastDotReached(dots);
+            } else if (gallery) {
+                // Birthday girl gift 3 — the camera roll. There is nothing to
+                // page through; opening the cover reveals the whole roll.
+                finished = () => gallery.classList.contains('active');
+            } else {
+                // A single-page gift — nothing to wait for.
+                finished = () => true;
+            }
+
+            let done = false;
+            function check() {
+                if (done || !finished()) return;
+                done = true;
+                nav.classList.add('is-ready');
+                observer.disconnect();
+                clearInterval(poll);
+                clearTimeout(failsafe);
+            }
+
+            // Between them these catch every way the designs change state: the
+            // class flips and the `disabled` attribute are attribute changes,
+            // and the dot rows are rebuilt as children.
+            const observer = new MutationObserver(check);
+            observer.observe(document.body, {
+                subtree: true,
+                childList: true,
+                attributes: true,
+                attributeFilter: ['class', 'disabled', 'hidden'],
+            });
+
+            // Belt and braces: an animation that finishes without touching an
+            // observed node still gets picked up, and a design these rules do
+            // not fit never traps the recipient in a gift with no way out.
+            const poll = setInterval(check, 400);
+            const failsafe = setTimeout(() => {
+                done = true;
+                nav.classList.add('is-ready');
+                observer.disconnect();
+                clearInterval(poll);
+            }, 180000);
+
+            check();
+        })();
+        </script>
+        HTML;
+    }
+
+    /**
+     * Gifts 1 and 2 — a way back to the gift screen.
+     *
+     * `$gated` holds that button back until the gift has been played through
+     * (see `giftGate()`). Gift 1 is a single page and is never gated; gift 2
+     * is on the anniversary side, where it deals out a stack of cards.
+     */
+    public static function gift(string $backUrl, ?array $music = null, bool $gated = false): string
     {
         $url = e($backUrl);
+        $class = $gated ? 'story-nav is-gated' : 'story-nav';
 
-        return self::styles() . "<div class=\"story-nav\"><a href=\"{$url}\">Next →</a></div>" . self::music($music);
+        return self::styles()
+            . "<div class=\"{$class}\"><a href=\"{$url}\">Next →</a></div>"
+            . self::navPlacement()
+            . ($gated ? self::giftGate() : '')
+            . self::music($music);
     }
 
     /**
@@ -697,6 +925,10 @@ final class StoryChrome
      * way onward lives in the floating nav instead, which is above everything
      * and works whatever state the book is in — including after the recipient
      * closes it.
+     *
+     * Both buttons are gated: the book is the one gift where leaving early
+     * costs the most, and its own page arrows sit right where a stray tap on
+     * "One Last Thing" would land.
      */
     public static function book(string $endingUrl, string $backUrl, ?array $music = null): string
     {
@@ -704,25 +936,244 @@ final class StoryChrome
         $back = e($backUrl);
 
         return self::styles()
-            . "<div class=\"story-nav\">"
+            . "<div class=\"story-nav is-gated\">"
             . "<a href=\"{$back}\">← Gifts</a>"
             . "<a href=\"{$ending}\">One Last Thing →</a>"
-            . "</div>" . self::music($music);
+            . "</div>"
+            . self::navPlacement()
+            . self::giftGate()
+            . self::music($music);
     }
 
     /**
-     * The ending page — the story is over; only a way back is offered.
+     * The ending page — the story is over, and it stays over.
      *
-     * The music plays on here too. This is the last screen rather than a way
-     * out, and the recipient can still walk back to the gifts, so cutting the
-     * song off at the door would be the one silence in the whole story.
+     * There is no way back from here. The gifts are behind a passcode and a
+     * gift screen the recipient has already walked through; offering a door
+     * back into them turned the last page into another stop on a loop, and the
+     * ending never landed. So the chrome adds no navigation at all, and the
+     * theatre curtain below closes over whatever the design finished doing.
+     *
+     * The music plays on underneath. This is the last screen of the story
+     * rather than a way out of it, so cutting the song off at the door would
+     * be the one silence in the whole thing.
      */
-    public static function ending(string $giftsUrl, ?array $music = null): string
+    public static function ending(?array $music = null): string
     {
-        $url = e($giftsUrl);
+        return self::curtain() . self::music($music);
+    }
 
-        return self::styles()
-            . "<div class=\"story-nav\"><a href=\"{$url}\">← Back to the gifts</a></div>"
-            . self::music($music);
+    /**
+     * The theatre curtain that closes the story.
+     *
+     * It waits for the ending design to finish its own flourish rather than
+     * running on a timer of its own: all three families raise a final line
+     * when they are done — the boy letter's "The End", the girl keepsake's,
+     * the anniversary farewell once the candles are out — and each is a class
+     * being added to an element that is already in the page. The curtain takes
+     * that as its cue, holds a beat so the line can be read, then draws across
+     * and puts the same words up on the velvet.
+     *
+     * Once it is closed it takes the taps: the designs all offer a replay of
+     * their own (relight the candles, read the letter again), and the point of
+     * the curtain is that the story does not go round again.
+     */
+    private static function curtain(): string
+    {
+        return <<<'HTML'
+        <style>
+        .story-curtain {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            pointer-events: none;
+            overflow: hidden;
+            font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        .story-curtain.is-closing {
+            pointer-events: auto;
+        }
+
+        /*
+         * Each half is a little over half the screen so the two overlap in the
+         * middle — a real curtain does not meet in a seam, and a hairline of
+         * the page showing through would give the whole thing away.
+         */
+        .story-curtain__panel {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 53%;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0, 0, 0, 0.44) 0 13px,
+                    rgba(255, 255, 255, 0.055) 32px,
+                    rgba(0, 0, 0, 0.44) 58px
+                ),
+                linear-gradient(90deg, #3f070e, #7d1420 40%, #5d0d17 68%, #2b0408);
+            box-shadow: 0 0 70px rgba(0, 0, 0, 0.6) inset;
+            transition: transform 2.15s cubic-bezier(0.33, 0.02, 0.2, 1);
+            will-change: transform;
+        }
+
+        .story-curtain__panel--left {
+            left: 0;
+            transform: translateX(-101%);
+        }
+
+        .story-curtain__panel--right {
+            right: 0;
+            transform: translateX(101%);
+        }
+
+        .story-curtain.is-closing .story-curtain__panel--left,
+        .story-curtain.is-closing .story-curtain__panel--right {
+            transform: translateX(0);
+        }
+
+        /* The pelmet across the top, so the panels hang from something. */
+        .story-curtain__valance {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 74px;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(0, 0, 0, 0.4) 0 16px,
+                    rgba(255, 255, 255, 0.06) 38px,
+                    rgba(0, 0, 0, 0.4) 66px
+                ),
+                linear-gradient(180deg, #8a1723, #4a0a12);
+            border-bottom: 2px solid rgba(214, 173, 94, 0.55);
+            transform: translateY(-102%);
+            transition: transform 1.5s cubic-bezier(0.33, 0.02, 0.2, 1) 0.35s;
+        }
+
+        .story-curtain.is-closing .story-curtain__valance {
+            transform: translateY(0);
+        }
+
+        .story-curtain__title {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1.1s ease, transform 1.1s ease;
+        }
+
+        .story-curtain.is-titled .story-curtain__title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .story-curtain__title span {
+            font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
+            font-size: clamp(38px, 11vw, 92px);
+            font-weight: 500;
+            font-style: italic;
+            letter-spacing: 0.06em;
+            color: #f0dcae;
+            text-shadow: 0 2px 26px rgba(0, 0, 0, 0.65), 0 0 44px rgba(214, 173, 94, 0.3);
+        }
+
+        .story-curtain__rule {
+            width: min(190px, 42vw);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(214, 173, 94, 0.75), transparent);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .story-curtain__panel,
+            .story-curtain__valance {
+                transition: transform 0.01s linear;
+            }
+
+            .story-curtain__title {
+                transition: opacity 0.3s ease;
+                transform: none;
+            }
+        }
+        </style>
+        <div class="story-curtain" id="storyCurtain" aria-hidden="true">
+            <div class="story-curtain__panel story-curtain__panel--left"></div>
+            <div class="story-curtain__panel story-curtain__panel--right"></div>
+            <div class="story-curtain__valance"></div>
+            <div class="story-curtain__title">
+                <div class="story-curtain__rule"></div>
+                <span id="storyCurtainLabel">The End</span>
+                <div class="story-curtain__rule"></div>
+            </div>
+        </div>
+        <script>
+        (function () {
+            const curtain = document.getElementById('storyCurtain');
+            if (!curtain) return;
+
+            // Each ending family raises its own closing line when it is done.
+            // The client can reword it, so the curtain takes the wording from
+            // whichever element it finds rather than printing its own.
+            const finale = document.getElementById('theEnd')          // birthday, boy
+                || document.getElementById('keepsakeEnd')             // birthday, girl
+                || document.getElementById('farewell');               // anniversary
+
+            const label = document.getElementById('storyCurtainLabel');
+            const wording = (document.getElementById('theEnd') || document.getElementById('keepsakeEnd'));
+            if (label && wording) {
+                const text = wording.textContent.trim();
+                if (text) label.textContent = text;
+            }
+
+            let closed = false;
+            function close() {
+                if (closed) return;
+                closed = true;
+                curtain.classList.add('is-closing');
+                curtain.setAttribute('aria-hidden', 'false');
+                setTimeout(() => curtain.classList.add('is-titled'), 1900);
+            }
+
+            // A beat before it draws, so the design's own last line can be read.
+            function cue() {
+                setTimeout(close, 2600);
+            }
+
+            if (!finale) {
+                // A design without a closing line of its own still gets its
+                // curtain, just on the clock rather than on a cue.
+                setTimeout(close, 45000);
+                return;
+            }
+
+            function done() {
+                return finale.classList.contains('show') || document.body.classList.contains('blown');
+            }
+
+            if (done()) {
+                cue();
+                return;
+            }
+
+            const observer = new MutationObserver(() => {
+                if (!done()) return;
+                observer.disconnect();
+                cue();
+            });
+            observer.observe(document.body, {
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class'],
+            });
+        })();
+        </script>
+        HTML;
     }
 }

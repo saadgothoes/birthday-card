@@ -103,6 +103,11 @@
             --np-b: #ffc978;
         }
 
+        .np.side-anniversary {
+            --np-a: #e0c9a0;
+            --np-b: #d99a8a;
+        }
+
         .np-pill {
             display: flex;
             align-items: center;

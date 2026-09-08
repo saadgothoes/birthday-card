@@ -236,8 +236,70 @@ honors `prefers-reduced-motion`.
 
 ---
 
+## Dashboard integration
+
+Done so far (see [DASHBOARD_WIZARD_DOCUMENTATION.md §33](DASHBOARD_WIZARD_DOCUMENTATION.md)):
+
+- **Occasion picker** before Step 1 — Birthday (unchanged flow) vs Anniversary,
+  as an in-dashboard tab (+ Proposal / Valentine's "coming soon").
+  `birthday_cards.occasion` column, `POST /client/card/occasion`.
+- **Anniversary wizard** (10 steps, dashboard-integrated, dynamic live previews):
+  1. **Theme** — 2 colour families (White & Cream = variants 1 & 3, Rose & Red = 2 & 4)
+  2. **Lock Screen** — photo + 4-digit code
+  3. **Welcome Screen** — heading + message
+  4. **Gift Box Screen** — the family's two `page/3/{v}` designs, shown as the real
+     gift **image** (not the CSS fallback)
+  5. **Gift 1** (Keepsake) — 2 themes + photos, names, date, years, letter, signature
+  6. **Gift 2** (Scratch) — 2 themes + names, up to 4 memory cards, closing letter
+  7. **Gift 3** (Pop-up Book) — 2 themes + photos, names, date, years, two lines, letter
+  8. **Ending** (Blow out the candles) — 2 themes + names, years, message, signature
+  9. **Music** — one library track + the two-minute clip picker (see below)
+  10. **Share Link & QR** — one of six anniversary QR designs, then generate
+
+  Each gift/ending offers only the **2 themes of the chosen family**. Names, date
+  and years carry forward from Gift 1. Reuses the generic card columns
+  (`variant`, `lock_code`, `profile_image_path`, `heading`, `welcome_message`,
+  `gift_screen_variant`, `gift{1,2,3}_data`, `ending_data`) + `current_step`.
+  Endpoints: `POST /client/card/anniversary/{theme,lock,welcome,gift-screen,gift-1,gift-2,gift-3,ending}`.
+  Resume restores everything.
+
+Gifts 2 & 3 are **beat sub-wizards** — one memory card / book spread per beat,
+the live preview auto-opens to it (`preview_card=N` on gift 2, `open=sN` on
+gift 3), Continue held to the last beat. Mandatory fields (theme, photos) block
+progress with an inline message.
+
+**Music (step 9)** reuses the birthday side wholesale: the same `saveStep9`
+endpoint, the same `music_data` column, and the *same* clip-picker element —
+`openClipPicker(url, mountId)` moves the one picker into whichever step asked
+for it, so there is no second copy of the slider, preview and volume controls.
+Skip leaves the story silent. Playback needed nothing new: `PublicStoryController`
+already reads `music_data` regardless of occasion.
+
+**QR (step 10)** generates the `/c/{slug}` link + QR (subscription-gated, reuses
+`saveStep10`). Anniversary cards get their **own family of six** designs —
+`QR_THEMES['anniversary']`, keyed off the occasion by `qrThemesForCard()` rather
+than off `theme`, which an anniversary card doesn't have. `saveStep10` validates
+the number against that card's own set, so birthday stays at four and
+anniversary accepts 1-6.
+
+| # | Design | Look |
+| - | --- | --- |
+| 1 | Taupe Vow | Charcoal squares on a warm ivory card |
+| 2 | Maroon & Gold | Rounded modules, gold double border, hearts |
+| 3 | Peach Gold | Soft dots on ivory, petal corners |
+| 4 | Crimson & White | Bright red rounded modules, heart corners |
+| 5 | Ivory Minimal | Plain squares, no border |
+| 6 | Midnight Vow | Dark card, rose gold dots, sparkle corners |
+
+The public story's own chrome — the gate that holds the way out of gifts 2 and 3
+until they are finished, the nav moved to the right edge, and the theatre curtain
+that closes the ending — is shared with the birthday side; see
+[DASHBOARD_WIZARD_DOCUMENTATION.md §34](DASHBOARD_WIZARD_DOCUMENTATION.md).
+
+**The public anniversary story is wired** — `PublicStoryController`
+renders an `occasion === 'anniversary'` card through lock → welcome → gifts →
+gift 1/2/3 → ending, and `StoryChrome` injects the same nav.
+
 ## TODO (later functionality)
 
-- Controller + wizard step so an anniversary card can be built and saved.
-- Wire `PublicStoryController` (`theme === 'anniversary'`) to serve pages 1-4
-  and the gifts through `/c/{slug}`.
+- The photo crop/position the birthday lock step has.

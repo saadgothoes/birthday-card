@@ -40,7 +40,7 @@
             @php
                 $qrImage = \App\Support\QrRenderer::dataUri(
                     $shareUrl,
-                    \App\Http\Controllers\Client\BirthdayCardController::qrThemes($card->theme)[$card->qr_data['theme']],
+                    \App\Http\Controllers\Client\BirthdayCardController::qrThemesForCard($card)[$card->qr_data['theme']],
                     180,
                 );
             @endphp
