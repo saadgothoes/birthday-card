@@ -99,11 +99,12 @@ class BirthdayCardController extends Controller
 
     // Occasion — the very first choice, before Step 1. "birthday" leaves the
     // existing boy/girl wizard exactly as it is; "anniversary" swaps in the
-    // anniversary theme picker. Does not touch current_step — it sits before it.
+    // anniversary theme picker, and "proposal" the four-step proposal wizard.
+    // Does not touch current_step — it sits before it.
     public function saveOccasion(Request $request)
     {
         $data = $request->validate([
-            'occasion' => 'required|in:birthday,anniversary',
+            'occasion' => 'required|in:birthday,anniversary,proposal',
         ]);
 
         $card = $this->currentDraft();
@@ -398,6 +399,327 @@ class BirthdayCardController extends Controller
         $card->save();
 
         return response()->json(['success' => true, 'card_id' => $card->id]);
+    }
+
+
+    // ─── Proposal wizard ─────────────────────────────────────────────────
+    // A proposal is not a five-screen story like a birthday or an anniversary
+    // card — it is one page that the recipient opens, plays through, and
+    // answers. So it gets a four-step wizard of its own (design & theme →
+    // words & photos → music → link) and the same generic columns everything
+    // else uses:
+    //
+    //     variant              which of the four designs
+    //     gift_screen_variant  which of that design's four colour themes
+    //     gift1_data           every word and photo on the page
+    //     music_data / qr_data the shared music + QR steps, unchanged
+    //
+    // The registry below is the single source of truth for what those numbers
+    // mean: the dashboard renders its design cards, theme swatches and per-
+    // design field list from it, and the endpoints validate against it, so a
+    // fifth design or a fifth theme is one entry here rather than an edit in
+    // four places.
+
+    /**
+     * The four proposal designs, each with four colour themes.
+     *
+     * `fields` is what the client is asked for on that design — the wizard
+     * shows exactly these, and nothing that design would ignore. `photos` is
+     * the same for image slots. Two of every design's themes are the soft
+     * side and two the bold side (`side`), which is the only grouping the
+     * dashboard shows.
+     *
+     * `beats` is the five phases the design plays, in order — the invitation,
+     * the opening motion, what it reveals, the question, and the answer. The
+     * design cards light each one up as the looping demo reaches it, so the
+     * five are a contract with `_proposal_demo.blade.php`, not just a blurb.
+     *
+     * `defaults` is the sample wording. It is read in *two* places — the page
+     * itself falls back to it when a parameter is missing, and the wizard
+     * pre-fills its empty boxes from it — so a client is never handed a blank
+     * form, and what they see in the preview before typing is exactly what
+     * they would get if they typed nothing at all.
+     */
+    public const PROPOSAL_DESIGNS = [
+        1 => [
+            'name' => 'Box & Ring Reveal',
+            'mood' => 'Classic · warm-romantic',
+            'blurb' => 'A wrapped box unties itself, the lid lifts on its hinge, and a folded letter rises and opens with the ring glowing at its base.',
+            'beats' => ['Tap the box', 'Ribbon off, lid up', 'The letter unfolds', 'The question', 'Confetti and petals'],
+            'fields' => ['heading', 'tap_label', 'letter_text', 'question', 'yes_label', 'no_label', 'yes_heading', 'closing_line', 'signed'],
+            'photos' => ['ring_photo'],
+            'defaults' => [
+                'to_name' => 'Ayesha',
+                'from_name' => 'Bilal',
+                'heading' => 'For you',
+                'tap_label' => 'Tap to open',
+                'letter_text' => "From the first day, it was always you.\n"
+                    . "I have thought about this a hundred times,\n"
+                    . "and every time the answer is the same.\n"
+                    . 'So here it is, in my own words.',
+                'question' => 'Will you marry me?',
+                'yes_label' => 'Yes 💍',
+                'no_label' => 'No',
+                'yes_heading' => 'She Said YES! 💍',
+                'closing_line' => 'The rest of my life starts here.',
+                'signed' => '— always yours',
+            ],
+            'themes' => [
+                1 => ['name' => 'Rose Gold & Cream', 'side' => 'soft', 'swatch' => '#e8c9b0', 'accent' => '#a35a56'],
+                2 => ['name' => 'Blush Pearl',       'side' => 'soft', 'swatch' => '#f3d6e0', 'accent' => '#c2607f'],
+                3 => ['name' => 'Midnight Velvet',   'side' => 'bold', 'swatch' => '#2f3a63', 'accent' => '#d9b26a'],
+                4 => ['name' => 'Emerald & Gold',    'side' => 'bold', 'swatch' => '#1e5c4d', 'accent' => '#e2b866'],
+            ],
+        ],
+        2 => [
+            'name' => 'Locket / Heart Open',
+            'mood' => 'Premium · heirloom',
+            'blurb' => 'A heart-shaped locket breathes, then splits down its seam and swings open on a photo of the two of you and the ring.',
+            'beats' => ['Tap the locket', 'The halves swing open', 'Photo and ring inside', 'The question', 'They drift together'],
+            'fields' => ['heading', 'tap_label', 'question', 'yes_label', 'no_label', 'yes_heading', 'closing_line', 'signed'],
+            'photos' => ['couple_photo', 'ring_photo'],
+            'defaults' => [
+                'to_name' => 'Ayesha',
+                'from_name' => 'Bilal',
+                'heading' => 'Open me',
+                'tap_label' => 'Tap to open',
+                'question' => 'Will you marry me?',
+                'yes_label' => 'Yes 💍',
+                'no_label' => 'No',
+                'yes_heading' => 'She Said YES! 💍',
+                'closing_line' => 'Kept in a locket, and now kept for good.',
+                'signed' => '— always yours',
+            ],
+            'themes' => [
+                1 => ['name' => 'Burgundy & Gold',  'side' => 'bold', 'swatch' => '#5c1420', 'accent' => '#c9a75c'],
+                2 => ['name' => 'Rose Quartz',      'side' => 'soft', 'swatch' => '#dba9bd', 'accent' => '#a4485f'],
+                3 => ['name' => 'Champagne Ivory',  'side' => 'soft', 'swatch' => '#e2cdae', 'accent' => '#9c7247'],
+                4 => ['name' => 'Onyx & Silver',    'side' => 'bold', 'swatch' => '#33393f', 'accent' => '#cfd6dd'],
+            ],
+        ],
+        3 => [
+            'name' => 'Countdown Reveal',
+            'mood' => 'Suspense · anticipation',
+            'blurb' => 'A dark screen and a numeral counting down. At zero it bursts, a wipe opens the reveal, and the question lands with fireworks behind the answer.',
+            'beats' => ['A warning line', 'The countdown runs', 'Zero — the wipe', 'The question', 'Fireworks and the date'],
+            'fields' => ['pre_label', 'countdown_seconds', 'question', 'yes_label', 'no_label', 'yes_heading', 'wedding_date', 'altar_label', 'fallback_line', 'closing_line', 'signed'],
+            'photos' => ['ring_photo'],
+            'defaults' => [
+                'to_name' => 'Ayesha',
+                'from_name' => 'Bilal',
+                'pre_label' => 'Something special is coming…',
+                'countdown_seconds' => '5',
+                'question' => 'Will you marry me?',
+                'yes_label' => 'Yes 💍',
+                'no_label' => 'No',
+                'yes_heading' => 'She Said YES! 💍',
+                'altar_label' => 'See you at the altar',
+                'fallback_line' => 'We will pick the date together.',
+                'closing_line' => 'Every second of the wait was worth it.',
+                'signed' => '— always yours',
+            ],
+            'themes' => [
+                1 => ['name' => 'Midnight Violet', 'side' => 'bold', 'swatch' => '#3a1f3d', 'accent' => '#f0d08a'],
+                2 => ['name' => 'Deep Sea',        'side' => 'bold', 'swatch' => '#0d3b4d', 'accent' => '#7fe3d4'],
+                3 => ['name' => 'Starlit Rose',    'side' => 'soft', 'swatch' => '#5c2a44', 'accent' => '#ffc2d4'],
+                4 => ['name' => 'Aurora Ice',      'side' => 'soft', 'swatch' => '#2b3566', 'accent' => '#bcd6ff'],
+            ],
+        ],
+        4 => [
+            'name' => 'Balloon Pop',
+            'mood' => 'Playful · light',
+            'blurb' => 'A tied bouquet sways until it is tapped, then pops balloon by balloon and drops the ring into the middle. The Yes sends a whole screen of balloons up.',
+            'beats' => ['Tap the balloons', 'They pop, 80ms apart', 'The ring drops in', 'The question', 'A screen of balloons'],
+            'fields' => ['heading', 'tap_label', 'question', 'yes_label', 'no_label', 'yes_heading', 'closing_line', 'signed'],
+            'photos' => ['ring_photo'],
+            'defaults' => [
+                'to_name' => 'Ayesha',
+                'from_name' => 'Bilal',
+                'heading' => 'A little something',
+                'tap_label' => 'Tap the balloons',
+                'question' => 'Will you marry me?',
+                'yes_label' => 'Yes! 🎉',
+                'no_label' => 'No',
+                'yes_heading' => 'She Said YES! 💍',
+                'closing_line' => 'Best day ever — and it only gets better from here.',
+                'signed' => '— always yours',
+            ],
+            'themes' => [
+                1 => ['name' => 'Pastel Sky',      'side' => 'soft', 'swatch' => '#cfe8f0', 'accent' => '#e2698c'],
+                2 => ['name' => 'Candy Blush',     'side' => 'soft', 'swatch' => '#ffd9c7', 'accent' => '#ef6f8e'],
+                3 => ['name' => 'Mint & Sunshine', 'side' => 'bold', 'swatch' => '#d8f3e6', 'accent' => '#2f9e7a'],
+                4 => ['name' => 'Bold Pop',        'side' => 'bold', 'swatch' => '#dbe7ff', 'accent' => '#2f5fe0'],
+            ],
+        ],
+    ];
+
+    /**
+     * How long every proposal text field may be.
+     *
+     * The designs are typeset to these: a question is one line at a display
+     * size, a closing line is two, and only the Design 1 letter is a
+     * paragraph. Anything longer would wrap out of the composition, so the
+     * limit is enforced on the way in rather than trimmed on the way out.
+     */
+    public const PROPOSAL_LIMITS = [
+        'to_name' => 24,
+        'from_name' => 24,
+        'heading' => 32,
+        'tap_label' => 32,
+        'letter_text' => 400,
+        'pre_label' => 60,
+        'question' => 60,
+        'yes_label' => 20,
+        'no_label' => 20,
+        'yes_heading' => 44,
+        'altar_label' => 40,
+        'fallback_line' => 60,
+        'closing_line' => 160,
+        'signed' => 30,
+    ];
+
+    /** Every image slot any proposal design offers. */
+    public const PROPOSAL_PHOTO_KEYS = ['ring_photo', 'couple_photo'];
+
+    /** The Design 1 letter is the one multi-line field; keep it to a stanza. */
+    public const PROPOSAL_LETTER_MAX_LINES = 8;
+
+    /** One design's definition, design 1 by default. */
+    public static function proposalDesign(?int $design): array
+    {
+        return self::PROPOSAL_DESIGNS[$design] ?? self::PROPOSAL_DESIGNS[1];
+    }
+
+    /**
+     * A design's sample wording.
+     *
+     * The design partials read this for their own `request(...)` fallbacks and
+     * the wizard pre-fills from it, so there is exactly one copy of every
+     * default sentence in the codebase.
+     */
+    public static function proposalDefaults(?int $design): array
+    {
+        return self::proposalDesign($design)['defaults'];
+    }
+
+    /** The text fields a given design actually uses. */
+    public static function proposalTextKeys(?int $design): array
+    {
+        return array_values(array_intersect(
+            self::proposalDesign($design)['fields'],
+            array_keys(self::PROPOSAL_LIMITS)
+        ));
+    }
+
+    // Proposal step 1 — which design, and which of its four colour themes.
+    // Both live on the card itself (`variant` / `gift_screen_variant`) rather
+    // than in the JSON, so the preview URL can be built without unpacking it.
+    public function saveProposalDesign(Request $request)
+    {
+        $data = $request->validate([
+            'design' => 'required|integer|in:1,2,3,4',
+            'theme' => 'required|integer|in:1,2,3,4',
+        ]);
+
+        $card = $this->currentDraft();
+        $card->occasion = 'proposal';
+        $card->variant = (int) $data['design'];
+        $card->gift_screen_variant = (int) $data['theme'];
+        $card->current_step = max($card->current_step, 2);
+        $card->save();
+
+        return response()->json(['success' => true, 'card_id' => $card->id]);
+    }
+
+    // Proposal step 2 — every word and photo on the page, stored in gift1_data.
+    //
+    // Only the chosen design's own fields are validated and kept: asking a
+    // Balloon Pop card to carry a countdown length, or a Countdown card to
+    // carry a letter, would put values in the JSON that nothing ever reads and
+    // that the client never saw a box for.
+    public function saveProposalContent(Request $request)
+    {
+        $card = $this->currentDraft();
+        $card->occasion = 'proposal';
+        $design = (int) ($card->variant ?: 1);
+        $spec = self::proposalDesign($design);
+
+        $rules = [
+            'to_name' => 'nullable|string|max:' . self::PROPOSAL_LIMITS['to_name'],
+            'from_name' => 'nullable|string|max:' . self::PROPOSAL_LIMITS['from_name'],
+            'photos' => 'nullable|array',
+            'photos.*' => 'nullable|image|max:5120',
+        ];
+        foreach (self::proposalTextKeys($design) as $key) {
+            $rules[$key] = 'nullable|string|max:' . self::PROPOSAL_LIMITS[$key];
+        }
+        if (in_array('countdown_seconds', $spec['fields'], true)) {
+            $rules['countdown_seconds'] = 'nullable|integer|min:1|max:10';
+        }
+        if (in_array('wedding_date', $spec['fields'], true)) {
+            $rules['wedding_date'] = 'nullable|date';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        // The letter is the only field where the shape matters as much as the
+        // length — the paper it is printed on has a fixed number of lines.
+        $validator->after(function ($validator) use ($request, $spec) {
+            if (! in_array('letter_text', $spec['fields'], true)) {
+                return;
+            }
+            $lines = preg_split('/\r\n|\r|\n/', (string) $request->input('letter_text'));
+            if (count(array_filter($lines, fn ($l) => trim($l) !== '')) > self::PROPOSAL_LETTER_MAX_LINES) {
+                $validator->errors()->add('letter_text',
+                    'The letter is longer than ' . self::PROPOSAL_LETTER_MAX_LINES . ' lines.');
+            }
+        });
+
+        $data = $validator->validate();
+
+        $existing = $card->gift1_data ?? [];
+        $photos = $existing['photos'] ?? [];
+
+        foreach ($request->file('photos', []) as $key => $file) {
+            if (! $file || ! in_array($key, $spec['photos'], true)) {
+                continue;
+            }
+            if (! empty($photos[$key])) {
+                Storage::disk('public')->delete($photos[$key]);
+            }
+            $photos[$key] = $file->store('birthday-cards/proposal', 'public');
+        }
+
+        // A design change can leave a photo behind that the new design has no
+        // slot for; it stays on disk but is not carried into the payload.
+        $photos = array_intersect_key($photos, array_flip($spec['photos']));
+
+        $content = [
+            'design' => $design,
+            'theme' => (int) ($card->gift_screen_variant ?: 1),
+            'to_name' => $data['to_name'] ?? null,
+            'from_name' => $data['from_name'] ?? null,
+            'photos' => $photos,
+        ];
+        foreach (self::proposalTextKeys($design) as $key) {
+            $content[$key] = $this->normaliseNewlines($data[$key] ?? null);
+        }
+        if (isset($rules['countdown_seconds'])) {
+            $content['countdown_seconds'] = $data['countdown_seconds'] ?? null;
+        }
+        if (isset($rules['wedding_date'])) {
+            $content['wedding_date'] = $data['wedding_date'] ?? null;
+        }
+
+        $card->gift1_data = $content;
+        $card->current_step = max($card->current_step, 3);
+        $card->save();
+
+        return response()->json([
+            'success' => true,
+            'card_id' => $card->id,
+            'photo_urls' => array_map(fn ($p) => $p ? Storage::url($p) : null, $photos),
+        ]);
     }
 
     // Step 1 — save theme + variant selection
@@ -1279,6 +1601,117 @@ class BirthdayCardController extends Controller
                 'radius' => 0.11,
             ],
         ],
+        // The proposal family is six of its own, drawn from the four designs'
+        // palettes rather than from the birthday or anniversary sets — a
+        // proposal card carries no boy/girl `theme` at all, so the occasion is
+        // what picks the family (see qrThemesForCard).
+        'proposal' => [
+            1 => [
+                'name' => 'Rose Gold Vow',
+                'blurb' => 'Rounded modules on warm cream, petal corners',
+                'available' => true,
+                'bg' => '#F7ECE2',
+                'plate' => '#FFFAF4',
+                'module' => '#7A3B36',
+                'module_alt' => '#A35A56',
+                'eye_frame' => '#A35A56',
+                'eye_ball' => '#7A3B36',
+                'shape' => 'rounded',
+                'frame' => 'solid',
+                'frame_color' => '#C98F6D',
+                'label' => 'Scan to open',
+                'label_color' => '#8A6A5C',
+                'motif' => 'petal',
+                'motif_color' => '#C98F6D',
+                'radius' => 0.10,
+            ],
+            2 => [
+                'name' => 'Midnight Velvet',
+                'blurb' => 'Dark card, gold dots, sparkle corners',
+                'available' => true,
+                'bg' => '#1B2036',
+                'plate' => '#FBF6EA',
+                'module' => '#2F3A63',
+                'eye_frame' => '#8A6C2E',
+                'eye_ball' => '#2F3A63',
+                'shape' => 'dot',
+                'frame' => 'solid',
+                'frame_color' => '#D9B26A',
+                'label' => 'Open it',
+                'label_color' => '#E7CE97',
+                'motif' => 'sparkle',
+                'motif_color' => '#D9B26A',
+                'radius' => 0.09,
+            ],
+            3 => [
+                'name' => 'Burgundy Seal',
+                'blurb' => 'Deep red squares, gold double border, hearts',
+                'available' => true,
+                'bg' => '#F6ECD6',
+                'plate' => '#FFFDF6',
+                'module' => '#5C1420',
+                'eye_frame' => '#8A2231',
+                'eye_ball' => '#5C1420',
+                'shape' => 'square',
+                'frame' => 'double',
+                'frame_color' => '#C9A75C',
+                'label' => 'A question inside',
+                'label_color' => '#8A2231',
+                'motif' => 'heart',
+                'motif_color' => '#A35A56',
+                'radius' => 0.06,
+            ],
+            4 => [
+                'name' => 'Blush Petal',
+                'blurb' => 'Soft dots on blush, petal corners, no border',
+                'available' => true,
+                'bg' => '#FDF2F5',
+                'plate' => '#FFFFFF',
+                'module' => '#8A3D55',
+                'module_alt' => '#C2607F',
+                'eye_frame' => '#C2607F',
+                'eye_ball' => '#8A3D55',
+                'shape' => 'dot',
+                'frame' => 'none',
+                'label' => 'Scan me',
+                'label_color' => '#C2607F',
+                'motif' => 'petal',
+                'motif_color' => '#E9B7C7',
+                'radius' => 0.10,
+            ],
+            5 => [
+                'name' => 'Emerald Band',
+                'blurb' => 'Rounded emerald modules on ivory, gold rule',
+                'available' => true,
+                'bg' => '#EDF3EF',
+                'plate' => '#FBF8EC',
+                'module' => '#123A33',
+                'module_alt' => '#1E5C4D',
+                'eye_frame' => '#1E5C4D',
+                'eye_ball' => '#123A33',
+                'shape' => 'rounded',
+                'frame' => 'solid',
+                'frame_color' => '#C69F57',
+                'label' => 'Scan to open',
+                'label_color' => '#1E5C4D',
+                'radius' => 0.08,
+            ],
+            6 => [
+                'name' => 'Bold Pop',
+                'blurb' => 'Bright squares, dashed frame, nothing else',
+                'available' => true,
+                'bg' => '#DBE7FF',
+                'plate' => '#FFFFFF',
+                'module' => '#22305C',
+                'eye_frame' => '#2F5FE0',
+                'eye_ball' => '#22305C',
+                'shape' => 'square',
+                'frame' => 'dashed',
+                'frame_color' => '#2F5FE0',
+                'label' => '',
+                'radius' => 0.04,
+            ],
+        ],
     ];
 
     /** Path the published story will live under — see the share URL below. */
@@ -1325,16 +1758,16 @@ class BirthdayCardController extends Controller
     /**
      * The QR designs a given card may choose from.
      *
-     * An anniversary card has no boy/girl `theme` at all — it carries a
-     * `variant` instead — so keying off `theme` alone would silently hand it
-     * the boy set. The occasion decides the family first, and only a birthday
-     * card falls through to its side's designs.
+     * An anniversary or proposal card has no boy/girl `theme` at all — it
+     * carries a `variant` instead — so keying off `theme` alone would silently
+     * hand it the boy set. The occasion decides the family first (the key in
+     * QR_THEMES is the occasion name), and only a birthday card, whose
+     * occasion is not a family in there, falls through to its side's designs.
      */
     public static function qrThemesForCard(BirthdayCard $card): array
     {
-        return $card->occasion === 'anniversary'
-            ? self::QR_THEMES['anniversary']
-            : self::qrThemes($card->theme);
+        return self::QR_THEMES[$card->occasion]
+            ?? self::qrThemes($card->theme);
     }
 
     /** Whether a side's designs are wired up yet (girl is not, for now). */
@@ -1372,10 +1805,13 @@ class BirthdayCardController extends Controller
 
         $stem = Str::slug((string) (
             $card->gift3_data['to_name']
+            ?? $card->gift1_data['to_name']
             ?? $card->gift1_data['name_first']
             ?? $card->recipient_name
             ?? ''
-        )) ?: ($card->occasion === 'anniversary' ? 'anniversary' : 'birthday');
+        )) ?: (in_array($card->occasion, ['anniversary', 'proposal'], true)
+            ? $card->occasion
+            : 'birthday');
 
         do {
             $slug = $stem . '-' . Str::lower(Str::random(6));

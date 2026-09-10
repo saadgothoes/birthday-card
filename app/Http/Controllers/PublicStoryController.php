@@ -43,10 +43,22 @@ class PublicStoryController extends Controller
         return $card->occasion === 'anniversary';
     }
 
+    /**
+     * A proposal is the odd one out: it is not a five-screen story but a
+     * single page. There is no code to enter, no welcome, no gifts and no
+     * ending — the recipient opens the link and the whole thing happens there.
+     */
+    private function isProposal(BirthdayCard $card): bool
+    {
+        return $card->occasion === 'proposal';
+    }
+
     /** Can this card's story be rendered at all? */
     private function isLive(BirthdayCard $card): bool
     {
-        return $this->isAnniversary($card) || in_array($card->theme, self::LIVE_THEMES, true);
+        return $this->isAnniversary($card)
+            || $this->isProposal($card)
+            || in_array($card->theme, self::LIVE_THEMES, true);
     }
 
     /** Look a story up by its slug, or 404. */
@@ -78,6 +90,12 @@ class PublicStoryController extends Controller
     private function guard(Request $request, BirthdayCard $card)
     {
         if (! $this->isLive($card)) {
+            abort(404);
+        }
+
+        // A proposal has one page and it is the entry point, so welcome /
+        // gifts / ending are not "locked" for it — they simply do not exist.
+        if ($this->isProposal($card)) {
             abort(404);
         }
 
@@ -209,8 +227,10 @@ class PublicStoryController extends Controller
             'lockPath' => route('story.lock', $card->slug, false),
             'music' => $this->musicClip($card),
             'storageKey' => 'story-music:' . $card->slug,
-            'title' => $card->heading ?: ($this->isAnniversary($card) ? 'An Anniversary' : 'A Birthday Surprise'),
-            'side' => $this->isAnniversary($card) ? 'anniversary' : $card->theme,
+            'title' => $card->heading ?: $this->shellTitle($card),
+            'side' => $card->occasion === 'proposal' || $this->isAnniversary($card)
+                ? $card->occasion
+                : $card->theme,
         ])->render());
     }
 
@@ -244,12 +264,35 @@ class PublicStoryController extends Controller
 
     // ── Page 1 — the lock screen ────────────────────────────────────────
 
+    /** What the shell's tab and badge call this card. */
+    private function shellTitle(BirthdayCard $card): string
+    {
+        return match ($card->occasion) {
+            'anniversary' => 'An Anniversary',
+            'proposal' => 'A Question For You',
+            default => 'A Birthday Surprise',
+        };
+    }
+
     public function lock(Request $request, string $slug)
     {
         $card = $this->story($slug);
 
         if (! $this->isLive($card)) {
             abort(404);
+        }
+
+        // A proposal card's link opens the proposal itself. There is nothing
+        // to unlock, so this route — the one the QR encodes — renders the one
+        // page the card is, with the client's words and photos in it.
+        if ($this->isProposal($card)) {
+            return $this->render(
+                $request,
+                $card,
+                $this->proposalView($card),
+                $this->proposalParams($card),
+                StoryChrome::proposal($this->musicClip($card))
+            );
         }
 
         // Someone who already entered the code shouldn't have to do it again.
@@ -550,6 +593,55 @@ class PublicStoryController extends Controller
         $p['line1'] = $data['line1'] ?? null;
         $p['line2'] = $data['line2'] ?? null;
         return $p;
+    }
+
+    // ── The proposal — one page, one design, one theme ──────────────────
+
+    /**
+     * `variant` is the design and `gift_screen_variant` its colour theme, the
+     * same two numbers the dashboard's preview URL is built from — so the page
+     * a client approved and the page a recipient opens are the same file.
+     */
+    private function proposalView(BirthdayCard $card): string
+    {
+        $design = (int) ($card->variant ?: 1);
+        $theme = (int) ($card->gift_screen_variant ?: 1);
+
+        if ($design < 1 || $design > 4) {
+            $design = 1;
+        }
+        if ($theme < 1 || $theme > 4) {
+            $theme = 1;
+        }
+
+        return 'birthday.proposal-design-' . $design . '-theme-' . $theme;
+    }
+
+    /**
+     * Everything the client typed, as the query parameters the design already
+     * reads. Only the chosen design's own fields were stored, so this hands
+     * over whatever is there rather than a fixed list — a Countdown card has
+     * no letter and a Box card has no wedding date.
+     */
+    private function proposalParams(BirthdayCard $card): array
+    {
+        $data = $card->gift1_data ?? [];
+        $params = [];
+
+        foreach ($data as $key => $value) {
+            // `design` / `theme` are already in the view name, and `photos`
+            // is a set of stored paths rather than a page parameter.
+            if (in_array($key, ['design', 'theme', 'photos'], true)) {
+                continue;
+            }
+            $params[$key] = is_scalar($value) ? (string) $value : null;
+        }
+
+        foreach (BirthdayCardController::PROPOSAL_PHOTO_KEYS as $key) {
+            $params[$key] = $this->photoUrl($data['photos'][$key] ?? null);
+        }
+
+        return $params;
     }
 
     // ── The ending page ─────────────────────────────────────────────────

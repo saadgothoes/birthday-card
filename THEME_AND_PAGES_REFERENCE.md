@@ -17,7 +17,7 @@ All hex values are lifted straight from the templates' own `:root` custom proper
 /{side}/page/{page}/{variant}/gift/{gift}/{giftTheme}      → a gift, in one of 4 colour themes
 ```
 
-| side  | `boy` or `girl` (plus new `anniversary` — page 1 only, 4 colour variants) |
+| side  | `boy` or `girl` (plus `anniversary`, 4 colour variants, and `proposal`, 4 designs × 4 themes — §9b) |
 | ----- | --------------- |
 | page  | `1` lock · `2` welcome · `3` gift screen · `4` ending |
 | variant | `1` = default theme · `2` = alternate colour theme (route appends `-{variant}` to the view name; `1` never appends) |
@@ -323,6 +323,30 @@ differ between the 4 files. `?debug=true` outlines the hotspots.
 
 ---
 
+## 9b. Proposal module — 4 designs × 4 colour themes
+
+One page per card, not a five-screen story, so the shape here is different from
+every other section: the *design* decides the composition and the *theme*
+decides only its colours. Route `/proposal/design/{design}/{theme}`, both 1-4.
+
+Full palettes, params and behaviour: [proposal.md](proposal.md).
+
+| Design | Composition | Theme 1 | Theme 2 | Theme 3 | Theme 4 |
+| - | --- | --- | --- | --- | --- |
+| 1 Box & Ring Reveal | box → letter → ring → question | Rose Gold & Cream `#f7ece2 → #e8c9b0` | Blush Pearl `#fdf2f5 → #f3d6e0` | Midnight Velvet `#2f3a63 → #161b31` | Emerald & Gold `#1e5c4d → #0e332c` |
+| 2 Locket / Heart Open | heart splits on its seam | Burgundy & Gold `#a35a56 → #5c1420` | Rose Quartz `#f6dce4 → #dba9bd` | Champagne Ivory `#f7efe3 → #e2cdae` | Onyx & Silver `#33393f → #14171b` |
+| 3 Countdown Reveal | countdown → wipe → question | Midnight Violet `#3a1f3d → #0d0918` | Deep Sea `#0d3b4d → #03121b` | Starlit Rose `#5c2a44 → #150a13` | Aurora Ice `#2b3566 → #080b1a` |
+| 4 Balloon Pop | bouquet pops → ring drops | Pastel Sky `#cfe8f0 → #f6d9e3` | Candy Blush `#ffeef4 → #ffd9c7` | Mint & Sunshine `#d8f3e6 → #fdf3cf` | Bold Pop `#dbe7ff → #ffe2e2` |
+
+Two of every design's four themes are the **soft** side and two the **bold**
+side; which number is which differs per design, because theme 1 is that design's
+own signature look rather than a shared slot.
+
+Proposal QR designs (six, `QR_THEMES['proposal']`): Rose Gold Vow · Midnight
+Velvet · Burgundy Seal · Blush Petal · Emerald Band · Bold Pop.
+
+---
+
 ## 10. App-chrome pages (not the card itself)
 
 ### Client — card builder / dashboard family
@@ -408,6 +432,7 @@ Injects a numpad glow keyed to the card side:
 | Gift themes | Amber / Cocoa · Sky-Blue · Violet-Lilac · Coral · Mint-Teal · Forest · Charcoal — one per slot 1-4, differs by gift |
 | Ending boy | Steel · Graphite · Gold · Emerald |
 | Ending girl | Blush Rose · Lilac Dusk · Rose Gold Noir · Plum Midnight |
+| Proposal designs | 4 designs × 4 themes — see §9b; soft: rose gold, blush, quartz, ivory, pastels · bold: midnight, emerald, burgundy, onyx, deep sea |
 | Client builder | warm cream + boy/girl dual accent |
 | Client auth / cards | violet `#8B5CF6` |
 | Admin | cool grey-blue + indigo `#6366f1` |

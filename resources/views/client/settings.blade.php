@@ -485,6 +485,36 @@
             border: 1px solid #fca5a5;
         }
 
+        /* The hamburger. Visibility is CSS-driven — it is hidden by default
+           and only the narrow breakpoint reveals it — so it can never flash
+           as an unstyled button before any script runs. */
+        #menuToggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            background: var(--accent-soft);
+            border: 1.5px solid var(--accent);
+            border-radius: 10px;
+            color: var(--accent);
+            font-size: 1.15rem;
+            line-height: 1;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform .18s ease, background .18s ease;
+        }
+
+        #menuToggle:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        #menuToggle:active {
+            transform: scale(.94);
+        }
+
         /* Mobile */
         @media (max-width: 768px) {
             #menuToggle {
@@ -602,6 +632,13 @@
                             </svg>
                             Settings
                         </a>
+                        <a href="{{ route('client.contact') }}" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path>
+                            </svg>
+                            Contact Us
+                        </a>
                         <div class="dropdown-divider"></div>
                         <form method="POST" action="{{ route('client.logout') }}" style="margin:0">
                             @csrf
@@ -712,16 +749,14 @@
                 }
             });
 
-            // Show menu toggle on mobile
+            // Visibility of the hamburger is pure CSS now; this only makes sure a
+            // sidebar left open on a phone is closed again on a wide window.
             function updateMenuButton() {
-                const menuToggle = document.getElementById('menuToggle');
-                if (window.innerWidth <= 768) {
-                    menuToggle.style.display = 'flex';
-                } else {
-                    menuToggle.style.display = 'none';
+                if (window.innerWidth > 768) {
                     document.querySelector('.sidebar').classList.remove('open');
                     document.body.style.overflow = 'auto';
                 }
+            }
             }
 
             window.addEventListener('resize', updateMenuButton);

@@ -134,6 +134,8 @@ class ClientAuthController extends Controller
             'card' => $card,
             'musicTracks' => MusicTrack::where('is_active', true)->latest()->get(),
             'plans' => SubscriptionPlans::all(),
+            'paymentMethods' => \App\Models\PaymentMethod::active()->get(),
+            'supportContacts' => \App\Models\SupportContact::active()->get(),
             'hasSubscription' => $user->hasActiveSubscription(),
             'pendingRequest' => $user->pendingSubscriptionRequest(),
             'planLabel' => $user->planLabel(),
@@ -161,6 +163,18 @@ class ClientAuthController extends Controller
     public function profile()
     {
         return view('client.profile');
+    }
+
+    /**
+     * Contact / chat support. Everything on it is whatever the Super Admin
+     * published under Payment Methods — nothing here is hard-coded, so a
+     * changed WhatsApp number reaches clients without a deploy.
+     */
+    public function contact()
+    {
+        return view('client.contact', [
+            'supportContacts' => \App\Models\SupportContact::active()->get(),
+        ]);
     }
 
     // Update password

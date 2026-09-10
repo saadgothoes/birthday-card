@@ -745,6 +745,56 @@
             color: var(--text-muted);
         }
 
+        .pay-to,
+        .pay-acct,
+        .pay-from,
+        .pay-txn,
+        .pay-note {
+            display: block;
+            font-size: .74rem;
+            line-height: 1.5;
+        }
+
+        .pay-to {
+            font-weight: 700;
+            font-size: .8rem;
+        }
+
+        .pay-acct {
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .pay-from {
+            color: var(--text-muted);
+            margin-top: .25rem;
+        }
+
+        .pay-txn {
+            color: var(--text-dim);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .pay-note {
+            color: var(--text-dim);
+            font-style: italic;
+            max-width: 220px;
+        }
+
+        .proof-thumb {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1.5px solid var(--border2);
+            display: block;
+            cursor: zoom-in;
+        }
+
+        .proof-thumb:hover {
+            border-color: var(--accent);
+        }
+
         .pending-flag {
             display: inline-block;
             background: var(--amber-s);
@@ -759,44 +809,7 @@
 
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-mark">⚡</div>
-            <div class="logo-text">Admin<span>Panel</span></div>
-        </div>
-        <nav class="sidebar-nav">
-            <div class="nav-label">Menu</div>
-            <a href="{{ route('admin.dashboard') }}" class="nav-item">
-                <div class="nav-icon">🏠</div> Dashboard
-            </a>
-            <a href="{{ route('admin.clients.index') }}" class="nav-item">
-                <div class="nav-icon">👥</div> All Clients
-            </a>
-            <a href="{{ route('admin.subscriptions.index') }}" class="nav-item active">
-                <div class="nav-icon">🎫</div> Subscriptions
-            </a>
-            <a href="{{ route('admin.links.index') }}" class="nav-item">
-                <div class="nav-icon">🔗</div> Generated Links
-            </a>
-            <a href="{{ route('admin.payments.index') }}" class="nav-item">
-                <div class="nav-icon">💰</div> Payments
-            </a>
-            <a href="{{ route('admin.bg-owner') }}" class="nav-item">
-                <div class="nav-icon">🔒</div> BG Owner
-            </a>
-        </nav>
-        <div class="sidebar-user">
-            <div class="user-av">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
-            <div class="user-meta">
-                <strong>{{ Auth::user()->name }}</strong>
-                <span>{{ Auth::user()->role }}</span>
-            </div>
-            <form class="logout-form" method="POST" action="{{ route('admin.logout') }}">
-                @csrf
-                <button type="submit" title="Logout">↩</button>
-            </form>
-        </div>
-    </aside>
+    @include('admin.partials.sidebar')
 
     <main class="main">
         <div class="topbar">
@@ -835,6 +848,8 @@
                                 <th>Client</th>
                                 <th>Requested Plan</th>
                                 <th>Cards</th>
+                                <th>Payment Sent</th>
+                                <th>Proof</th>
                                 <th>Requested On</th>
                                 <th>Action</th>
                             </tr>
@@ -853,6 +868,40 @@
                                     </td>
                                     <td><strong>Rs {{ number_format($req->plan_amount) }}</strong></td>
                                     <td>{{ \App\Support\SubscriptionPlans::cardsFor($req->plan_amount) }}</td>
+                                    <td>
+                                        @if ($req->paymentMethod)
+                                            <span class="pay-to">
+                                                {{ $req->paymentMethod->typeIcon() }} {{ $req->paymentMethod->label }}
+                                            </span>
+                                            <span class="pay-acct">{{ $req->paymentMethod->account_number }}</span>
+                                        @else
+                                            <span class="pay-acct">No account recorded</span>
+                                        @endif
+                                        <span class="pay-from">
+                                            From <strong>{{ $req->sender_name ?? '—' }}</strong>
+                                            @if ($req->sender_number)
+                                                · {{ $req->sender_number }}
+                                            @endif
+                                        </span>
+                                        @if ($req->transaction_id)
+                                            <span class="pay-txn">TXN {{ $req->transaction_id }}</span>
+                                        @endif
+                                        @if ($req->client_note)
+                                            <span class="pay-note">“{{ $req->client_note }}”</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($req->screenshotUrl())
+                                            {{-- Opens full size in a new tab: verifying a transfer means
+                                                 reading the amount and time off the screenshot. --}}
+                                            <a href="{{ $req->screenshotUrl() }}" target="_blank" rel="noopener">
+                                                <img class="proof-thumb" src="{{ $req->screenshotUrl() }}"
+                                                    alt="Payment screenshot from {{ $req->user?->name }}">
+                                            </a>
+                                        @else
+                                            <span class="pay-acct">None</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $req->created_at?->format('d M Y, g:i A') ?? '—' }}</td>
                                     <td>
                                         <form action="{{ route('admin.subscriptions.approve', $req->id) }}"
@@ -889,6 +938,8 @@
                             <tr>
                                 <th>Client</th>
                                 <th>Plan</th>
+                                <th>Paid Via</th>
+                                <th>Proof</th>
                                 <th>Status</th>
                                 <th>Reviewed By</th>
                                 <th>Reviewed On</th>
@@ -904,6 +955,24 @@
                                         </a>
                                     </td>
                                     <td>Rs {{ number_format($req->plan_amount) }}</td>
+                                    <td>
+                                        @if ($req->paymentMethod)
+                                            <span class="pay-to">
+                                                {{ $req->paymentMethod->typeIcon() }} {{ $req->paymentMethod->label }}
+                                            </span>
+                                        @endif
+                                        <span class="pay-from">{{ $req->sender_number ?? '—' }}</span>
+                                    </td>
+                                    <td>
+                                        @if ($req->screenshotUrl())
+                                            <a href="{{ $req->screenshotUrl() }}" target="_blank" rel="noopener">
+                                                <img class="proof-thumb" src="{{ $req->screenshotUrl() }}"
+                                                    alt="Payment screenshot from {{ $req->user?->name }}">
+                                            </a>
+                                        @else
+                                            <span class="pay-acct">None</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <span class="status-badge {{ $req->status === 'approved' ? 'active' : 'disabled' }}">
                                             {{ $req->status }}

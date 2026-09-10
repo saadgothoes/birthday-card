@@ -241,7 +241,8 @@ honors `prefers-reduced-motion`.
 Done so far (see [DASHBOARD_WIZARD_DOCUMENTATION.md §33](DASHBOARD_WIZARD_DOCUMENTATION.md)):
 
 - **Occasion picker** before Step 1 — Birthday (unchanged flow) vs Anniversary,
-  as an in-dashboard tab (+ Proposal / Valentine's "coming soon").
+  as an in-dashboard tab. Proposal is live too now (see
+  [proposal.md](proposal.md)); Valentine's Day is still "coming soon".
   `birthday_cards.occasion` column, `POST /client/card/occasion`.
 - **Anniversary wizard** (10 steps, dashboard-integrated, dynamic live previews):
   1. **Theme** — 2 colour families (White & Cream = variants 1 & 3, Rose & Red = 2 & 4)

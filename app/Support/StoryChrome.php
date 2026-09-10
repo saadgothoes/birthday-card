@@ -490,7 +490,11 @@ final class StoryChrome
         <script>
         (function () {
             const next = {$url};
-            const button = document.querySelector('.bb-next, .gb-next');
+            // Each welcome design names its own Next differently — boy `.bb-next`,
+            // girl `.gb-next`, anniversary `.om-continue`. Wiring the button the
+            // design already draws is the whole point: miss one and the fallback
+            // below adds a second Next beside the first.
+            const button = document.querySelector('.bb-next, .gb-next, .om-continue');
             if (button) {
                 button.addEventListener('click', () => { window.location.href = next; });
             } else {
@@ -752,10 +756,31 @@ final class StoryChrome
             const GAP = 12;
             const BASE = 16;
 
+            let placing = false;
+
             function place() {
-                nav.style.bottom = '';
+                // This writes to the nav's own style, and the observer below is
+                // watching for style changes — without this guard each write
+                // schedules another pass and the two spin forever, which locks
+                // up the page rather than merely misplacing a button.
+                if (placing) return;
+                placing = true;
+                try {
+                    measure();
+                } finally {
+                    placing = false;
+                }
+            }
+
+            function measure() {
                 const own = nav.getBoundingClientRect();
                 if (!own.width) return;
+
+                // Where the button sits with no lift applied, worked out rather
+                // than measured: clearing the offset to measure it would be a
+                // style write of its own, and one more thing to loop on.
+                const restBottom = window.innerHeight - BASE;
+                const restTop = restBottom - own.height;
 
                 let lift = 0;
                 document.querySelectorAll('button, a, input, select, [onclick], [role="button"]').forEach((el) => {
@@ -769,7 +794,7 @@ final class StoryChrome
 
                     // Only what actually sits under the button, not beside it.
                     if (box.right < own.left - GAP || box.left > own.right + GAP) return;
-                    if (box.bottom < own.top - GAP) return;
+                    if (box.bottom < restTop - GAP) return;
 
                     lift = Math.max(lift, window.innerHeight - box.top + GAP);
                 });
@@ -777,7 +802,11 @@ final class StoryChrome
                 // A design whose whole page is one big button would otherwise
                 // push this off the top; half the screen is as far as it goes.
                 lift = Math.min(lift, window.innerHeight * 0.5);
-                nav.style.bottom = lift > BASE ? lift + 'px' : '';
+
+                const want = lift > BASE ? lift + 'px' : '';
+                if (nav.style.bottom !== want) {
+                    nav.style.bottom = want;
+                }
             }
 
             place();
@@ -961,6 +990,17 @@ final class StoryChrome
     public static function ending(?array $music = null): string
     {
         return self::curtain() . self::music($music);
+    }
+
+    /**
+     * A proposal card is one page and that page is the whole story, so it gets
+     * no navigation at all — no Next to somewhere else, and no curtain, because
+     * the design already ends on its own celebration. All it needs from the
+     * chrome is the music control, which lives in the shell around it.
+     */
+    public static function proposal(?array $music = null): string
+    {
+        return self::music($music);
     }
 
     /**

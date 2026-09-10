@@ -56,6 +56,24 @@ Source: `routes/web.php` (verified via `php artisan route:list`)
 
 **Scenario:** Admin clients ke payments/transactions ki list dekhta hai.
 
+### 2.4a Payment Methods + Support Contacts (Middleware: `auth`, `super_admin`)
+
+| Method | URL | Name | Action |
+|---|---|---|---|
+| GET | `/admin/payment-methods` | `admin.payment-methods.index` | `PaymentMethodController@index` |
+| POST | `/admin/payment-methods` | `admin.payment-methods.store` | `PaymentMethodController@store` |
+| PUT | `/admin/payment-methods/{paymentMethod}` | `admin.payment-methods.update` | `PaymentMethodController@update` |
+| PATCH | `/admin/payment-methods/{paymentMethod}/toggle` | `admin.payment-methods.toggle` | `PaymentMethodController@toggle` |
+| DELETE | `/admin/payment-methods/{paymentMethod}` | `admin.payment-methods.destroy` | `PaymentMethodController@destroy` |
+| POST | `/admin/support-contacts` | `admin.support-contacts.store` | `PaymentMethodController@storeContact` |
+| PUT | `/admin/support-contacts/{supportContact}` | `admin.support-contacts.update` | `PaymentMethodController@updateContact` |
+| PATCH | `/admin/support-contacts/{supportContact}/toggle` | `admin.support-contacts.toggle` | `PaymentMethodController@toggleContact` |
+| DELETE | `/admin/support-contacts/{supportContact}` | `admin.support-contacts.destroy` | `PaymentMethodController@destroyContact` |
+
+**Scenario:** Super Admin yahan JazzCash / EasyPaisa / bank / Payoneer accounts add karta hai jo client ko plan
+lene par dikhtay hain, aur WhatsApp / Instagram jaise chat-support channels set karta hai jo client ke Contact
+page aur landing page par show hotay hain. Account hide karne se purani requests intact rehti hain.
+
 ### 2.5 BG Owner (Middleware: `auth`, `super_admin`)
 
 | Method | URL | Name | Action |
@@ -172,12 +190,16 @@ Source: `routes/web.php` (verified via `php artisan route:list`)
 | 9 | POST | `/admin/clients` | admin.clients.store |
 | 10 | PATCH | `/admin/clients/{id}/toggle-status` | admin.clients.toggle-status |
 | 11 | GET | `/admin/payments` | admin.payments.index |
+| 11a | GET | `/admin/payment-methods` | admin.payment-methods.index |
+| 11b | POST | `/admin/payment-methods` | admin.payment-methods.store |
+| 11c | POST | `/admin/support-contacts` | admin.support-contacts.store |
 | 12 | GET | `/admin/bg-owner` | admin.bg-owner |
 | 13 | POST | `/admin/bg-owner/verify-pin` | admin.bg-owner.verify-pin |
 | 14 | GET | `/client/login` | client.login |
 | 15 | POST | `/client/login` | client.login.post |
 | 16 | GET | `/client/dashboard` | client.dashboard |
 | 17 | GET | `/client/profile` | client.profile |
+| 17a | GET | `/client/contact` | client.contact |
 | 18 | GET | `/client/settings` | client.settings |
 | 19 | POST | `/client/settings/password` | client.settings.password |
 | 20 | POST | `/client/logout` | client.logout |

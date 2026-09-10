@@ -108,6 +108,11 @@
             --np-b: #d99a8a;
         }
 
+        .np.side-proposal {
+            --np-a: #e8c9b0;
+            --np-b: #a35a56;
+        }
+
         .np-pill {
             display: flex;
             align-items: center;

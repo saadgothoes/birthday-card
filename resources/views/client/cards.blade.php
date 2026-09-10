@@ -234,12 +234,87 @@
 
         .menu-toggle {
             display: none;
-            border: 1.5px solid var(--border);
-            background: var(--surface);
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border: 1.5px solid var(--accent);
+            background: var(--accent-soft);
+            color: var(--accent);
             border-radius: 10px;
-            padding: .5rem .7rem;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
+            line-height: 1;
             cursor: pointer;
+            flex-shrink: 0;
+            transition: transform .18s ease, background .18s ease, color .18s ease;
+        }
+
+        .menu-toggle:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .menu-toggle:active {
+            transform: scale(.94);
+        }
+
+        /* ── Card tabs ── */
+        .tabbar {
+            display: flex;
+            gap: .5rem;
+            margin-bottom: 1.1rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tabbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            flex-shrink: 0;
+            font-family: inherit;
+            font-size: .86rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 999px;
+            padding: .55rem 1rem;
+            cursor: pointer;
+            transition: border-color .18s ease, color .18s ease, background .18s ease;
+        }
+
+        .tab:hover {
+            border-color: var(--border2);
+            color: var(--text);
+        }
+
+        .tab.active {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .tab-count {
+            font-size: .74rem;
+            font-weight: 700;
+            background: var(--border);
+            color: var(--text-muted);
+            border-radius: 999px;
+            padding: .1rem .45rem;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .tab.active .tab-count {
+            background: var(--accent);
+            color: #fff;
         }
 
         .btn {
@@ -582,20 +657,33 @@
             color: var(--text-muted);
         }
 
+        /* Status on its own line, buttons underneath. Side by side, a tile with
+           three actions (Edit / rename / Disable) wrapped into a ragged three
+           rows once the grid column dropped near its 228px minimum. */
         .tile-foot {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: .4rem;
+            flex-direction: column;
+            align-items: stretch;
+            gap: .45rem;
             margin-top: .15rem;
+        }
+
+        .tile-foot .pill {
+            align-self: flex-start;
         }
 
         .tile-actions {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: .25rem;
-            justify-content: flex-end;
+            gap: .3rem;
+            justify-content: flex-start;
+        }
+
+        .tile-actions > a.btn-sm {
+            flex: 1 1 auto;
+            min-width: 0;
+            justify-content: center;
         }
 
         .qr-block {
@@ -837,6 +925,315 @@
             margin-top: 1.3rem;
         }
 
+        /* ── Payment step ────────────────────────────────── */
+        .modal-box.wide {
+            width: min(580px, 100%);
+        }
+
+        .pay-step[hidden] {
+            display: none;
+        }
+
+        .pay-plan-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .8rem;
+            background: var(--accent-soft);
+            border: 1.5px solid var(--accent);
+            border-radius: 12px;
+            padding: .8rem 1rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .pay-plan-banner .amt {
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .pay-plan-banner .cds {
+            font-size: .76rem;
+            color: var(--text-muted);
+        }
+
+        .pay-plan-banner button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-family: inherit;
+            font-size: .78rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .pay-section-label {
+            font-size: .78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted);
+            margin: 1.1rem 0 .6rem;
+        }
+
+        .acct-opt {
+            display: block;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: .85rem 1rem;
+            margin-bottom: .6rem;
+            cursor: pointer;
+            transition: border-color .18s ease, background .18s ease;
+        }
+
+        .acct-opt:hover {
+            border-color: var(--border2);
+        }
+
+        .acct-opt.selected {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .acct-opt input {
+            display: none;
+        }
+
+        .acct-top {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .acct-ico {
+            font-size: 1.1rem;
+        }
+
+        .acct-top strong {
+            font-size: .92rem;
+        }
+
+        .acct-top .kind {
+            font-size: .72rem;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .acct-rows {
+            margin-top: .55rem;
+            font-size: .82rem;
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+        }
+
+        .acct-rows div {
+            display: flex;
+            gap: .6rem;
+            align-items: center;
+        }
+
+        .acct-rows .k {
+            color: var(--text-muted);
+            min-width: 74px;
+        }
+
+        .acct-rows .v {
+            font-weight: 600;
+            word-break: break-all;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .copy-mini {
+            margin-left: auto;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: .7rem;
+            font-weight: 700;
+            padding: .22rem .5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .copy-mini:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .acct-note {
+            margin-top: .5rem;
+            font-size: .76rem;
+            color: var(--text-muted);
+        }
+
+        .acct-qr {
+            margin-top: .6rem;
+            max-width: 140px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+        }
+
+        .pay-field {
+            margin-bottom: .8rem;
+        }
+
+        .pay-field label {
+            display: block;
+            font-size: .8rem;
+            font-weight: 600;
+            margin-bottom: .35rem;
+        }
+
+        .pay-field label .opt {
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .pay-field input[type=text],
+        .pay-field input[type=file],
+        .pay-field textarea {
+            width: 100%;
+            font-family: inherit;
+            font-size: .9rem;
+            padding: .72rem .9rem;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            outline: none;
+            background: var(--surface);
+        }
+
+        .pay-field textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        .pay-field input:focus,
+        .pay-field textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .shot-preview {
+            margin-top: .6rem;
+            max-width: 100%;
+            max-height: 210px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            display: none;
+        }
+
+        .pay-errors {
+            background: #fef2f2;
+            border: 1.5px solid #ef4444;
+            color: #b91c1c;
+            border-radius: 10px;
+            padding: .7rem .9rem;
+            font-size: .82rem;
+            margin-bottom: 1rem;
+        }
+
+        .pay-errors ul {
+            margin: .3rem 0 0 1rem;
+        }
+
+        .no-accts {
+            background: #fffbeb;
+            border: 1.5px solid #f59e0b;
+            color: #92400e;
+            border-radius: 10px;
+            padding: .8rem .9rem;
+            font-size: .84rem;
+        }
+
+        /* ── Support panel ───────────────────────────────── */
+        .support-box {
+            margin-top: 1.2rem;
+            border-top: 1.5px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        .support-box.bare {
+            margin-top: 0;
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .support-box h4 {
+            font-size: .88rem;
+            margin-bottom: .2rem;
+        }
+
+        .support-box p {
+            font-size: .78rem;
+            color: var(--text-muted);
+            margin-bottom: .7rem;
+        }
+
+        .support-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .support-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            border: 1.5px solid var(--border);
+            border-radius: 999px;
+            padding: .45rem .85rem;
+            font-size: .8rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text);
+            transition: border-color .18s ease, background .18s ease;
+        }
+
+        .support-link:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .support-link__ico {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .support-link span.val {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: .74rem;
+        }
+
+        /* Floating help button — reachable from anywhere on the hub, not just
+           from inside the payment modal. */
+        .help-fab {
+            position: fixed;
+            right: 1.4rem;
+            bottom: 1.4rem;
+            z-index: 55;
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            border: none;
+            border-radius: 999px;
+            padding: .8rem 1.2rem;
+            font-family: inherit;
+            font-size: .85rem;
+            font-weight: 700;
+            color: #fff;
+            background: var(--accent);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+            cursor: pointer;
+        }
+
+        .help-fab:hover {
+            filter: brightness(1.08);
+        }
+
         /* ── Responsive ────────────────────────────────────── */
         @media (max-width: 1080px) {
             .cols {
@@ -898,6 +1295,248 @@
                 display: block;
             }
         }
+
+        /* ── Phones ──
+           Below this the two-up stat grid and the fixed 228px tile columns stop
+           fitting, and the payment modal has to stop behaving like a dialog. */
+        @media (max-width: 560px) {
+            .main {
+                padding: 1.1rem .85rem 2.5rem;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: .9rem;
+            }
+
+            .topbar h1 {
+                font-size: 1.25rem;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: .6rem;
+            }
+
+            .stat {
+                padding: .85rem;
+            }
+
+            .stat-num {
+                font-size: 1.25rem;
+            }
+
+            .stat-lbl {
+                font-size: .72rem;
+            }
+
+            /* Two cards per row on phones. Everything inside a tile is scaled
+               down to survive the ~155px column that leaves. */
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: .6rem;
+            }
+
+            .tile {
+                padding: .7rem;
+                border-radius: 13px;
+                gap: .45rem;
+            }
+
+            /* Thumb over name instead of beside it — side by side left the
+               title about 90px, which truncated almost every card name. */
+            .tile-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: .4rem;
+            }
+
+            .tile-thumb {
+                width: 36px;
+                height: 36px;
+                border-radius: 9px;
+                font-size: 1rem;
+            }
+
+            /* Only the text column stretches — matching every child also hit
+               the thumb and blew it up to the full tile width. */
+            .tile-top > div + div {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .tile-name {
+                font-size: .82rem;
+            }
+
+            .tile-meta {
+                font-size: .67rem;
+                line-height: 1.35;
+            }
+
+            .tile-foot {
+                flex-direction: column;
+                align-items: stretch;
+                gap: .4rem;
+            }
+
+            .tile-actions {
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                gap: .3rem;
+            }
+
+            /* Continue takes the slack, the two icon buttons stay square, so
+               all three fit on one row instead of the delete wrapping under. */
+            .tile-actions .btn-sm {
+                padding: .3rem .42rem;
+                font-size: .66rem;
+            }
+
+            .tile-actions > a.btn-sm {
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow: hidden;
+                justify-content: center;
+            }
+
+            .tile-actions form {
+                flex: 0 0 auto;
+            }
+
+            .tile-new {
+                min-height: 132px;
+            }
+
+            .tile-new .plus {
+                font-size: 1.5rem;
+            }
+
+            .tile-new strong {
+                font-size: .82rem;
+            }
+
+            .tile-new small {
+                font-size: .66rem;
+            }
+
+            /* The share link is far wider than the column: keep it to one
+               ellipsised line so it cannot stretch the grid. */
+            .share-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: .3rem;
+            }
+
+            .share-row .tile-meta {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-break: normal !important;
+            }
+
+            .qr-block img {
+                width: 96px;
+                height: 96px;
+            }
+
+            .qr-download {
+                font-size: .64rem;
+                padding: .25rem .45rem;
+            }
+
+            .panel {
+                padding: .95rem;
+                border-radius: 14px;
+            }
+
+            .panel-head h3 {
+                font-size: 1rem;
+            }
+
+            .tab {
+                font-size: .76rem;
+                padding: .45rem .7rem;
+                gap: .3rem;
+            }
+
+            .tab-count {
+                font-size: .68rem;
+                padding: .05rem .35rem;
+                min-width: 17px;
+            }
+
+            .tabbar {
+                gap: .35rem;
+            }
+
+            /* The modal becomes a full-height sheet: a 580px dialog with its own
+               scroll inside a 360px viewport was unusable. */
+            .modal {
+                padding: 0;
+                place-items: end stretch;
+            }
+
+            .modal-box,
+            .modal-box.wide {
+                width: 100%;
+                max-width: 100%;
+                max-height: 92vh;
+                border-radius: 18px 18px 0 0;
+                padding: 1.3rem 1.1rem 1.6rem;
+            }
+
+            .modal-actions {
+                flex-direction: column-reverse;
+            }
+
+            .modal-actions .btn,
+            .modal-actions a.btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .sub-plan-grid,
+            .pay-plan-banner {
+                flex-wrap: wrap;
+            }
+
+            .acct-rows .k {
+                min-width: 62px;
+            }
+
+            .support-links {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .support-link {
+                justify-content: flex-start;
+            }
+
+            /* The floating help button must not sit on top of the last tile's
+               buttons on a short screen. */
+            .help-fab {
+                right: .9rem;
+                bottom: .9rem;
+                padding: .7rem 1rem;
+                font-size: .8rem;
+            }
+        }
+
+        /* Very narrow phones: keep the two-up rhythm, just tighten the tabs
+           so all three fit without the bar having to scroll. */
+        @media (max-width: 400px) {
+            .tab {
+                font-size: .72rem;
+                padding: .42rem .55rem;
+            }
+
+            .stat-num {
+                font-size: 1.15rem;
+            }
+        }
     </style>
 </head>
 
@@ -919,15 +1558,15 @@
             <a href="{{ route('client.cards') }}" class="sb-item active">
                 <span class="ico">🏠</span> Main Dashboard
             </a>
-            <button class="sb-item" onclick="jumpTo('recentSection')">
+            <button class="sb-item" data-tab-link="recent" onclick="showTab('recent')">
                 <span class="ico">🕘</span> Recent
                 <span class="tally">{{ $recent->count() }}</span>
             </button>
-            <button class="sb-item" onclick="jumpTo('draftsSection')">
+            <button class="sb-item" data-tab-link="drafts" onclick="showTab('drafts')">
                 <span class="ico">📝</span> Drafts
                 <span class="tally">{{ $drafts->count() }}</span>
             </button>
-            <button class="sb-item" onclick="jumpTo('completedSection')">
+            <button class="sb-item" data-tab-link="completed" onclick="showTab('completed')">
                 <span class="ico">✅</span> Completed
                 <span class="tally">{{ $completed->count() }}</span>
             </button>
@@ -935,6 +1574,10 @@
             <div class="sb-label" style="margin-top:1.2rem">Account</div>
             <a href="{{ route('client.profile') }}" class="sb-item"><span class="ico">👤</span> My Profile</a>
             <a href="{{ route('client.settings') }}" class="sb-item"><span class="ico">⚙️</span> Settings</a>
+            <a href="{{ route('client.contact') }}" class="sb-item">
+                <span class="ico">@include('partials.channel-icon', ['channel' => 'phone', 'size' => 15])</span>
+                Contact Us
+            </a>
         </nav>
 
         <div class="sb-foot">
@@ -1030,8 +1673,22 @@
 
         <div class="cols">
             <div>
-                {{-- ── Recent ── --}}
-                <div class="panel" id="recentSection">
+                {{-- ── Recent / Drafts / Completed ──
+                     One at a time. Showing all three at once listed every card
+                     twice: once under Recent and again under its own section. --}}
+                <div class="tabbar" role="tablist">
+                    <button class="tab" role="tab" data-tab-link="recent" onclick="showTab('recent')">
+                        🕘 Recent <span class="tab-count">{{ $recent->count() }}</span>
+                    </button>
+                    <button class="tab" role="tab" data-tab-link="drafts" onclick="showTab('drafts')">
+                        📝 Drafts <span class="tab-count">{{ $drafts->count() }}</span>
+                    </button>
+                    <button class="tab" role="tab" data-tab-link="completed" onclick="showTab('completed')">
+                        ✅ Completed <span class="tab-count">{{ $completed->count() }}</span>
+                    </button>
+                </div>
+
+                <div class="panel" id="recentSection" data-tab-panel="recent">
                     <div class="panel-head">
                         <h3>Recent</h3>
                         <span class="count">{{ $recent->count() }} shown</span>
@@ -1062,7 +1719,7 @@
                 </div>
 
                 {{-- ── Drafts ── --}}
-                <div class="panel" id="draftsSection">
+                <div class="panel" id="draftsSection" data-tab-panel="drafts" hidden>
                     <div class="panel-head">
                         <h3>Drafts</h3>
                         <span class="count">{{ $drafts->count() }}</span>
@@ -1080,7 +1737,7 @@
                 </div>
 
                 {{-- ── Completed ── --}}
-                <div class="panel" id="completedSection">
+                <div class="panel" id="completedSection" data-tab-panel="completed" hidden>
                     <div class="panel-head">
                         <h3>Completed</h3>
                         <span class="count">{{ $completed->count() }}</span>
@@ -1173,19 +1830,23 @@
         </div>
     </main>
 
-    {{-- ── Subscription request modal ── --}}
+    {{-- ── Subscription request modal ──
+         Two steps in one box: choose the plan, then pay into one of the
+         admin's accounts and attach proof. The request is only filed once the
+         proof is attached, so the admin always has something to verify. --}}
     <div class="modal" id="planModal">
-        <div class="modal-box">
-            <h3>Request a Subscription</h3>
-            <p class="sub">Pick a plan and send the request to the admin. Payment is not collected here yet —
-                your subscription activates once the admin approves it.</p>
+        <div class="modal-box wide">
 
-            <form method="POST" action="{{ route('client.subscription.request') }}">
-                @csrf
+            {{-- Step 1 — pick a plan --}}
+            <div class="pay-step" id="planStep">
+                <h3>Choose a Plan</h3>
+                <p class="sub">Pick the plan you want, then pay into one of our accounts on the next step.</p>
+
                 @foreach ($plans as $i => $plan)
-                    <label class="plan-opt {{ $i === 0 ? 'selected' : '' }}" onclick="pickPlan(this)">
-                        <input type="radio" name="plan_amount" value="{{ $plan['amount'] }}"
-                            {{ $i === 0 ? 'checked' : '' }} required>
+                    <label class="plan-opt {{ $i === 0 ? 'selected' : '' }}"
+                        onclick="pickPlan(this, {{ $plan['amount'] }}, {{ $plan['cards'] }})">
+                        <input type="radio" name="plan_pick" value="{{ $plan['amount'] }}"
+                            {{ $i === 0 ? 'checked' : '' }}>
                         <span>
                             <span class="amount">Rs {{ number_format($plan['amount']) }}</span><br>
                             <span class="cards">{{ $plan['cards'] }}
@@ -1196,11 +1857,164 @@
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-ghost" onclick="closePlanModal()">Cancel</button>
-                    <button type="submit" class="btn">Send Request</button>
+                    <button type="button" class="btn" onclick="goToPayStep()">Continue to Payment →</button>
                 </div>
-            </form>
+            </div>
+
+            {{-- Step 2 — pay, then send the proof --}}
+            <div class="pay-step" id="payStep" hidden>
+                <h3>Send Payment</h3>
+                <p class="sub">Transfer the plan amount to any account below, then fill in the details and attach
+                    your payment screenshot.</p>
+
+                @if ($errors->any())
+                    <div class="pay-errors">
+                        <strong>Please fix the following:</strong>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <div class="pay-plan-banner">
+                    <div>
+                        <div class="amt" id="payPlanAmount">Rs 0</div>
+                        <div class="cds" id="payPlanCards">— cards</div>
+                    </div>
+                    <button type="button" onclick="backToPlanStep()">Change plan</button>
+                </div>
+
+                @if ($paymentMethods->isEmpty())
+                    <div class="no-accts">
+                        No payment accounts are set up right now. Please contact support below and we will take your
+                        payment directly.
+                    </div>
+                @else
+                    <form method="POST" action="{{ route('client.subscription.request') }}"
+                        enctype="multipart/form-data" id="payForm">
+                        @csrf
+                        <input type="hidden" name="plan_amount" id="payPlanInput"
+                            value="{{ old('plan_amount', $plans[0]['amount'] ?? '') }}">
+
+                        <div class="pay-section-label">1 · Pay into one of these accounts</div>
+
+                        @foreach ($paymentMethods as $i => $method)
+                            @php $checked = (int) old('payment_method_id', $paymentMethods->first()->id) === $method->id; @endphp
+                            <label class="acct-opt {{ $checked ? 'selected' : '' }}" onclick="pickAccount(this)">
+                                <input type="radio" name="payment_method_id" value="{{ $method->id }}"
+                                    {{ $checked ? 'checked' : '' }}>
+                                <span class="acct-top">
+                                    <span class="acct-ico">{{ $method->typeIcon() }}</span>
+                                    <strong>{{ $method->label }}</strong>
+                                    <span class="kind">{{ $method->typeLabel() }}</span>
+                                </span>
+                                <span class="acct-rows">
+                                    <span style="display:flex;gap:.6rem;align-items:center;">
+                                        <span class="k">Title</span>
+                                        <span class="v">{{ $method->account_name }}</span>
+                                    </span>
+                                    <span style="display:flex;gap:.6rem;align-items:center;">
+                                        <span class="k">{{ $method->isBank() ? 'IBAN / Acct' : 'Number' }}</span>
+                                        <span class="v">{{ $method->account_number }}</span>
+                                        <button type="button" class="copy-mini"
+                                            onclick="event.preventDefault();event.stopPropagation();copyAccount(this,@json($method->account_number))">Copy</button>
+                                    </span>
+                                    @if ($method->bank_name)
+                                        <span style="display:flex;gap:.6rem;align-items:center;">
+                                            <span class="k">Bank</span>
+                                            <span class="v">{{ $method->bank_name }}</span>
+                                        </span>
+                                    @endif
+                                    @if ($method->branch_code)
+                                        <span style="display:flex;gap:.6rem;align-items:center;">
+                                            <span class="k">Branch</span>
+                                            <span class="v">{{ $method->branch_code }}</span>
+                                        </span>
+                                    @endif
+                                </span>
+                                @if ($method->instructions)
+                                    <span class="acct-note">{{ $method->instructions }}</span>
+                                @endif
+                                @if ($method->qr_image_path)
+                                    <img class="acct-qr" src="{{ asset('storage/' . $method->qr_image_path) }}"
+                                        alt="Payment QR for {{ $method->label }}">
+                                @endif
+                            </label>
+                        @endforeach
+
+                        <div class="pay-section-label">2 · Tell us where it came from</div>
+
+                        <div class="pay-field">
+                            <label for="senderName">Sender name</label>
+                            <input type="text" name="sender_name" id="senderName" required maxlength="120"
+                                placeholder="Name on the account you paid from"
+                                value="{{ old('sender_name', Auth::user()->name) }}">
+                        </div>
+
+                        <div class="pay-field">
+                            <label for="senderNumber">Sender number / account</label>
+                            <input type="text" name="sender_number" id="senderNumber" required maxlength="60"
+                                placeholder="e.g. 0300-1234567"
+                                value="{{ old('sender_number', Auth::user()->phone) }}">
+                        </div>
+
+                        <div class="pay-field">
+                            <label for="txnId">Transaction ID <span class="opt">(optional)</span></label>
+                            <input type="text" name="transaction_id" id="txnId" maxlength="120"
+                                placeholder="TID from your payment receipt" value="{{ old('transaction_id') }}">
+                        </div>
+
+                        <div class="pay-section-label">3 · Attach your payment screenshot</div>
+
+                        <div class="pay-field">
+                            <label for="shotInput">Payment screenshot</label>
+                            <input type="file" name="payment_screenshot" id="shotInput" accept="image/*" required
+                                onchange="previewShot(this)">
+                            <img class="shot-preview" id="shotPreview" alt="Your payment screenshot">
+                        </div>
+
+                        <div class="pay-field">
+                            <label for="clientNote">Anything else? <span class="opt">(optional)</span></label>
+                            <textarea name="client_note" id="clientNote" maxlength="500"
+                                placeholder="Add a note for the admin">{{ old('client_note') }}</textarea>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-ghost" onclick="backToPlanStep()">← Back</button>
+                            <button type="submit" class="btn" id="paySubmitBtn">Submit for Approval</button>
+                        </div>
+                    </form>
+                @endif
+
+                @include('client.partials.support-links', ['supportContacts' => $supportContacts])
+            </div>
         </div>
     </div>
+
+    {{-- ── Help modal ── --}}
+    @if ($supportContacts->isNotEmpty())
+        <button class="help-fab" onclick="openHelpModal()">💬 Need Help?</button>
+
+        <div class="modal" id="helpModal">
+            <div class="modal-box">
+                <h3>Chat Support</h3>
+                <p class="sub">Payment not going through, or something else stuck? Message us on any of these and
+                    we will sort it out.</p>
+
+                @include('client.partials.support-links', [
+                    'supportContacts' => $supportContacts,
+                    'bare' => true,
+                ])
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" onclick="closeHelpModal()">Close</button>
+                    <a class="btn" href="{{ route('client.contact') }}">Open Contact Page →</a>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- ── Rename modal ── --}}
     <div class="modal" id="renameModal">
@@ -1227,23 +2041,134 @@
             document.getElementById('backdrop').classList.toggle('open');
         }
 
-        function jumpTo(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
-            if (window.innerWidth <= 860) toggleSidebar();
+        // ── Card tabs ──
+        // Only one of Recent / Drafts / Completed is mounted at a time, so a
+        // card is never listed twice on the same screen.
+        function showTab(name) {
+            document.querySelectorAll('[data-tab-panel]').forEach(panel => {
+                panel.hidden = panel.dataset.tabPanel !== name;
+            });
+            document.querySelectorAll('[data-tab-link]').forEach(link => {
+                link.classList.toggle('active', link.dataset.tabLink === name);
+            });
+
+            try {
+                localStorage.setItem('cardsTab', name);
+            } catch (e) {
+                /* private mode — the tab just will not be remembered */
+            }
+
+            if (window.innerWidth <= 860 && document.getElementById('sidebar').classList.contains('open')) {
+                toggleSidebar();
+            }
         }
+
+        (function () {
+            let saved = 'recent';
+            try {
+                saved = localStorage.getItem('cardsTab') || 'recent';
+            } catch (e) {
+                /* ignore */
+            }
+            if (!document.querySelector('[data-tab-panel="' + saved + '"]')) saved = 'recent';
+            showTab(saved);
+        })();
+
+        // ── Subscription: plan → payment → proof ──
+        // The chosen plan is mirrored into the payment form's hidden input, so
+        // the amount the client picked is the amount the request is filed for.
+        let chosenPlan = {
+            amount: {{ $plans[0]['amount'] ?? 0 }},
+            cards: {{ $plans[0]['cards'] ?? 0 }},
+        };
 
         function openPlanModal() {
             document.getElementById('planModal').classList.add('open');
+            showPlanStep();
         }
 
         function closePlanModal() {
             document.getElementById('planModal').classList.remove('open');
         }
 
-        function pickPlan(label) {
+        function pickPlan(label, amount, cards) {
             document.querySelectorAll('.plan-opt').forEach(el => el.classList.remove('selected'));
             label.classList.add('selected');
+            const radio = label.querySelector('input');
+            if (radio) radio.checked = true;
+            if (amount !== undefined) chosenPlan = { amount: amount, cards: cards };
         }
+
+        function showPlanStep() {
+            document.getElementById('planStep').hidden = false;
+            document.getElementById('payStep').hidden = true;
+        }
+
+        function backToPlanStep() {
+            showPlanStep();
+        }
+
+        function goToPayStep() {
+            const picked = document.querySelector('input[name="plan_pick"]:checked');
+            if (picked) chosenPlan.amount = parseInt(picked.value, 10);
+
+            document.getElementById('payPlanInput').value = chosenPlan.amount;
+            document.getElementById('payPlanAmount').textContent =
+                'Rs ' + chosenPlan.amount.toLocaleString();
+            document.getElementById('payPlanCards').textContent =
+                chosenPlan.cards + (chosenPlan.cards === 1 ? ' card' : ' cards');
+
+            document.getElementById('planStep').hidden = true;
+            document.getElementById('payStep').hidden = false;
+            document.querySelector('.modal-box.wide').scrollTop = 0;
+        }
+
+        function pickAccount(label) {
+            document.querySelectorAll('.acct-opt').forEach(el => el.classList.remove('selected'));
+            label.classList.add('selected');
+            const radio = label.querySelector('input');
+            if (radio) radio.checked = true;
+        }
+
+        function copyAccount(button, value) {
+            navigator.clipboard.writeText(value).then(() => {
+                const original = button.textContent;
+                button.textContent = 'Copied';
+                setTimeout(() => button.textContent = original, 1400);
+            });
+        }
+
+        function previewShot(input) {
+            const img = document.getElementById('shotPreview');
+            const file = input.files && input.files[0];
+            if (!file) {
+                img.style.display = 'none';
+                return;
+            }
+            img.src = URL.createObjectURL(file);
+            img.style.display = 'block';
+        }
+
+        function openHelpModal() {
+            document.getElementById('helpModal').classList.add('open');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpModal').classList.remove('open');
+        }
+
+        // A rejected submission comes back as a redirect, which would otherwise
+        // drop the client back on the hub with no idea what went wrong — so
+        // reopen the modal on the step that failed.
+        @if ($errors->any())
+            window.addEventListener('DOMContentLoaded', () => {
+                const amount = {{ (int) old('plan_amount', $plans[0]['amount'] ?? 0) }};
+                const plan = @json(collect($plans)->keyBy('amount'));
+                if (plan[amount]) chosenPlan = { amount: amount, cards: plan[amount].cards };
+                openPlanModal();
+                goToPayStep();
+            });
+        @endif
 
         function openRenameModal(action, current) {
             const form = document.getElementById('renameForm');

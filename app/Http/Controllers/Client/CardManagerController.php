@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\BirthdayCard;
+use App\Models\PaymentMethod;
 use App\Models\SubscriptionRequest;
+use App\Models\SupportContact;
 use App\Support\SubscriptionPlans;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
 /**
@@ -43,6 +46,8 @@ class CardManagerController extends Controller
             'cardLimit' => $user->cardLimit(),
             'cardsRemaining' => max(0, $user->cardLimit() - $cardsUsed),
             'plans' => SubscriptionPlans::all(),
+            'paymentMethods' => PaymentMethod::active()->get(),
+            'supportContacts' => SupportContact::active()->get(),
             'pendingRequest' => $user->pendingSubscriptionRequest(),
             'latestRequest' => $user->subscriptionRequests()->first(),
             // Recent activity is derived from the cards themselves — every
@@ -54,8 +59,11 @@ class CardManagerController extends Controller
 
     /**
      * A short "what happened lately" feed for the dashboard, built from the
-     * cards' own timestamps. Creation and edit are separate entries only when
-     * they actually differ, so a freshly made card does not show twice.
+     * cards' own timestamps.
+     *
+     * One entry per card — the latest thing that happened to it. Emitting both
+     * "Created" and "Edited" for the same card made the feed read as if every
+     * draft had been duplicated.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -64,16 +72,10 @@ class CardManagerController extends Controller
         $events = collect();
 
         foreach ($cards as $card) {
-            if ($card->created_at) {
-                $events->push([
-                    'at' => $card->created_at,
-                    'icon' => '✨',
-                    'text' => 'Created',
-                    'card' => $card,
-                ]);
-            }
-
-            if ($card->is_published) {
+            // Newest state wins: a published card reports its QR, an edited
+            // draft reports the edit, and anything untouched since it was made
+            // reports its creation.
+            if ($card->is_published && $card->updated_at) {
                 $events->push([
                     'at' => $card->updated_at,
                     'icon' => '🔗',
@@ -86,6 +88,13 @@ class CardManagerController extends Controller
                     'at' => $card->updated_at,
                     'icon' => '✏️',
                     'text' => 'Edited',
+                    'card' => $card,
+                ]);
+            } elseif ($card->created_at) {
+                $events->push([
+                    'at' => $card->created_at,
+                    'icon' => '✨',
+                    'text' => 'Created',
                     'card' => $card,
                 ]);
             }
@@ -262,6 +271,20 @@ class CardManagerController extends Controller
     {
         $data = $request->validate([
             'plan_amount' => 'required|integer|in:' . implode(',', SubscriptionPlans::amounts()),
+            // The account they say they paid into has to be one the admin is
+            // actually advertising — an inactive method is not an option.
+            'payment_method_id' => [
+                'required',
+                Rule::exists('payment_methods', 'id')->where('is_active', true),
+            ],
+            'sender_name' => 'required|string|max:120',
+            'sender_number' => 'required|string|max:60',
+            'transaction_id' => 'nullable|string|max:120',
+            'client_note' => 'nullable|string|max:500',
+            'payment_screenshot' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ], [
+            'payment_method_id.required' => 'Please choose the account you sent the payment to.',
+            'payment_screenshot.required' => 'Please attach a screenshot of your payment.',
         ]);
 
         $user = Auth::user();
@@ -278,6 +301,13 @@ class CardManagerController extends Controller
             'user_id' => $user->id,
             'plan_amount' => $data['plan_amount'],
             'card_limit' => SubscriptionPlans::cardsFor($data['plan_amount']),
+            'payment_method_id' => $data['payment_method_id'],
+            'sender_name' => $data['sender_name'],
+            'sender_number' => $data['sender_number'],
+            'transaction_id' => $data['transaction_id'] ?? null,
+            'client_note' => $data['client_note'] ?? null,
+            'payment_screenshot_path' => $request->file('payment_screenshot')
+                ->store('payment-proofs', 'public'),
             'status' => SubscriptionRequest::PENDING,
         ]);
 
@@ -286,7 +316,7 @@ class CardManagerController extends Controller
         return $this->subscriptionResponse(
             $request,
             true,
-            'Request sent. The admin will review it shortly.'
+            'Payment submitted. The admin will verify it and activate your plan shortly.'
         );
     }
 

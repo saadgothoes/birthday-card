@@ -665,44 +665,7 @@
 
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-mark">⚡</div>
-            <div class="logo-text">Admin<span>Panel</span></div>
-        </div>
-        <nav class="sidebar-nav">
-            <div class="nav-label">Menu</div>
-            <a href="{{ route('admin.dashboard') }}" class="nav-item">
-                <div class="nav-icon">🏠</div> Dashboard
-            </a>
-            <a href="{{ route('admin.clients.index') }}" class="nav-item active">
-                <div class="nav-icon">👥</div> All Clients
-            </a>
-            <a href="{{ route('admin.subscriptions.index') }}" class="nav-item">
-                <div class="nav-icon">🎫</div> Subscriptions
-            </a>
-            <a href="{{ route('admin.links.index') }}" class="nav-item">
-                <div class="nav-icon">🔗</div> Generated Links
-            </a>
-            <a href="{{ route('admin.payments.index') }}" class="nav-item">
-                <div class="nav-icon">💰</div> Payments
-            </a>
-            <a href="{{ route('admin.bg-owner') }}" class="nav-item">
-                <div class="nav-icon">🔒</div> BG Owner
-            </a>
-        </nav>
-        <div class="sidebar-user">
-            <div class="user-av">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
-            <div class="user-meta">
-                <strong>{{ Auth::user()->name }}</strong>
-                <span>{{ Auth::user()->role }}</span>
-            </div>
-            <form class="logout-form" method="POST" action="{{ route('admin.logout') }}">
-                @csrf
-                <button type="submit" title="Logout">↩</button>
-            </form>
-        </div>
-    </aside>
+    @include('admin.partials.sidebar')
 
     <main class="main">
 

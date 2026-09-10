@@ -21,11 +21,11 @@ class SubscriptionController extends Controller
     public function index()
     {
         return view('admin.subscriptions.index', [
-            'pending' => SubscriptionRequest::with('user')
+            'pending' => SubscriptionRequest::with(['user', 'paymentMethod'])
                 ->where('status', SubscriptionRequest::PENDING)
                 ->latest()
                 ->get(),
-            'reviewed' => SubscriptionRequest::with(['user', 'reviewer'])
+            'reviewed' => SubscriptionRequest::with(['user', 'reviewer', 'paymentMethod'])
                 ->where('status', '!=', SubscriptionRequest::PENDING)
                 ->latest('reviewed_at')
                 ->limit(50)

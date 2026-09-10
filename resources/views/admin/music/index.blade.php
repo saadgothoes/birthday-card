@@ -12,6 +12,19 @@
             --line: #e5e8f2;
             --soft: #f7f8fc;
             --accent: #5b5ef4;
+            /* Tokens the shared admin sidebar expects. */
+            --surface: #ffffff;
+            --surface2: #f8faff;
+            --border: #e4e9f4;
+            --border2: #d0d8ee;
+            --text: #111827;
+            --text-muted: #6b7a99;
+            --text-dim: #adb5cc;
+            --accent2: #818cf8;
+            --accent-g: rgba(91, 94, 244, 0.10);
+            --red: #ef4444;
+            --red-s: #fef2f2;
+            --sidebar: 260px;
         }
 
         * {
@@ -21,15 +34,166 @@
         body {
             margin: 0;
             min-height: 100vh;
-            padding: 38px;
             background: #f4f6fb;
             color: var(--ink);
             font-family: Arial, sans-serif;
+            display: flex;
         }
 
         main {
+            flex: 1;
+            margin-left: var(--sidebar);
+            padding: 38px;
             max-width: 1100px;
-            margin: auto;
+        }
+
+        .sidebar {
+            width: var(--sidebar);
+            background: var(--surface);
+            border-right: 1.5px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: 4px 0 24px rgba(100, 116, 180, 0.06);
+        }
+
+        .sidebar-logo {
+            padding: 1.6rem 1.4rem;
+            border-bottom: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px var(--accent-g);
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        .sidebar-nav {
+            padding: 1.2rem 0.8rem;
+        }
+
+        .nav-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.8rem;
+            padding: 0 0.6rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.85rem 0.6rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            margin-bottom: 0.2rem;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--accent-g);
+            color: var(--accent);
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .nav-item.active:hover {
+            background: var(--accent2);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .sidebar-user {
+            margin-top: auto;
+            padding: 1.2rem 0.8rem;
+            border-top: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .user-av {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .user-meta strong {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .user-meta span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .logout-form button {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.2rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .logout-form button:hover {
+            background: var(--red-s);
+            color: var(--red);
+        }
+
+        /* ─── MAIN ─── */
+        .main {
+            flex: 1;
+            margin-left: var(--sidebar);
         }
 
         .top {
@@ -172,7 +336,7 @@
         }
 
         @media (max-width:800px) {
-            body {
+            main {
                 padding: 20px 12px;
             }
 
@@ -192,13 +356,14 @@
 </head>
 
 <body>
+    @include('admin.partials.sidebar')
+
     <main>
         <div class="top">
             <div>
                 <h1>Music Library</h1>
                 <p>Upload default English and Hindi songs for client cards.</p>
             </div>
-            <a class="back" href="{{ route('admin.dashboard') }}">← Dashboard</a>
         </div>
         @if(session('success')) <div class="notice">{{ session('success') }}</div> @endif
         @if($errors->any()) <div class="notice" style="background:#fff1f2;color:#be123c;">{{ $errors->first() }}</div> @endif

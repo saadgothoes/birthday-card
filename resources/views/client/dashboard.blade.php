@@ -3018,6 +3018,223 @@
         line-height: 1.55;
     }
 
+    /* ── Payment accounts + proof, inside the QR gate ── */
+    .gate-accts {
+        display: grid;
+        gap: .6rem;
+        margin-bottom: 1rem;
+    }
+
+    .gate-acct {
+        display: block;
+        background: #fff;
+        border: 1.5px solid #f3d9a4;
+        border-radius: 11px;
+        padding: .85rem 1rem;
+        cursor: pointer;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .gate-acct:hover {
+        border-color: #e0b155;
+    }
+
+    .gate-acct.selected {
+        border-color: #d97706;
+        box-shadow: 0 0 0 2px rgba(217, 119, 6, .15);
+    }
+
+    .gate-acct input {
+        display: none;
+    }
+
+    .gate-acct-top {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: .5rem;
+    }
+
+    .gate-acct-top strong {
+        font-size: .9rem;
+        color: #78350f;
+    }
+
+    .gate-acct-top .kind {
+        margin-left: auto;
+        font-size: .72rem;
+        color: #a16207;
+    }
+
+    .gate-acct-row {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-size: .82rem;
+        margin-top: .28rem;
+        color: #78350f;
+    }
+
+    .gate-acct-row .k {
+        color: #a16207;
+        min-width: 62px;
+    }
+
+    .gate-acct-row .v {
+        font-weight: 700;
+        word-break: break-all;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .gate-copy {
+        margin-left: auto;
+        background: #fffbeb;
+        border: 1.5px solid #f3d9a4;
+        border-radius: 7px;
+        font-family: inherit;
+        font-size: .7rem;
+        font-weight: 700;
+        padding: .22rem .5rem;
+        cursor: pointer;
+        color: #a16207;
+        flex-shrink: 0;
+    }
+
+    .gate-copy:hover {
+        border-color: #d97706;
+        color: #d97706;
+    }
+
+    .gate-acct-note {
+        display: block;
+        margin-top: .5rem;
+        font-size: .76rem;
+        color: #a16207;
+    }
+
+    .gate-acct-qr {
+        display: block;
+        margin-top: .6rem;
+        max-width: 130px;
+        border-radius: 9px;
+        border: 1.5px solid #f3d9a4;
+    }
+
+    .gate-fields {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: .8rem;
+        margin-bottom: 1rem;
+    }
+
+    .gate-field.wide {
+        grid-column: 1 / -1;
+    }
+
+    .gate-field label {
+        display: block;
+        font-size: .78rem;
+        font-weight: 700;
+        color: #78350f;
+        margin-bottom: .32rem;
+    }
+
+    .gate-field label .opt {
+        font-weight: 400;
+        color: #a16207;
+    }
+
+    .gate-field input[type=text],
+    .gate-field input[type=file],
+    .gate-field textarea {
+        width: 100%;
+        font-family: inherit;
+        font-size: .86rem;
+        padding: .62rem .8rem;
+        border-radius: 9px;
+        border: 1.5px solid #f3d9a4;
+        background: #fff;
+        outline: none;
+        color: #78350f;
+    }
+
+    .gate-field textarea {
+        resize: vertical;
+        min-height: 64px;
+    }
+
+    .gate-field input:focus,
+    .gate-field textarea:focus {
+        border-color: #d97706;
+    }
+
+    .gate-shot-preview {
+        display: none;
+        margin-top: .55rem;
+        max-width: 100%;
+        max-height: 190px;
+        border-radius: 9px;
+        border: 1.5px solid #f3d9a4;
+    }
+
+    /* The support panel rides inside the amber gate, so it borrows its palette
+       rather than the page's neutral one. */
+    .sub-gate .support-box {
+        margin-top: 1.1rem;
+        border-top: 1.5px solid #f3d9a4;
+        padding-top: .9rem;
+    }
+
+    .sub-gate .support-box h4 {
+        font-size: .86rem;
+        color: #78350f;
+        margin-bottom: .2rem;
+    }
+
+    .sub-gate .support-box p {
+        font-size: .76rem;
+        color: #a16207;
+        margin-bottom: .6rem;
+    }
+
+    .support-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    .support-link {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        background: #fff;
+        border: 1.5px solid #f3d9a4;
+        border-radius: 999px;
+        padding: .42rem .8rem;
+        font-size: .79rem;
+        font-weight: 700;
+        text-decoration: none;
+        color: #78350f;
+        transition: border-color .18s ease;
+    }
+
+    .support-link:hover {
+        border-color: #d97706;
+    }
+
+    .support-link__ico {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+    }
+
+    .support-link span.val {
+        display: block;
+        font-weight: 400;
+        color: #a16207;
+        font-size: .72rem;
+    }
+
     .sub-gate-msg {
         display: none;
         margin-top: .8rem;
@@ -3421,6 +3638,10 @@
         background: linear-gradient(135deg, #fffbf0, #f9ede0);
     }
 
+    .occasion-choice.proposal-occ::before {
+        background: linear-gradient(135deg, #fdf2f5, #f7ece2);
+    }
+
     .occasion-choice:hover::before,
     .occasion-choice.selected::before {
         opacity: 1;
@@ -3438,6 +3659,10 @@
 
     .occasion-choice.selected.anniversary-occ {
         border-color: var(--gold);
+    }
+
+    .occasion-choice.selected.proposal-occ {
+        border-color: #a35a56;
     }
 
     .occasion-choice .check {
@@ -3462,6 +3687,10 @@
 
     .occasion-choice.anniversary-occ .check {
         background: var(--gold);
+    }
+
+    .occasion-choice.proposal-occ .check {
+        background: #a35a56;
     }
 
     .occasion-choice.selected .check {
@@ -3633,6 +3862,574 @@
         border-color: #a7f3d0;
     }
 
+
+    /* ── Proposal flow (its own panels; mirrors the anniversary ones) ──── */
+    #proposalFlow {
+        display: none;
+    }
+
+    body.occasion-proposal #proposalFlow {
+        display: block;
+    }
+
+    body.show-occasion #proposalFlow {
+        display: none !important;
+    }
+
+    .prop-panel {
+        display: none;
+    }
+
+    .prop-panel.active {
+        display: block;
+        animation: fadeIn 0.35s ease;
+    }
+
+    body.occasion-proposal .step-panel,
+    body.occasion-proposal .nav-steps .step-item,
+    body.occasion-proposal .nav-anniv,
+    body.occasion-proposal #occasionSetupHeading,
+    body.occasion-proposal .theme-switcher,
+    body.occasion-proposal .progress-pill {
+        display: none !important;
+    }
+
+    .nav-prop {
+        display: none;
+    }
+
+    body.occasion-proposal .nav-prop {
+        display: block;
+    }
+
+    .prop-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.75rem 0.85rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 0.2rem;
+    }
+
+    .prop-nav-item:hover {
+        background: var(--surface2);
+    }
+
+    .prop-nav-item.active {
+        background: var(--accent-soft);
+    }
+
+    .prop-nav-item.active .step-num {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+
+    .prop-nav-item.active .step-label {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .prop-nav-item.done .step-num {
+        background: #d1fae5;
+        color: #059669;
+        border-color: #a7f3d0;
+    }
+
+    /* ── Step 1: the four design cards ──────────────────────────────────
+       Each card carries a looping motion preview of its own design — the
+       lid lifting, the locket opening, the countdown running, the balloons
+       popping — so the client can see what the design *does* before picking
+       it, without opening it. It is drawn in CSS rather than shipped as a
+       video file; a real clip dropped at public/videos/proposal/design{n}.mp4
+       is used instead when one exists. */
+    .prop-design-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.2rem;
+        margin-top: 0.4rem;
+    }
+
+    @media (max-width: 900px) {
+        .prop-design-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .prop-design {
+        position: relative;
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        cursor: pointer;
+        background: var(--surface);
+        transition: border-color .2s, box-shadow .2s, transform .2s;
+    }
+
+    .prop-design:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px -20px rgba(0, 0, 0, .5);
+    }
+
+    .prop-design.selected {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .prop-design .variant-check {
+        position: absolute;
+        top: 0.7rem;
+        right: 0.7rem;
+        z-index: 3;
+        opacity: 0;
+        transition: opacity .2s;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 0.8rem;
+    }
+
+    .prop-design.selected .variant-check {
+        opacity: 1;
+    }
+
+    /* 5:4 rather than the 16:10 the other previews use: a proposal is a tall
+       page — hero, question, two buttons and a closing line — and at 16:10 the
+       bottom of every design was cut off. */
+    .prop-clip {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 900 / 720;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        isolation: isolate;
+        contain: layout paint;
+    }
+
+    /* The preview is the real page, scaled down and playing itself — see
+       _proposal_demo.blade.php. It is not interactive: the card underneath it
+       is what takes the click. */
+    .prop-clip iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 900px;
+        height: 720px;
+        border: 0;
+        transform-origin: top left;
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0;
+        transition: opacity .4s ease;
+    }
+
+    .prop-clip iframe.loaded { opacity: 1; }
+
+    .prop-clip video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 3;
+    }
+
+    /* the proposal's own previews get the same taller frame */
+    #propPanelDesign .live-page-preview,
+    #propPanelContent .live-page-preview {
+        aspect-ratio: 900 / 720;
+    }
+
+    #propDesignPreview,
+    #propContentPreview {
+        height: 720px;
+    }
+
+    /* which moment of the step-2 preview is showing */
+    .prop-modes {
+        display: flex;
+        gap: 0.35rem;
+        margin-bottom: 0.7rem;
+        flex-wrap: wrap;
+    }
+
+    .prop-mode {
+        font: inherit;
+        font-size: 0.74rem;
+        font-weight: 600;
+        padding: 0.32rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all .2s;
+    }
+
+    .prop-mode:hover { border-color: var(--accent); }
+
+    .prop-mode.on {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+
+    /* the still that holds the space until the real page has loaded */
+    .pc-inner {
+        position: relative;
+        width: 220px;
+        height: 168px;
+    }
+
+    .prop-design-body {
+        padding: 0.95rem 1.05rem 1.1rem;
+    }
+
+    .prop-design-body h5 {
+        margin: 0 0 0.2rem;
+        font-size: 1rem;
+    }
+
+    .prop-design-mood {
+        font-size: 0.7rem;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin: 0 0 0.45rem;
+        font-weight: 600;
+    }
+
+    .prop-design-blurb {
+        font-size: 0.83rem;
+        line-height: 1.55;
+        color: var(--text-muted);
+        margin: 0 0 0.6rem;
+    }
+
+    .prop-beats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .prop-beats li {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 999px;
+        background: var(--surface2);
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+        transition: background .25s ease, color .25s ease, border-color .25s ease;
+    }
+
+    /* the beat the preview is playing right now */
+    .prop-beats li.at {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+
+    /* the motion loops themselves — one keyframe set per design */
+    .pc {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+
+    .pc-1 { background: linear-gradient(160deg, #f7ece2, #e8c9b0); }
+    .pc-2 { background: linear-gradient(160deg, #a35a56, #5c1420); }
+    .pc-3 { background: linear-gradient(170deg, #3a1f3d, #16102a); }
+    .pc-4 { background: linear-gradient(165deg, #cfe8f0, #f6d9e3); }
+
+    /* 1 — the lid lifts and a letter rises */
+    .pc-1 .lid {
+        position: absolute;
+        left: 50%;
+        top: 58px;
+        width: 92px;
+        height: 20px;
+        margin-left: -46px;
+        border-radius: 5px;
+        background: linear-gradient(170deg, #c98079, #9c5852);
+        transform-origin: 6% 100%;
+        animation: pcLid 4s ease-in-out infinite;
+        z-index: 3;
+    }
+
+    .pc-1 .base {
+        position: absolute;
+        left: 50%;
+        top: 78px;
+        width: 80px;
+        height: 52px;
+        margin-left: -40px;
+        border-radius: 4px 4px 7px 7px;
+        background: linear-gradient(170deg, #b8746c, #8f4f4b);
+        z-index: 2;
+    }
+
+    /* the ribbon down the front, so the shape reads as a gift and not a brick */
+    .pc-1 .base::after,
+    .pc-1 .lid::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 14px;
+        margin-left: -7px;
+        background: linear-gradient(180deg, #f3dcc4, #dcb08a);
+    }
+
+    .pc-1 .note {
+        position: absolute;
+        left: 50%;
+        top: 66px;
+        width: 62px;
+        height: 44px;
+        margin-left: -31px;
+        border-radius: 3px;
+        background: #fffaf4;
+        box-shadow: 0 6px 12px -8px rgba(0, 0, 0, .6);
+        animation: pcNote 4s ease-in-out infinite;
+        z-index: 1;
+    }
+
+    @keyframes pcLid {
+        0%, 22% { transform: rotate(0); }
+        38%, 78% { transform: rotate(-108deg); }
+        94%, 100% { transform: rotate(0); }
+    }
+
+    @keyframes pcNote {
+        0%, 30% { transform: translateY(14px) scaleY(.4); opacity: 0; }
+        48%, 78% { transform: translateY(-26px) scaleY(1); opacity: 1; }
+        92%, 100% { transform: translateY(14px) scaleY(.4); opacity: 0; }
+    }
+
+    /* 2 — the locket halves swing open */
+    .pc-2 .lk {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 96px;
+        height: 88px;
+        margin: -44px 0 0 -48px;
+    }
+
+    /* each half is its own half-of-a-heart polygon, closed down the seam —
+       clipping a whole heart to a rectangle would square off the inner edge */
+    .pc-2 .lk i {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 38% 32%, #f0d79b, #8a6524);
+        transform-origin: left center;
+        animation: pcLkL 4s ease-in-out infinite;
+    }
+
+    .pc-2 .lk i:nth-of-type(1) {
+        clip-path: polygon(50% 100%, 8% 55%, 4% 28%, 20% 10%, 38% 12%, 50% 26%);
+    }
+
+    .pc-2 .lk i:nth-of-type(2) {
+        clip-path: polygon(50% 100%, 50% 26%, 62% 12%, 80% 10%, 96% 28%, 92% 55%);
+        transform-origin: right center;
+        animation-name: pcLkR;
+    }
+
+    .pc-2 .lk b {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 44px;
+        height: 44px;
+        margin: -22px 0 0 -22px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #fff, #f6ecd6);
+        border: 2px solid #f0d79b;
+    }
+
+    @keyframes pcLkL {
+        0%, 24% { transform: rotateY(0); }
+        44%, 80% { transform: rotateY(-108deg); }
+        96%, 100% { transform: rotateY(0); }
+    }
+
+    @keyframes pcLkR {
+        0%, 24% { transform: rotateY(0); }
+        44%, 80% { transform: rotateY(108deg); }
+        96%, 100% { transform: rotateY(0); }
+    }
+
+    /* 3 — the countdown runs, then flashes */
+    .pc-3 .num {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font: 700 3.4rem/1 'Inter', system-ui, sans-serif;
+        color: #fff;
+        text-shadow: 0 0 26px rgba(255, 226, 168, .8);
+        opacity: 0;
+    }
+
+    .pc-3 .num:nth-child(1) { animation: pcNum 4s linear infinite; }
+    .pc-3 .num:nth-child(2) { animation: pcNum 4s linear infinite -1s; }
+    .pc-3 .num:nth-child(3) { animation: pcNum 4s linear infinite -2s; }
+
+    .pc-3 .flash {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 24px;
+        height: 24px;
+        margin: -12px 0 0 -12px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #ffe2a8, transparent 70%);
+        animation: pcFlash 4s ease-out infinite;
+    }
+
+    @keyframes pcNum {
+        0% { opacity: 0; transform: scale(.9); }
+        6%, 22% { opacity: 1; transform: scale(1); }
+        30% { opacity: 0; transform: scale(.9); }
+        100% { opacity: 0; }
+    }
+
+    @keyframes pcFlash {
+        0%, 74% { transform: scale(0); opacity: 0; }
+        82% { transform: scale(9); opacity: .95; }
+        100% { transform: scale(16); opacity: 0; }
+    }
+
+    /* 4 — the balloons pop one after another */
+    .pc-4 .bl {
+        position: absolute;
+        top: 40px;
+        width: 40px;
+        height: 50px;
+        border-radius: 50% 50% 47% 47% / 42% 42% 58% 58%;
+        animation: pcPop 4s ease-in-out infinite;
+    }
+
+    .pc-4 .bl:nth-child(1) { left: 24%; background: #8ecae6; animation-delay: 0s; }
+    .pc-4 .bl:nth-child(2) { left: 42%; top: 24px; background: #ffb3c6; animation-delay: .18s; }
+    .pc-4 .bl:nth-child(3) { left: 60%; background: #ffd6a5; animation-delay: .36s; }
+    .pc-4 .bl:nth-child(4) { left: 42%; top: 74px; background: #caffbf; animation-delay: .54s; }
+
+    @keyframes pcPop {
+        0%, 40% { transform: scale(1) translateY(0); opacity: 1; }
+        50% { transform: scale(1.4); opacity: 0; }
+        88% { transform: scale(1) translateY(0); opacity: 0; }
+        96%, 100% { opacity: 1; }
+    }
+
+    /* ── Step 1: the theme swatches under the chosen design ───────────── */
+    .prop-theme-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    @media (max-width: 780px) {
+        .prop-theme-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .prop-theme {
+        position: relative;
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        cursor: pointer;
+        background: var(--surface);
+        transition: border-color .2s, transform .2s;
+    }
+
+    .prop-theme:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+    .prop-theme.selected {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .prop-theme .sw {
+        height: 62px;
+    }
+
+    .prop-theme .lbl {
+        padding: 0.5rem 0.6rem 0.6rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .prop-theme .side {
+        display: block;
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-top: 0.15rem;
+    }
+
+    .prop-theme .variant-check {
+        position: absolute;
+        top: 0.4rem;
+        right: 0.4rem;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 0.7rem;
+        opacity: 0;
+        transition: opacity .2s;
+    }
+
+    .prop-theme.selected .variant-check { opacity: 1; }
+
+    /* Fields the chosen design does not use are not rendered as disabled —
+       they are simply not there. Photo slots are hidden the other way round:
+       `.image-slot` brings its own display and sizing, so switching it to
+       `block` stretched the thumbnail across the panel. */
+    .prop-field[data-field] { display: none; }
+    .prop-field[data-field].on { display: block; }
+
+    .image-slot.prop-off { display: none !important; }
+
+    /* the shared slot grid is three across; a proposal offers at most two, so
+       it is narrowed here rather than leaving one slot a third of a page wide */
+    #propPhotoRow .image-slots {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 340px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .pc-1 .lid, .pc-1 .note, .pc-2 .lk i, .pc-3 .num, .pc-3 .flash, .pc-4 .bl {
+            animation: none;
+        }
+
+        .pc-3 .num:nth-child(1) { opacity: 1; }
+    }
+
     </style>
 </head>
 
@@ -3643,6 +4440,7 @@
     $bodyClass = trim(
         (! $cardOccasion ? 'show-occasion ' : '')
         . ($cardOccasion === 'anniversary' ? 'occasion-anniversary' : '')
+        . ($cardOccasion === 'proposal' ? 'occasion-proposal' : '')
     );
 @endphp
 <body @if($bodyClass) class="{{ $bodyClass }}" @endif>
@@ -3692,7 +4490,7 @@
                 <div class="nav-occasion-icon">🎉</div>
                 <div>
                     <div class="step-label">Occasion</div>
-                    <div class="step-sub" id="navOccasionSub">Birthday or Anniversary</div>
+                    <div class="step-sub" id="navOccasionSub">Birthday, Anniversary or Proposal</div>
                 </div>
             </div>
             <div class="nav-occasion-divider"></div>
@@ -3842,6 +4640,39 @@
                     </div>
                 </div>
             </div>
+
+            <!-- proposal sub-steps (only shown for a proposal card) -->
+            <div class="nav-prop">
+                <h4>Setup Steps</h4>
+                <div class="prop-nav-item" id="propNav1" onclick="goToPropStep(1)">
+                    <div class="step-num" id="psn1">1</div>
+                    <div>
+                        <div class="step-label">Design &amp; Theme</div>
+                        <div class="step-sub">Pick one of four, then its colours</div>
+                    </div>
+                </div>
+                <div class="prop-nav-item" id="propNav2" onclick="goToPropStep(2)">
+                    <div class="step-num" id="psn2">2</div>
+                    <div>
+                        <div class="step-label">Your Words</div>
+                        <div class="step-sub">The question, the letter, the ring</div>
+                    </div>
+                </div>
+                <div class="prop-nav-item" id="propNav3" onclick="goToPropStep(3)">
+                    <div class="step-num" id="psn3">3</div>
+                    <div>
+                        <div class="step-label">Music</div>
+                        <div class="step-sub">A song behind the moment</div>
+                    </div>
+                </div>
+                <div class="prop-nav-item" id="propNav4" onclick="goToPropStep(4)">
+                    <div class="step-num" id="psn4">4</div>
+                    <div>
+                        <div class="step-label">Share Link &amp; QR</div>
+                        <div class="step-sub">Pick a design, generate</div>
+                    </div>
+                </div>
+            </div>
         </nav>
 
     </aside>
@@ -3901,6 +4732,13 @@
                                 </path>
                             </svg>
                             Settings
+                        </a>
+                        <a href="{{ route('client.contact') }}" class="dropdown-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path>
+                            </svg>
+                            Contact Us
                         </a>
                         <div class="dropdown-divider"></div>
                         <form method="POST" action="{{ route('client.logout') }}" style="margin:0">
@@ -3984,11 +4822,13 @@
                                 <div class="occasion-name">Anniversary</div>
                                 <div class="occasion-desc">White &amp; Cream or Rose &amp; Red — a keepsake for two</div>
                             </div>
-                            <div class="occasion-choice soon" aria-disabled="true">
-                                <div class="soon-badge">Coming soon</div>
+                            <div class="occasion-choice proposal-occ" id="occChoiceProposal"
+                                onclick="chooseOccasion('proposal')">
+                                <div class="check">✓</div>
                                 <div class="occasion-emoji">💐</div>
                                 <div class="occasion-name">Proposal</div>
-                                <div class="occasion-desc">Will you marry me? A build-up that ends on the question</div>
+                                <div class="occasion-desc">Will you marry me? — one page, four designs, and the
+                                    question at the end of it</div>
                             </div>
                             <div class="occasion-choice soon" aria-disabled="true">
                                 <div class="soon-badge">Coming soon</div>
@@ -4769,6 +5609,366 @@
             </div>
 
             </div><!-- /#anniversaryFlow -->
+
+            <!-- ══ PROPOSAL FLOW (shown instead of the birthday wizard) ══ -->
+            @php
+            $propDesigns = \App\Http\Controllers\Client\BirthdayCardController::PROPOSAL_DESIGNS;
+            $propLimits = \App\Http\Controllers\Client\BirthdayCardController::PROPOSAL_LIMITS;
+            // The motion preview on each design card is drawn in CSS. A real
+            // clip dropped in public/videos/proposal/ is played over it when
+            // one is there, so a marketing video can be added later without
+            // touching this file.
+            $propClips = [];
+            foreach ([1, 2, 3, 4] as $n) {
+                $propClips[$n] = file_exists(public_path("videos/proposal/design{$n}.mp4"))
+                    ? asset("videos/proposal/design{$n}.mp4") : null;
+            }
+            $propQrThemes = \App\Http\Controllers\Client\BirthdayCardController::qrThemes('proposal');
+            $propQrPreviews = ($cardOccasion === 'proposal')
+                ? \App\Http\Controllers\Client\BirthdayCardController::qrPreviews('proposal', $card->slug ?? null, 300)
+                : [];
+            $savedPropQrTheme = ($cardOccasion === 'proposal') ? ($card->qr_data['theme'] ?? null) : null;
+
+            // Which text box each field gets. Everything else is a plain input.
+            $propAreas = ['letter_text', 'closing_line'];
+            $propLabels = [
+                'heading' => ['Kicker', 'The small line above the name'],
+                'tap_label' => ['Tap hint', 'What the page asks them to do'],
+                'letter_text' => ['The letter', 'One line per line — up to 8'],
+                'pre_label' => ['Warning line', 'The line above the countdown'],
+                'countdown_seconds' => ['Countdown', 'How many seconds it counts (1-10)'],
+                'question' => ['The question', 'The one that matters'],
+                'yes_label' => ['Yes button', ''],
+                'no_label' => ['No button', 'The one that runs away'],
+                'yes_heading' => ['After the Yes', 'The celebration heading'],
+                'wedding_date' => ['Wedding date', 'Optional — shows a date card after the Yes'],
+                'altar_label' => ['Date card label', ''],
+                'fallback_line' => ['If there is no date yet', 'Shown on the card instead'],
+                'closing_line' => ['Closing line', 'The last thing they read'],
+                'signed' => ['Signed', ''],
+            ];
+            $propPhotoLabels = [
+                'ring_photo' => 'The ring',
+                'couple_photo' => 'The two of you',
+            ];
+            @endphp
+            <div id="proposalFlow">
+
+            <!-- Proposal step 1 — the design, then its colour theme -->
+            <div id="propPanelDesign" class="prop-panel active">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💐</div>
+                        <div class="card-title">
+                            <h3>Choose a Proposal Design</h3>
+                            <p>Four different moments. Each card plays a preview of what it does.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="prop-design-grid">
+                            @foreach ($propDesigns as $n => $d)
+                            <div class="prop-design" id="propDesign{{ $n }}" onclick="selectPropDesign({{ $n }})">
+                                <div class="variant-check">✓</div>
+                                <div class="prop-clip">
+                                    @if ($propClips[$n])
+                                        <video src="{{ $propClips[$n] }}" autoplay muted loop playsinline></video>
+                                    @endif
+                                    {{-- The real page, playing its whole flow on a loop — box open,
+                                         letter, question, the No button running away, the
+                                         celebration — then starting again. `data-src` because it
+                                         is only loaded once this step is on screen. --}}
+                                    <iframe data-src="{{ route('proposal.design.theme', ['design' => $n, 'theme' => 1]) }}?demo=1{{ $n === 3 ? '&countdown_seconds=3' : '' }}"
+                                        title="{{ $d['name'] }} preview" tabindex="-1" aria-hidden="true"
+                                        data-design="{{ $n }}"></iframe>
+                                    <div class="pc pc-{{ $n }}" aria-hidden="true">
+                                        <div class="pc-inner">
+                                        @if ($n === 1)
+                                            <span class="note"></span><span class="base"></span><span class="lid"></span>
+                                        @elseif ($n === 2)
+                                            <span class="lk"><b></b><i></i><i></i></span>
+                                        @elseif ($n === 3)
+                                            <span class="num">3</span><span class="num">2</span><span class="num">1</span>
+                                            <span class="flash"></span>
+                                        @else
+                                            <span class="bl"></span><span class="bl"></span>
+                                            <span class="bl"></span><span class="bl"></span>
+                                        @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="prop-design-body">
+                                    <p class="prop-design-mood">{{ $d['mood'] }}</p>
+                                    <h5>{{ $d['name'] }}</h5>
+                                    <p class="prop-design-blurb">{{ $d['blurb'] }}</p>
+                                    <ul class="prop-beats" id="propBeats{{ $n }}">
+                                        @foreach ($d['beats'] as $beat)
+                                            <li>{{ $beat }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+
+                        <!-- the chosen design's own four colour themes -->
+                        <div class="variant-section" id="propThemeSection" style="margin-top:1.6rem;">
+                            <h4 id="propThemeHeading">Choose a colour theme</h4>
+                            <p class="field-hint" style="margin:-0.4rem 0 0.8rem;">
+                                Two soft, two bold — every theme is the same design in different colours.
+                            </p>
+                            <div class="prop-theme-grid" id="propThemeGrid">
+                                @foreach ([1, 2, 3, 4] as $tn)
+                                <div class="prop-theme" id="propTheme{{ $tn }}" onclick="selectPropTheme({{ $tn }})">
+                                    <div class="variant-check">✓</div>
+                                    <div class="sw" id="propThemeSw{{ $tn }}"></div>
+                                    <div class="lbl">
+                                        <span id="propThemeName{{ $tn }}">Theme {{ $tn }}</span>
+                                        <span class="side" id="propThemeSide{{ $tn }}"></span>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+
+                            <div class="welcome-layout" style="margin-top:1.4rem;">
+                                <div>
+                                    <p class="field-hint">
+                                        This is the real page — the one the recipient will open. Tap inside it to
+                                        play the reveal through.
+                                    </p>
+                                </div>
+                                <div class="step2-preview-col">
+                                    <div class="live-preview-label">Live Preview</div>
+                                    <div class="live-page-preview">
+                                        <iframe id="propDesignPreview" src="about:blank" tabindex="-1"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="step1-error" id="propDesignError"
+                            style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;"></p>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToOccasion()">← Occasion</button>
+                            <button class="btn-next" id="propDesignContinueBtn" type="button"
+                                onclick="savePropDesignAndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proposal step 2 — everything that is written on the page -->
+            <div id="propPanelContent" class="prop-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">✍️</div>
+                        <div class="card-title">
+                            <h3>Your Words</h3>
+                            <p id="propContentSub">Only the fields this design actually uses are shown</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group" id="propPhotoRow">
+                            <label>Photos</label>
+                            <div class="image-slots">
+                                @foreach ($propPhotoLabels as $key => $label)
+                                <div class="image-slot prop-off" id="propSlot_{{ $key }}"
+                                    data-photo="{{ $key }}"
+                                    onclick="document.getElementById('propInput_{{ $key }}').click()">
+                                    <img class="slot-preview" id="propPreview_{{ $key }}" alt="">
+                                    <span class="slot-plus">+<span>{{ $label }}</span></span>
+                                </div>
+                                @endforeach
+                            </div>
+                            @foreach (array_keys($propPhotoLabels) as $key)
+                            <input type="file" id="propInput_{{ $key }}" accept="image/*" style="display:none"
+                                onchange="onPropPhoto('{{ $key }}', this)">
+                            @endforeach
+                            <p class="field-hint">Optional — a design with no photo draws its own ring instead.</p>
+                        </div>
+
+                        <div class="welcome-layout">
+                            <div>
+                                <div class="form-group">
+                                    <label>Names</label>
+                                    <div style="display:flex; gap:0.6rem;">
+                                        <input type="text" id="propTo" maxlength="{{ $propLimits['to_name'] }}"
+                                            placeholder="To (her name)" oninput="updatePropPreview()">
+                                        <input type="text" id="propFrom" maxlength="{{ $propLimits['from_name'] }}"
+                                            placeholder="From (your name)" oninput="updatePropPreview()">
+                                    </div>
+                                </div>
+
+                                @foreach ($propLabels as $key => $meta)
+                                <div class="form-group prop-field" data-field="{{ $key }}">
+                                    <div class="field-head">
+                                        <label>{{ $meta[0] }}</label>
+                                        @if (isset($propLimits[$key]))
+                                            <span class="char-count" data-for="prop_{{ $key }}"></span>
+                                        @endif
+                                    </div>
+                                    @if (in_array($key, $propAreas))
+                                        <textarea id="prop_{{ $key }}" rows="{{ $key === 'letter_text' ? 5 : 2 }}"
+                                            maxlength="{{ $propLimits[$key] }}"
+                                            @if ($key === 'letter_text') data-max-lines="{{ \App\Http\Controllers\Client\BirthdayCardController::PROPOSAL_LETTER_MAX_LINES }}" @endif
+                                            oninput="updatePropPreview()"></textarea>
+                                    @elseif ($key === 'wedding_date')
+                                        <input type="date" id="prop_{{ $key }}" oninput="updatePropPreview()">
+                                    @elseif ($key === 'countdown_seconds')
+                                        <input type="number" id="prop_{{ $key }}" min="1" max="10" placeholder="5"
+                                            style="max-width:120px;" oninput="updatePropPreview()">
+                                    @else
+                                        <input type="text" id="prop_{{ $key }}"
+                                            maxlength="{{ $propLimits[$key] ?? 60 }}" oninput="updatePropPreview()">
+                                    @endif
+                                    @if ($meta[1])
+                                        <p class="field-hint">{{ $meta[1] }}</p>
+                                    @endif
+                                </div>
+                                @endforeach
+                            </div>
+
+                            <div class="step2-preview-col">
+                                <div class="live-preview-label">Live Preview</div>
+                                <div class="prop-modes" role="group" aria-label="What the preview shows">
+                                    <button type="button" class="prop-mode on" id="propMode-words"
+                                        onclick="setPropPreviewMode('words')">Your words</button>
+                                    <button type="button" class="prop-mode" id="propMode-yes"
+                                        onclick="setPropPreviewMode('yes')">After the Yes</button>
+                                    <button type="button" class="prop-mode" id="propMode-play"
+                                        onclick="setPropPreviewMode('play')">▶ Play it through</button>
+                                </div>
+                                <div class="live-page-preview">
+                                    <iframe id="propContentPreview" src="about:blank" tabindex="-1"></iframe>
+                                </div>
+                                <p class="field-hint" style="margin-top:0.6rem;" id="propPreviewHint">
+                                    Held at the question so you can read your own words. The recipient sees
+                                    the reveal play out first.
+                                </p>
+                            </div>
+                        </div>
+
+                        <p class="step5-error" id="propContentError"
+                            style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;"></p>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToPropStep(1)">← Back</button>
+                            <button class="btn-next" id="propContentContinueBtn" type="button"
+                                onclick="savePropContentAndContinue()">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proposal step 3 — Music (the shared step 9 endpoint + clip picker) -->
+            <div id="propPanelMusic" class="prop-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🎵</div>
+                        <div class="card-title">
+                            <h3>Music</h3>
+                            <p>A song behind the moment, from the second they open the link</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="music-grid" id="propMusicGrid">
+                            @forelse($musicTracks->groupBy('category') as $category => $tracks)
+                            @foreach($tracks as $track)
+                            <div class="music-choice" data-track-id="{{ $track->id }}"
+                                data-track-url="{{ $track->url }}"
+                                onclick="selectPropMusic({{ $track->id }}, this)">
+                                <strong>{{ $track->title }}</strong><small>{{ $category }}{{ $track->artist ? ' · '.$track->artist : '' }}</small>
+                                <audio controls preload="none" src="{{ $track->url }}" onclick="event.stopPropagation()"></audio>
+                            </div>
+                            @endforeach
+                            @empty
+                            <p>No songs available yet. Ask Super Admin to add one.</p>
+                            @endforelse
+                        </div>
+
+                        {{-- the one clip picker, moved here by openClipPicker() --}}
+                        <div id="propMusicClipMount"></div>
+
+                        <p class="field-hint" style="margin-top:1.2rem">Only songs uploaded and approved by Super Admin
+                            are available here.</p>
+                        <p class="step5-error" id="propMusicError"
+                            style="display:none; color:#dc2626; font-size:0.82rem; margin-top:1rem;"></p>
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToPropStep(2)">← Back</button>
+                            <button class="btn-prev" type="button" onclick="savePropMusicAndContinue(true)">Skip</button>
+                            <button class="btn-next" type="button" id="propMusicContinueBtn"
+                                onclick="savePropMusicAndContinue(false)">Continue →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proposal step 4 — the link and its QR -->
+            <div id="propPanelQr" class="prop-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔗</div>
+                        <div class="card-title">
+                            <h3>Share Link &amp; QR</h3>
+                            <p>Pick a QR design, then generate the link that opens the proposal</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="variant-section visible" style="margin-top:0;">
+                            <h4>Choose a QR design</h4>
+                            <div class="qr-grid" id="propQrThemeGrid">
+                                @foreach ($propQrThemes as $n => $design)
+                                <div class="variant-choice" id="propQrTheme{{ $n }}" onclick="selectPropQrTheme({{ $n }})">
+                                    <div class="variant-check">✓</div>
+                                    <div class="qr-thumb"><img id="propQrThemeImg{{ $n }}"
+                                            src="{{ $propQrPreviews[$n] ?? '' }}" alt="{{ $design['name'] }}"></div>
+                                    <div class="variant-label">{{ $design['name'] }}</div>
+                                    <div class="qr-blurb">{{ $design['blurb'] }}</div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        @unless($hasSubscription)
+                        <div class="sub-gate" style="border:1px solid var(--border); border-radius:14px; padding:1.2rem; margin:1.2rem 0; background:var(--surface2);">
+                            <p style="margin:0 0 0.6rem; font-weight:600;">A subscription is needed to generate the link.</p>
+                            <p style="margin:0; font-size:0.86rem; color:var(--text-muted);">
+                                Open <a href="{{ route('client.cards') }}">Main Dashboard</a> to request a plan. Your
+                                proposal is fully built and saved as a draft until then.
+                            </p>
+                        </div>
+                        @endunless
+
+                        <button class="generate-btn" id="propQrGenerateBtn" type="button" onclick="propGenerateQr()"
+                            @unless($hasSubscription) disabled @endunless>
+                            Generate Link &amp; QR
+                        </button>
+                        <p class="step5-error" id="propQrError"
+                            style="display:none; color:#dc2626; font-size:0.82rem; margin-top:0.8rem;"></p>
+
+                        <div id="propQrResult" style="display:none; margin-top:1.6rem;">
+                            <div class="url-box" style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+                                <code id="propQrUrl" style="flex:1; min-width:220px; word-break:break-all; background:var(--surface2); padding:0.6rem 0.8rem; border-radius:8px; border:1px solid var(--border);"></code>
+                                <button type="button" class="btn-next" onclick="propCopyQrUrl(this)">Copy Link</button>
+                            </div>
+                            <div style="margin-top:1.2rem; display:flex; gap:1.4rem; align-items:center; flex-wrap:wrap;">
+                                <img id="propQrImg" alt="QR code" style="width:220px; height:220px; border:1px solid var(--border); border-radius:12px; background:#fff;">
+                                <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                                    <button type="button" class="btn-prev" onclick="propDownloadQr('png')">Download PNG</button>
+                                    <button type="button" class="btn-prev" onclick="propDownloadQr('svg')">Download SVG</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-nav">
+                            <button class="btn-prev" type="button" onclick="goToPropStep(3)">← Back</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div><!-- /#proposalFlow -->
+
 
             <!-- ── STEP 1: Theme ── -->
             <div class="step-panel active" id="panel1">
@@ -6261,7 +7461,7 @@
                                         approval — you will be able to generate the QR as soon as it is approved.
                                     </div>
                                 @else
-                                    <p class="sub-gate-label">Choose a plan to request:</p>
+                                    <p class="sub-gate-label">1 · Choose a plan:</p>
                                     <div class="sub-plan-grid">
                                         @foreach ($plans as $i => $plan)
                                             <label class="sub-plan {{ $i === 0 ? 'selected' : '' }}"
@@ -6274,12 +7474,93 @@
                                             </label>
                                         @endforeach
                                     </div>
-                                    <button class="sub-gate-btn" id="subRequestBtn" onclick="requestSubscription()">
-                                        Send Request to Admin
-                                    </button>
-                                    <p class="sub-gate-note">Payment is not collected online yet — the admin
-                                        activates your plan after reviewing the request.</p>
+
+                                    @if ($paymentMethods->isEmpty())
+                                        <p class="sub-gate-note">No payment accounts are published right now —
+                                            please contact support below and we will take your payment directly.</p>
+                                    @else
+                                        <p class="sub-gate-label">2 · Pay into one of these accounts:</p>
+                                        <div class="gate-accts">
+                                            @foreach ($paymentMethods as $i => $method)
+                                                <label class="gate-acct {{ $i === 0 ? 'selected' : '' }}"
+                                                    onclick="pickGateAccount(this)">
+                                                    <input type="radio" name="gate_payment_method"
+                                                        value="{{ $method->id }}" {{ $i === 0 ? 'checked' : '' }}>
+                                                    <span class="gate-acct-top">
+                                                        <span>{{ $method->typeIcon() }}</span>
+                                                        <strong>{{ $method->label }}</strong>
+                                                        <span class="kind">{{ $method->typeLabel() }}</span>
+                                                    </span>
+                                                    <span class="gate-acct-row">
+                                                        <span class="k">Title</span>
+                                                        <span class="v">{{ $method->account_name }}</span>
+                                                    </span>
+                                                    <span class="gate-acct-row">
+                                                        <span class="k">{{ $method->isBank() ? 'IBAN' : 'Number' }}</span>
+                                                        <span class="v">{{ $method->account_number }}</span>
+                                                        <button type="button" class="gate-copy"
+                                                            onclick="event.preventDefault();event.stopPropagation();copyGateAccount(this,@json($method->account_number))">Copy</button>
+                                                    </span>
+                                                    @if ($method->bank_name)
+                                                        <span class="gate-acct-row">
+                                                            <span class="k">Bank</span>
+                                                            <span class="v">{{ $method->bank_name }}</span>
+                                                        </span>
+                                                    @endif
+                                                    @if ($method->instructions)
+                                                        <span class="gate-acct-note">{{ $method->instructions }}</span>
+                                                    @endif
+                                                    @if ($method->qr_image_path)
+                                                        <img class="gate-acct-qr"
+                                                            src="{{ asset('storage/' . $method->qr_image_path) }}"
+                                                            alt="Payment QR for {{ $method->label }}">
+                                                    @endif
+                                                </label>
+                                            @endforeach
+                                        </div>
+
+                                        <p class="sub-gate-label">3 · Send us your payment details:</p>
+                                        <div class="gate-fields">
+                                            <div class="gate-field">
+                                                <label for="gateSenderName">Sender name</label>
+                                                <input type="text" id="gateSenderName" maxlength="120"
+                                                    placeholder="Name on the account you paid from"
+                                                    value="{{ Auth::user()->name }}">
+                                            </div>
+                                            <div class="gate-field">
+                                                <label for="gateSenderNumber">Sender number / account</label>
+                                                <input type="text" id="gateSenderNumber" maxlength="60"
+                                                    placeholder="e.g. 0300-1234567"
+                                                    value="{{ Auth::user()->phone }}">
+                                            </div>
+                                            <div class="gate-field">
+                                                <label for="gateTxnId">Transaction ID <span class="opt">(optional)</span></label>
+                                                <input type="text" id="gateTxnId" maxlength="120"
+                                                    placeholder="TID from your receipt">
+                                            </div>
+                                            <div class="gate-field">
+                                                <label for="gateShot">Payment screenshot</label>
+                                                <input type="file" id="gateShot" accept="image/*"
+                                                    onchange="previewGateShot(this)">
+                                                <img class="gate-shot-preview" id="gateShotPreview"
+                                                    alt="Your payment screenshot">
+                                            </div>
+                                            <div class="gate-field wide">
+                                                <label for="gateNote">Note for the admin <span class="opt">(optional)</span></label>
+                                                <textarea id="gateNote" maxlength="500"
+                                                    placeholder="Anything we should know"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <button class="sub-gate-btn" id="subRequestBtn" onclick="requestSubscription()">
+                                            Submit Payment for Approval
+                                        </button>
+                                        <p class="sub-gate-note">Your plan activates as soon as the admin verifies
+                                            the payment.</p>
+                                    @endif
                                 @endif
+
+                                @include('client.partials.support-links', ['supportContacts' => $supportContacts])
 
                                 <p class="sub-gate-msg" id="subGateMsg"></p>
                             </div>
@@ -6549,9 +7830,12 @@
         document.getElementById('progressText').textContent = 'Step ' + currentStep + ' of ' + totalSteps;
 
         // Whichever step just became visible may hold thumbs/previews that
-        // were left at scale(0) from a previous step change (see the guard
-        // in scaleVariantThumbs) — recompute now that they have real layout.
-        requestAnimationFrame(scaleVariantThumbs);
+        // were left unscaled while the step was display:none (see the guard in
+        // scalePreviewBox) — recompute now that they have real layout.
+        // Synchronously, so they are already fitted in the frame that reveals
+        // them; scaleVariantThumbs queues its own follow-up frame for anything
+        // that is still loading.
+        scaleVariantThumbs();
 
         if (currentStep === 2) {
             updateStep2LivePreview();
@@ -6727,29 +8011,100 @@
     // Step 2 live preview, so both always show the full design
     // shrunk to fit, on any screen size (mobile or web). ───────
     const THUMB_IFRAME_WIDTH = 900;
+    const PREVIEW_BOXES = '.variant-thumb, .live-page-preview, .prop-clip';
 
+    /** Fit one box's iframe to the width the box actually has right now. */
+    function scalePreviewBox(box) {
+        const iframe = box.querySelector('iframe');
+        if (!iframe) return;
+        // A box on an inactive step (display:none) reports 0 width. Skip it
+        // instead of zeroing its scale — this used to run on every step change
+        // (via updateStep2LivePreview's own recalibration), so switching to
+        // Step 2 silently collapsed Step 1's already-correct thumbs to
+        // scale(0), leaving them blank until a full page refresh.
+        if (box.clientWidth === 0) return;
+        // Each iframe scales against its own CSS-defined width (usually
+        // THUMB_IFRAME_WIDTH, but the gift-screen thumbs render wider — see
+        // .gift-variant-thumb iframe — so they land past the real page's own
+        // 1024px breakpoint and show its desktop image instead of the mobile
+        // CSS fallback).
+        const iframeWidth = iframe.offsetWidth || THUMB_IFRAME_WIDTH;
+        const next = 'scale(' + (box.clientWidth / iframeWidth) + ')';
+        // never write the same value back — a no-op style write is still a
+        // mutation, and the observer below is watching
+        if (iframe.style.transform === next) return;
+        iframe.style.transform = next;
+    }
+
+    /** Fit every preview on screen, right now. */
     function scaleVariantThumbs() {
-        document.querySelectorAll('.variant-thumb, .live-page-preview').forEach(box => {
-            const iframe = box.querySelector('iframe');
-            if (!iframe) return;
-            // Boxes on an inactive step (display:none) report 0 width. Skip
-            // them instead of zeroing their scale — this ran on every step
-            // change (via updateStep2LivePreview's own recalibration), so
-            // switching to Step 2 was silently collapsing Step 1's already
-            // -correct thumbs to scale(0), leaving them blank until a full
-            // page refresh recomputed everything from scratch.
-            if (box.clientWidth === 0) return;
-            // Each iframe scales against its own CSS-defined width (usually
-            // THUMB_IFRAME_WIDTH, but the gift-screen thumbs render wider —
-            // see .gift-variant-thumb iframe — so they land past the real
-            // page's own 1024px breakpoint and show its desktop image
-            // instead of the mobile CSS fallback).
-            const iframeWidth = iframe.offsetWidth || THUMB_IFRAME_WIDTH;
-            const scale = box.clientWidth / iframeWidth;
-            iframe.style.transform = 'scale(' + scale + ')';
+        document.querySelectorAll(PREVIEW_BOXES).forEach(scalePreviewBox);
+        observePreviewBoxes();
+        // and once more next frame, for anything still settling (a panel's
+        // fade-in, a late web font, an iframe that has only just loaded)
+        queuePreviewFit();
+    }
+
+    /**
+     * One coalesced sweep per frame.
+     *
+     * The observer below deliberately does *not* fit only the boxes it was
+     * handed. Chrome defers resize notifications it decides came from inside a
+     * callback, and a per-entry handler could then be told about a box, skip it
+     * as still-hidden, and never hear about it again — which is precisely how a
+     * revealed panel ended up unscaled until something else forced a resize.
+     * Re-fitting everything costs one querySelectorAll and is idempotent, so
+     * one dropped notification can no longer strand a preview.
+     */
+    let previewFitQueued = false;
+
+    function queuePreviewFit() {
+        if (previewFitQueued) return;
+        previewFitQueued = true;
+        requestAnimationFrame(() => {
+            previewFitQueued = false;
+            document.querySelectorAll(PREVIEW_BOXES).forEach(scalePreviewBox);
         });
     }
 
+    /**
+     * Keep every preview fitted, whatever changed its size.
+     *
+     * The scale used to be recomputed only by the ~30 hand-placed calls to
+     * scaleVariantThumbs() and by window.resize, which meant a box measured
+     * while its step was still `display:none` was skipped and never measured
+     * again — the panel appeared at the wrong scale and *stayed* wrong until
+     * the window was resized. A reload did not help, because the one call on
+     * `load` runs before the step is activated.
+     *
+     * Watching the boxes themselves removes the whole class of bug: whoever
+     * reveals a panel, collapses the sidebar, rotates the phone or lands a late
+     * web font, the box changes size and the fit is recomputed. A `transform`
+     * on an absolutely-positioned child cannot change the box's own size, so
+     * this cannot feed itself.
+     */
+    const previewResizeObserver = 'ResizeObserver' in window
+        ? new ResizeObserver(queuePreviewFit)
+        : null;
+
+    function observePreviewBoxes() {
+        if (!previewResizeObserver) return;
+        document.querySelectorAll(PREVIEW_BOXES).forEach(box => {
+            if (box.dataset.previewObserved) return;
+            box.dataset.previewObserved = '1';
+            previewResizeObserver.observe(box);
+        });
+    }
+
+    // Observe as soon as the boxes exist, rather than waiting for `load` — the
+    // first paint of an already-visible panel should already be fitted.
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', observePreviewBoxes);
+    } else {
+        observePreviewBoxes();
+    }
+
+    // Kept for browsers with no ResizeObserver; harmless everywhere else.
     window.addEventListener('resize', scaleVariantThumbs);
 
     // ── Step 2: live preview of the selected real page ─────
@@ -8385,16 +9740,51 @@
         if (radio) radio.checked = true;
     }
 
+    function pickGateAccount(label) {
+        document.querySelectorAll('.gate-acct').forEach(el => el.classList.remove('selected'));
+        label.classList.add('selected');
+        const radio = label.querySelector('input');
+        if (radio) radio.checked = true;
+    }
+
+    function copyGateAccount(button, value) {
+        navigator.clipboard.writeText(value).then(() => {
+            const original = button.textContent;
+            button.textContent = 'Copied';
+            setTimeout(() => button.textContent = original, 1400);
+        });
+    }
+
+    function previewGateShot(input) {
+        const img = document.getElementById('gateShotPreview');
+        const file = input.files && input.files[0];
+        if (!file) {
+            img.style.display = 'none';
+            return;
+        }
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
+    }
+
     function requestSubscription() {
         const btn = document.getElementById('subRequestBtn');
         const msg = document.getElementById('subGateMsg');
         const picked = document.querySelector('input[name="sub_plan_amount"]:checked');
+        const account = document.querySelector('input[name="gate_payment_method"]:checked');
+        const senderName = document.getElementById('gateSenderName');
+        const senderNumber = document.getElementById('gateSenderNumber');
+        const shot = document.getElementById('gateShot');
 
-        if (!picked) {
-            msg.textContent = 'Please choose a plan first.';
+        const fail = (text) => {
+            msg.textContent = text;
             msg.className = 'sub-gate-msg bad';
-            return;
-        }
+        };
+
+        if (!picked) return fail('Please choose a plan first.');
+        if (!account) return fail('Please choose the account you paid into.');
+        if (!senderName || !senderName.value.trim()) return fail('Please enter the sender name.');
+        if (!senderNumber || !senderNumber.value.trim()) return fail('Please enter the sender number.');
+        if (!shot || !shot.files.length) return fail('Please attach a screenshot of your payment.');
 
         btn.disabled = true;
         const original = btn.textContent;
@@ -8402,6 +9792,16 @@
 
         const body = new FormData();
         body.append('plan_amount', picked.value);
+        body.append('payment_method_id', account.value);
+        body.append('sender_name', senderName.value.trim());
+        body.append('sender_number', senderNumber.value.trim());
+        body.append('payment_screenshot', shot.files[0]);
+
+        const txn = document.getElementById('gateTxnId');
+        if (txn && txn.value.trim()) body.append('transaction_id', txn.value.trim());
+
+        const note = document.getElementById('gateNote');
+        if (note && note.value.trim()) body.append('client_note', note.value.trim());
 
         fetch(SUBSCRIPTION_REQUEST_URL, {
                 method: 'POST',
@@ -8413,10 +9813,14 @@
             })
             .then(res => res.json().then(data => ({ ok: res.ok, data })))
             .then(({ ok, data }) => {
-                msg.textContent = data.message || (ok ? 'Request sent.' : 'Could not send the request.');
+                const firstError = data.errors
+                    ? Object.values(data.errors).flat()[0]
+                    : null;
+                msg.textContent = firstError || data.message ||
+                    (ok ? 'Payment submitted.' : 'Could not send the request.');
                 msg.className = 'sub-gate-msg ' + (ok ? 'ok' : 'bad');
                 if (ok) {
-                    btn.textContent = 'Request Sent ✓';
+                    btn.textContent = 'Payment Sent ✓';
                     // Reload so the gate switches to its "pending" state.
                     setTimeout(() => window.location.reload(), 1400);
                     return;
@@ -8896,26 +10300,34 @@
             body,
         }).catch(() => { /* the choice still applies locally; a later save re-sends it */ });
 
+        const label = { birthday: 'Birthday', anniversary: 'Anniversary', proposal: 'Proposal' }[occ] || 'Birthday';
         document.getElementById('occChoiceBirthday').classList.toggle('selected', occ === 'birthday');
         document.getElementById('occChoiceAnniversary').classList.toggle('selected', occ === 'anniversary');
-        document.getElementById('navOccasionSub').textContent = occ === 'anniversary' ? 'Anniversary' : 'Birthday';
+        document.getElementById('occChoiceProposal').classList.toggle('selected', occ === 'proposal');
+        document.getElementById('navOccasionSub').textContent = label;
         document.getElementById('occasionNote').textContent =
-            'This card is set to ' + (occ === 'anniversary' ? 'Anniversary' : 'Birthday') +
-            '. Pick the other option here any time to switch.';
+            'This card is set to ' + label + '. Pick another option here any time to switch.';
 
         document.body.classList.remove('show-occasion');
         document.getElementById('navOccasion').classList.remove('active');
 
+        // exactly one flow is on screen, so the other two body classes go
+        document.body.classList.toggle('occasion-anniversary', occ === 'anniversary');
+        document.body.classList.toggle('occasion-proposal', occ === 'proposal');
+
         if (occ === 'anniversary') {
-            document.body.classList.add('occasion-anniversary');
             loadAnnivThumbs();
             if (annivVariant) {
                 selectAnnivCategory(annivVariant === 2 || annivVariant === 4 ? 'red' : 'cream');
                 selectAnnivVariant(annivVariant);
             }
             goToAnnivStep(annivFurthest || 1);
+        } else if (occ === 'proposal') {
+            // a card that has not picked a design yet opens on the first one,
+            // so the theme swatches and the preview are never empty
+            selectPropDesign(propDesign || 1);
+            goToPropStep(propFurthest || 1);
         } else {
-            document.body.classList.remove('occasion-anniversary');
             goToStep(currentStep || 1);
         }
     }
@@ -9038,7 +10450,10 @@
         if (n === 8) { annivPrefillNames(8); loadAnnivEndingThumbs(); updateAnnivEndingPreview(true); }
         if (n === 9) annivSyncMusicStep();
         if (n === 10) annivSyncQrStep();
-        requestAnimationFrame(scaleVariantThumbs);
+        // synchronously, so the panel is already fitted in the frame that
+        // reveals it — the rAF pass inside scaleVariantThumbs catches whatever
+        // is still settling after that
+        scaleVariantThumbs();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -9914,6 +11329,553 @@
         img.src = svgDataUri(annivQrSvg);
     }
 
+
+    // ══ Proposal wizard ═══════════════════════════════════════════════════
+    // Four steps: design & theme → words & photos → music → link. Steps 3 and
+    // 4 are the *same* endpoints and the *same* clip picker the birthday and
+    // anniversary flows use (CARD_STEP9_URL / CARD_STEP10_URL, and
+    // openClipPicker moving the one picker element into whichever step asked
+    // for it) — only the first two steps are the proposal's own.
+    const PROP_STEPS = 4;
+    const PROP_DESIGN_URL = @json(route('client.card.proposal.design'));
+    const PROP_CONTENT_URL = @json(route('client.card.proposal.content'));
+    const PROP_BASE = '/proposal/design/';
+    // The registry from the controller, so the design cards, the theme
+    // swatches and the per-design field list all come from one definition.
+    const PROP_DESIGNS = @json(\App\Http\Controllers\Client\BirthdayCardController::PROPOSAL_DESIGNS);
+    const PROP_DATA = @json(($cardOccasion === 'proposal') ? ($card->gift1_data ?? null) : null);
+    const PROP_PHOTO_KEYS = @json(\App\Http\Controllers\Client\BirthdayCardController::PROPOSAL_PHOTO_KEYS);
+
+    let propStep = 1;
+    let propFurthest = @json(($cardOccasion === 'proposal') ? min(4, max(1, (int) $card->current_step)) : 1);
+    let propDesign = @json(($cardOccasion === 'proposal') ? ($card->variant ?? null) : null);
+    let propTheme = @json(($cardOccasion === 'proposal') ? ($card->gift_screen_variant ?? null) : null);
+    let propPhotoFiles = {};
+    let propPhotoUrls = @json(($cardOccasion === 'proposal' && ($card->gift1_data['photos'] ?? null))
+        ? array_map(fn ($p) => $p ? \Illuminate\Support\Facades\Storage::url($p) : null, $card->gift1_data['photos'])
+        : new stdClass) || {};
+    let propPreviewDebounce = null;
+
+    function goToPropStep(n) {
+        if (n < 1 || n > PROP_STEPS) return;
+        propStep = n;
+        propFurthest = Math.max(propFurthest, n);
+
+        document.querySelectorAll('#proposalFlow .prop-panel').forEach((p, i) => {
+            p.classList.toggle('active', i === n - 1);
+        });
+        document.querySelectorAll('.nav-prop .prop-nav-item').forEach((el, i) => {
+            el.classList.toggle('active', i === n - 1);
+            el.classList.toggle('done', i + 1 < propFurthest && i + 1 !== n);
+        });
+
+        if (n === 1) { loadPropDemos(); updatePropDesignPreview(); }
+        if (n === 2) { propApplyFields(); updatePropPreview(true); }
+        if (n === 3) propSyncMusicStep();
+        if (n === 4) propSyncQrStep();
+        // The panel has only just stopped being display:none, so its previews
+        // are measurable for the first time. Fitting them synchronously means
+        // they are already the right size in the frame that reveals them —
+        // waiting for the observer (or for a rAF) would paint one frame of
+        // unscaled, cropped iframe first. The second pass catches anything
+        // that settles a frame later, such as the panel's fade-in.
+        scaleVariantThumbs();
+        requestAnimationFrame(scaleVariantThumbs);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Step 1 — design, then theme ────────────────────────
+    let propDemosLoaded = false;
+
+    /**
+     * Start the four looping previews.
+     *
+     * They are real pages driving themselves (`?demo=1`), not video files, so
+     * a preview can never show something the design no longer does. They are
+     * loaded on first sight of this step rather than with the dashboard,
+     * because a birthday card never opens this panel at all.
+     */
+    function loadPropDemos() {
+        if (propDemosLoaded) return;
+        propDemosLoaded = true;
+        document.querySelectorAll('.prop-clip iframe[data-src]').forEach(frame => {
+            frame.addEventListener('load', () => {
+                frame.classList.add('loaded');
+                requestAnimationFrame(scaleVariantThumbs);
+            });
+            frame.src = frame.dataset.src;
+        });
+    }
+
+    // Each preview announces the beat it has reached; the card's chips light up
+    // in step, so the client can read what is happening as it happens.
+    window.addEventListener('message', event => {
+        // the previews are same-origin iframes; nothing else gets to drive the chips
+        if (event.origin !== window.location.origin) return;
+        const beat = event.data && event.data.proposalBeat;
+        if (typeof beat !== 'number') return;
+        const frame = [...document.querySelectorAll('.prop-clip iframe')]
+            .find(f => f.contentWindow === event.source);
+        if (!frame) return;
+        const list = document.getElementById('propBeats' + frame.dataset.design);
+        if (!list) return;
+        [...list.children].forEach((li, i) => li.classList.toggle('at', i === beat));
+    });
+
+    function selectPropDesign(n) {
+        propDesign = n;
+        document.querySelectorAll('#proposalFlow .prop-design')
+            .forEach(el => el.classList.remove('selected'));
+        const chosen = document.getElementById('propDesign' + n);
+        if (chosen) chosen.classList.add('selected');
+        document.getElementById('propDesignError').style.display = 'none';
+
+        const spec = PROP_DESIGNS[n];
+        document.getElementById('propThemeHeading').textContent =
+            'Choose a colour theme for ' + spec.name;
+        // this reveals the full-size preview box, which was display:none until now
+        document.getElementById('propThemeSection').classList.add('visible');
+        scaleVariantThumbs();
+
+        // The four swatches are this design's own palettes, not a shared set.
+        [1, 2, 3, 4].forEach(t => {
+            const th = spec.themes[t];
+            document.getElementById('propThemeName' + t).textContent = th.name;
+            document.getElementById('propThemeSide' + t).textContent =
+                th.side === 'soft' ? 'Soft' : 'Bold';
+            document.getElementById('propThemeSw' + t).style.background =
+                'linear-gradient(135deg,' + th.swatch + ',' + th.accent + ')';
+        });
+
+        // A design change keeps the theme number if it is still sensible, so
+        // switching designs to compare them doesn't reset the choice.
+        selectPropTheme(propTheme || 1);
+        propApplyFields();
+    }
+
+    function selectPropTheme(n) {
+        propTheme = n;
+        document.querySelectorAll('#propThemeGrid .prop-theme')
+            .forEach(el => el.classList.remove('selected'));
+        const chosen = document.getElementById('propTheme' + n);
+        if (chosen) chosen.classList.add('selected');
+        document.getElementById('propDesignError').style.display = 'none';
+        updatePropDesignPreview();
+    }
+
+    function propPageUrl(extra) {
+        const d = propDesign || 1, t = propTheme || 1;
+        return PROP_BASE + d + '/' + t + (extra ? ('?' + extra) : '');
+    }
+
+    /**
+     * A preview inside a panel that is still display:none has nothing to show
+     * and cannot be measured, so loading it there is a wasted page fetch and a
+     * demo animating for nobody. goToPropStep() calls both update functions on
+     * the way in, which is when they can actually do their job.
+     */
+    function propPreviewIsVisible(frame) {
+        const panel = frame.closest('.prop-panel');
+        return !!panel && panel.classList.contains('active');
+    }
+
+    function updatePropDesignPreview() {
+        const frame = document.getElementById('propDesignPreview');
+        if (!frame || !propDesign || !propPreviewIsVisible(frame)) return;
+        // the chosen design at full size, playing its flow through on a loop —
+        // the same `?demo=1` the four cards use
+        frame.src = propPageUrl('demo=1' + (propDesign === 3 ? '&countdown_seconds=3' : ''));
+    }
+
+    function savePropDesignAndContinue() {
+        const err = document.getElementById('propDesignError');
+        if (!propDesign) {
+            err.textContent = 'Please choose a design to continue.';
+            err.style.display = 'block';
+            return;
+        }
+        if (!propTheme) {
+            err.textContent = 'Please choose a colour theme to continue.';
+            err.style.display = 'block';
+            return;
+        }
+        const btn = document.getElementById('propDesignContinueBtn');
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = 'Saving…';
+
+        const body = new FormData();
+        body.append('design', propDesign);
+        body.append('theme', propTheme);
+        fetch(PROP_DESIGN_URL, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                body,
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || 'Could not save.');
+                goToPropStep(2);
+            })
+            .catch(e => annivSaveErr('propDesignError', e))
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ── Step 2 — the words ─────────────────────────────────
+    /** Show only the fields and photo slots this design actually reads. */
+    function propApplyFields() {
+        const spec = PROP_DESIGNS[propDesign || 1];
+        document.getElementById('propContentSub').textContent =
+            spec.name + ' — only the fields this design uses are shown';
+
+        document.querySelectorAll('#propPanelContent .prop-field[data-field]').forEach(el => {
+            el.classList.toggle('on', spec.fields.indexOf(el.dataset.field) !== -1);
+        });
+        document.querySelectorAll('#propPanelContent .image-slot[data-photo]').forEach(el => {
+            el.classList.toggle('prop-off', spec.photos.indexOf(el.dataset.photo) === -1);
+        });
+        // a design with no photo slot at all shouldn't show an empty row
+        document.getElementById('propPhotoRow').style.display = spec.photos.length ? '' : 'none';
+        wireCharCounters(document.getElementById('propPanelContent'));
+        wireLineLimits(document.getElementById('propPanelContent'));
+        propFillDefaults();
+    }
+
+    /**
+     * Nobody should be handed a blank form.
+     *
+     * Every empty box is filled with this design's sample wording — the same
+     * text the page itself falls back to, from the one copy in
+     * PROPOSAL_DESIGNS[n]['defaults'] — so the client starts from a complete,
+     * sensible card and edits what they want to change instead of writing one
+     * from nothing. Anything already typed or already saved is left alone.
+     */
+    function propFillDefaults() {
+        const defaults = (PROP_DESIGNS[propDesign || 1] || {}).defaults || {};
+        Object.keys(defaults).forEach(key => {
+            const el = document.getElementById(
+                key === 'to_name' ? 'propTo' : (key === 'from_name' ? 'propFrom' : 'prop_' + key));
+            if (!el || el.value) return;
+            el.value = defaults[key];
+            // the counters and the live preview both listen for this
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    }
+
+    function onPropPhoto(key, input) {
+        const file = input.files[0];
+        if (!file) return;
+        propPhotoFiles[key] = file;
+        if (propPhotoUrls[key] && propPhotoUrls[key].startsWith('blob:')) {
+            URL.revokeObjectURL(propPhotoUrls[key]);
+        }
+        propPhotoUrls[key] = URL.createObjectURL(file);
+        document.getElementById('propPreview_' + key).src = propPhotoUrls[key];
+        document.getElementById('propSlot_' + key).classList.add('filled');
+        updatePropPreview();
+    }
+
+    /** Everything the client has typed, as the page's own query string. */
+    function propParams() {
+        const spec = PROP_DESIGNS[propDesign || 1];
+        const p = new URLSearchParams();
+        const put = (k, v) => { if (v !== null && v !== undefined && v !== '') p.set(k, v); };
+
+        put('to_name', document.getElementById('propTo').value);
+        put('from_name', document.getElementById('propFrom').value);
+        spec.fields.forEach(key => {
+            const el = document.getElementById('prop_' + key);
+            if (el) put(key, el.value);
+        });
+        spec.photos.forEach(key => put(key, propPhotoUrls[key]));
+        return p;
+    }
+
+    /**
+     * Which moment of the page the step-2 preview holds.
+     *
+     * `words` parks it at the question so the client can read what they typed
+     * without tapping through the reveal on every keystroke; `yes` shows the
+     * celebration, which is the half of the page the other two modes never
+     * reach; `play` runs the whole thing on a loop, the same `?demo=1` the
+     * design cards use.
+     */
+    let propPreviewMode = 'words';
+    const PROP_MODE_HINTS = {
+        words: 'Held at the question so you can read your own words. The recipient sees the reveal play out first.',
+        yes: 'The celebration, with your closing line and signature.',
+        play: 'The whole thing, start to finish, on a loop — exactly what they will see.',
+    };
+
+    function setPropPreviewMode(mode) {
+        propPreviewMode = mode;
+        ['words', 'yes', 'play'].forEach(m => {
+            const btn = document.getElementById('propMode-' + m);
+            if (btn) btn.classList.toggle('on', m === mode);
+        });
+        const hint = document.getElementById('propPreviewHint');
+        if (hint) hint.textContent = PROP_MODE_HINTS[mode];
+        updatePropPreview(true);
+    }
+
+    function updatePropPreview(immediate) {
+        const frame = document.getElementById('propContentPreview');
+        if (!frame || !propDesign || !propPreviewIsVisible(frame)) return;
+        clearTimeout(propPreviewDebounce);
+        const run = () => {
+            const p = propParams();
+            if (propPreviewMode === 'play') {
+                p.set('demo', '1');
+                // a five-second countdown makes for a slow loop to watch
+                if (propDesign === 3 && !p.get('countdown_seconds')) p.set('countdown_seconds', '3');
+            } else if (propPreviewMode === 'yes') {
+                p.set('preview_stage', 'yes');
+            } else {
+                p.set('preview_stage', propDesign === 3 ? 'reveal' : 'open');
+            }
+            frame.src = propPageUrl(p.toString());
+        };
+        immediate ? run() : (propPreviewDebounce = setTimeout(run, 450));
+    }
+
+    function savePropContentAndContinue() {
+        const err = document.getElementById('propContentError');
+        err.style.display = 'none';
+        const spec = PROP_DESIGNS[propDesign || 1];
+
+        const btn = document.getElementById('propContentContinueBtn');
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = 'Saving…';
+
+        const body = new FormData();
+        body.append('to_name', document.getElementById('propTo').value);
+        body.append('from_name', document.getElementById('propFrom').value);
+        spec.fields.forEach(key => {
+            const el = document.getElementById('prop_' + key);
+            if (el) body.append(key, el.value);
+        });
+        Object.keys(propPhotoFiles).forEach(key => {
+            if (propPhotoFiles[key] && spec.photos.indexOf(key) !== -1) {
+                body.append('photos[' + key + ']', propPhotoFiles[key]);
+            }
+        });
+
+        fetch(PROP_CONTENT_URL, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                body,
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || 'Could not save.');
+                // stored paths replace the local blobs, so a later preview
+                // still shows the photo after the object URL is gone
+                Object.keys(data.photo_urls || {}).forEach(k => {
+                    if (data.photo_urls[k]) propPhotoUrls[k] = data.photo_urls[k];
+                });
+                propPhotoFiles = {};
+                goToPropStep(3);
+            })
+            .catch(e => annivSaveErr('propContentError', e))
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ── Step 3 — music (shared endpoint, shared picker) ────
+    function selectPropMusic(trackId, element) {
+        const isNewTrack = selectedMusicTrackId !== trackId;
+
+        selectedMusicSource = 'library';
+        selectedMusicTrackId = trackId;
+        selectedMusicPath = null;
+        selectedMusicUrl = element.dataset.trackUrl;
+
+        document.querySelectorAll('#propMusicGrid .music-choice')
+            .forEach(choice => choice.classList.remove('selected'));
+        element.classList.add('selected');
+        document.getElementById('propMusicError').style.display = 'none';
+
+        if (isNewTrack) { musicClipStart = null; musicClipEnd = null; }
+        openClipPicker(element.dataset.trackUrl, 'propMusicClipMount');
+    }
+
+    function propSyncMusicStep() {
+        if (selectedMusicSource !== 'library' || !selectedMusicTrackId) return;
+        const choice = document.querySelector('#propMusicGrid [data-track-id="' + selectedMusicTrackId + '"]');
+        if (!choice) return;
+        choice.classList.add('selected');
+        openClipPicker(choice.dataset.trackUrl, 'propMusicClipMount');
+    }
+
+    function savePropMusicAndContinue(skip) {
+        const err = document.getElementById('propMusicError');
+        err.style.display = 'none';
+        stopClipPreview();
+
+        if (skip) { goToPropStep(4); return; }
+
+        if (selectedMusicSource !== 'library' || !selectedMusicTrackId) {
+            err.textContent = 'Please choose a song, or use Skip to leave it silent.';
+            err.style.display = 'block';
+            return;
+        }
+
+        const btn = document.getElementById('propMusicContinueBtn');
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = 'Saving…';
+
+        const body = new FormData();
+        body.append('source', selectedMusicSource);
+        body.append('track_id', selectedMusicTrackId);
+        if (musicClipEnd !== null) {
+            body.append('trim_start', musicClipStart || 0);
+            body.append('trim_end', musicClipEnd);
+        }
+
+        fetch(CARD_STEP9_URL, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                body,
+            })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(firstValidationError(data) || data.message || 'Could not save music.');
+                goToPropStep(4);
+            })
+            .catch(e => annivSaveErr('propMusicError', e))
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    // ── Step 4 — the link and its QR ───────────────────────
+    let propQrSvg = null;
+    let selectedPropQrTheme = @json($savedPropQrTheme);
+    const PROP_QR_DONE = @json(($cardOccasion === 'proposal' && $card->qr_data) ? true : false);
+    const PROP_QR_SHARE = @json(($cardOccasion === 'proposal' && $card->slug)
+        ? \App\Http\Controllers\Client\BirthdayCardController::shareUrl($card->slug) : null);
+
+    function selectPropQrTheme(n) {
+        selectedPropQrTheme = n;
+        document.querySelectorAll('#propQrThemeGrid .variant-choice')
+            .forEach(el => el.classList.remove('selected'));
+        const chosen = document.getElementById('propQrTheme' + n);
+        if (chosen) chosen.classList.add('selected');
+        document.getElementById('propQrError').style.display = 'none';
+    }
+
+    function propSyncQrStep() {
+        if (selectedPropQrTheme) selectPropQrTheme(selectedPropQrTheme);
+
+        if (PROP_QR_DONE && PROP_QR_SHARE && !propQrSvg) {
+            document.getElementById('propQrUrl').textContent = PROP_QR_SHARE;
+            document.getElementById('propQrResult').style.display = 'block';
+            fetch(CARD_STEP10_URL, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    body: (() => { const f = new FormData(); f.append('theme', selectedPropQrTheme || 1); return f; })(),
+                })
+                .then(r => r.ok ? r.json() : null)
+                .then(d => { if (d && d.qr_svg) { propQrSvg = d.qr_svg; document.getElementById('propQrImg').src = svgDataUri(d.qr_svg); } })
+                .catch(() => {});
+        }
+    }
+
+    function propGenerateQr() {
+        const err = document.getElementById('propQrError');
+        err.style.display = 'none';
+        if (!HAS_SUBSCRIPTION) {
+            err.textContent = 'An active subscription is required to generate the link.';
+            err.style.display = 'block';
+            return;
+        }
+        if (!selectedPropQrTheme) {
+            err.textContent = 'Please choose a QR design first.';
+            err.style.display = 'block';
+            document.getElementById('propQrThemeGrid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        const btn = document.getElementById('propQrGenerateBtn');
+        btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Generating…';
+        const f = new FormData();
+        f.append('theme', selectedPropQrTheme);
+        fetch(CARD_STEP10_URL, { method: 'POST', headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }, body: f })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) throw new Error(data.message || 'Could not generate the link.');
+                propQrSvg = data.qr_svg;
+                document.getElementById('propQrUrl').textContent = data.share_url;
+                document.getElementById('propQrImg').src = svgDataUri(data.qr_svg);
+                document.getElementById('propQrResult').style.display = 'block';
+                document.getElementById('propQrResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            })
+            .catch(e => { err.textContent = e.message || 'Could not generate the link.'; err.style.display = 'block'; })
+            .finally(() => { btn.disabled = false; btn.textContent = orig; });
+    }
+
+    function propCopyQrUrl(btn) {
+        navigator.clipboard.writeText(document.getElementById('propQrUrl').textContent).then(() => {
+            const t = btn.textContent; btn.textContent = 'Copied ✓';
+            setTimeout(() => btn.textContent = t, 1800);
+        });
+    }
+
+    function propDownloadQr(format) {
+        if (!propQrSvg) return;
+        if (format === 'svg') {
+            saveBlob(new Blob([propQrSvg], { type: 'image/svg+xml' }), 'proposal-qr.svg');
+            return;
+        }
+        const img = new Image();
+        img.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = c.height = 720;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 720, 720);
+            ctx.drawImage(img, 0, 0, 720, 720);
+            c.toBlob(b => saveBlob(b, 'proposal-qr.png'), 'image/png');
+        };
+        img.src = svgDataUri(propQrSvg);
+    }
+
+    /** Put a reopened proposal card back the way the client left it. */
+    function propRestore() {
+        wireCharCounters(document.getElementById('propPanelContent'));
+        wireLineLimits(document.getElementById('propPanelContent'));
+        // A card with nothing chosen yet opens on the first design rather than
+        // on an empty step — the theme row and the preview are there from the
+        // first second, and picking a different design is one click. This is
+        // the same landing chooseOccasion() gives, so both ways in agree.
+        selectPropDesign(propDesign || 1);
+        if (propTheme) selectPropTheme(propTheme);
+        if (PROP_DATA) {
+            // The counters were wired before these values arrived, and they
+            // only recount on input — so say so, or a restored card reads 0/32
+            // under a full field.
+            const setV = (id, v) => {
+                const el = document.getElementById(id);
+                if (!el || v === null || v === undefined || v === '') return;
+                el.value = v;
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+            };
+            setV('propTo', PROP_DATA.to_name);
+            setV('propFrom', PROP_DATA.from_name);
+            Object.keys(PROP_DATA).forEach(key => {
+                if (['design', 'theme', 'photos', 'to_name', 'from_name'].indexOf(key) !== -1) return;
+                setV('prop_' + key, PROP_DATA[key]);
+            });
+        }
+        PROP_PHOTO_KEYS.forEach(key => {
+            const url = propPhotoUrls[key];
+            if (!url) return;
+            const img = document.getElementById('propPreview_' + key);
+            if (!img) return;
+            img.src = url;
+            document.getElementById('propSlot_' + key).classList.add('filled');
+        });
+        propApplyFields();
+        goToPropStep(propFurthest || 1);
+    }
+
     // Prevent scrolling when sidebar is open on mobile
     function preventScroll(e) {
         e.preventDefault();
@@ -10004,11 +11966,17 @@
 
             // land on the furthest anniversary step reached
             goToAnnivStep(annivFurthest || 1);
+        } else if (cardOccasion === 'proposal') {
+            document.getElementById('occChoiceProposal').classList.add('selected');
+            document.getElementById('navOccasionSub').textContent = 'Proposal';
+            document.getElementById('occasionNote').textContent =
+                'This card is set to Proposal. Pick another option here any time to switch.';
+            propRestore();
         } else if (cardOccasion === 'birthday') {
             document.getElementById('occChoiceBirthday').classList.add('selected');
             document.getElementById('navOccasionSub').textContent = 'Birthday';
             document.getElementById('occasionNote').textContent =
-                'This card is set to Birthday. Pick the other option here any time to switch.';
+                'This card is set to Birthday. Pick another option here any time to switch.';
         } else {
             // no occasion yet — the picker is showing (server set body.show-occasion)
             document.getElementById('navOccasion').classList.add('active');

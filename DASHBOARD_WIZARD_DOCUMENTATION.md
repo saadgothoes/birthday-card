@@ -1828,7 +1828,8 @@ looked detached):
   untouched. Clickable any time to switch occasion.
 - **`#occasionPanel`** — a normal `.card` in the main flow, styled exactly like
   the other steps (four `.occasion-choice` cards: **Birthday**, **Anniversary**,
-  and **Proposal** / **Valentine's Day** marked *Coming soon* and inert).
+  **Proposal** — live as of §35 — and **Valentine's Day**, still marked
+  *Coming soon* and inert).
   Visibility is `body.show-occasion` (server-set when `$cardOccasion` is null).
 - **Birthday** → `chooseOccasion('birthday')` saves, drops `show-occasion`,
   `goToStep(currentStep)`. The 10-step wizard is untouched.
@@ -1973,12 +1974,42 @@ without touching an observed node. A design none of the rules fit falls into the
 last row and is never gated at all; a three-minute failsafe reveals the button
 regardless, so no recipient is ever shut inside a gift with no way out.
 
-### 34.2 The button moved to the side
+### 34.2 Where the floating button sits
 
-`.story-nav` was pinned bottom-right, which is where every design puts its own
-controls — the scratch cards' Next and dots, the book's page arrows, the "Open
-the book" button. It now sits **centred on the right edge**, stacked vertically,
-which is the one area clear in all of them.
+It stays in the **bottom-right corner**. The middle of the right edge was tried
+and is worse: on a gift that fills the width it lands beside the heading at eye
+level and reads as part of the card rather than as chrome.
+
+The corner is not always free, though, so the offset is **measured rather than
+fixed** (`navPlacement()`): anything interactive that would sit under the button
+pushes it up above itself. Boy gift 1 puts its own Next in that exact spot —
+measured at 893,662 on a 1000x720 screen, against the story button's 879,662 —
+and it is now lifted to `bottom: 70px`, clear of it. Designs change shape as they
+are played, so the measurement re-runs on resize and as the page mutates.
+
+One trap worth recording: the placement writes `nav.style.bottom`, and its own
+`MutationObserver` watches `style`. Without a re-entry guard each write schedules
+another pass and the two spin forever — which does not misplace the button, it
+locks the page up entirely. Boy gift 1, the one design that needs a lift, was the
+one that hung. The guard plus "only write when the value actually changes" is
+what makes it settle.
+
+### 34.2.1 The welcome page had two Nexts as well
+
+The welcome chrome wires the button the design already draws and only falls back
+to a floating one when it cannot find it. It looked for `.bb-next, .gb-next` —
+boy and girl — but the anniversary welcome names its button `.om-continue`, so
+it was never found and the fallback added a **second** Next beside the design's
+own. Adding `.om-continue` to the selector wires the real button and the floating
+one is gone.
+
+### 34.2.2 The dead NEXT on the gift-select screen
+
+The four anniversary gift-select designs (`anniversary-page-3{,-2,-3,-4}`) carried
+a `<button class="next-btn">NEXT</button>` — commented "Static next button", with
+no handler anywhere in the file. On that screen the way on is picking a gift, so
+it only invited a tap that did nothing. The button and its rules are removed.
+Boy and girl gift-select pages never had one.
 
 ### 34.3 The ending is the end
 
@@ -2009,12 +2040,368 @@ Headless Chrome over CDP, against the real rendered pages:
   own completion marker; the pop-up book specifically **not** fooled by its
   spread dots reaching the last spread; all three single-page gifts revealed
   immediately.
-- **Nav placement** — 14 px from the right edge, centred vertically, `opacity: 0`
-  and `visibility: hidden` while gated (so it cannot be tapped through).
+- **Nav placement** — bottom-right at 16 px, covering nothing, fully on screen,
+  on every story page at 1000x720 and 390x780; `opacity: 0` and
+  `visibility: hidden` while gated, so it cannot be tapped through.
+- **The lift** — against boy gift 1's own corner button: unplaced it covers
+  `.next-btn`, placed it sits at `bottom: 70px` and covers nothing, at both
+  widths.
+- **One Next per page** — welcome and gift-select carry no floating button at
+  all, and the welcome design's own Next navigates to the gift screen.
 - **Curtain, all three ending families** — open on arrival, closed after the
   design's finale, "The End" up, panels covering past the centre line.
 - **Live story** (`/c/{slug}`, unlocked): gifts screen no nav · gift 1 plain nav ·
   gifts 2 and 3 gated · ending no nav and a curtain.
+
+---
+
+## 35. Proposal — a Third Occasion, and a Wizard That Is Only Four Steps
+
+The occasion picker's third card is live. A proposal is **not** a five-screen
+story like a birthday or an anniversary — it is one page that the recipient
+opens, plays through, and answers — so it gets a wizard shaped like the thing
+it builds: **design & theme → your words → music → link**. Four steps, two of
+them the ones the other occasions already use.
+
+The design work itself — the four designs, their four themes each, the shared
+Yes/No module, the params, the public page — is documented in
+[proposal.md](proposal.md). This section is the dashboard and backend wiring.
+
+**Nothing about birthday or anniversary changed.** No step was renumbered, no
+`saveStep*` or `saveAnniversary*` handler was touched, and both flows were
+re-opened afterwards to confirm they still render on their own body class.
+
+### 35.1 Database
+
+**No migration.** `occasion` is a plain nullable string and already existed, so
+a proposal card is one that carries `occasion = 'proposal'` and reuses the
+generic columns:
+
+| Column | Holds |
+| --- | --- |
+| `variant` | which of the four designs |
+| `gift_screen_variant` | which of that design's four colour themes |
+| `gift1_data` | every word and photo on the page |
+| `music_data`, `qr_data`, `slug`, `is_published` | the shared music + QR steps |
+| `current_step` | 1-3 for the proposal's own steps |
+
+Putting the two numbers on the card rather than inside the JSON is what lets the
+preview URL and `proposalView()` be built without unpacking the payload.
+
+### 35.2 Backend
+
+| Piece | Detail |
+| ----- | ------ |
+| `POST /client/card/occasion` | `saveOccasion` — now `in:birthday,anniversary,proposal` |
+| `POST /client/card/proposal/design` | `saveProposalDesign` — `design` 1-4 + `theme` 1-4, `occasion='proposal'`, step→2 |
+| `POST /client/card/proposal/content` | `saveProposalContent` — the chosen design's own fields + photos → `gift1_data`, step→3 |
+| `POST /client/card/step9` | unchanged — the shared music step |
+| `POST /client/card/step10` | unchanged — the shared QR step |
+| `GET /proposal/design/{design}/{theme}` | the standalone page, `abort_unless` both are 1-4 |
+
+**`PROPOSAL_DESIGNS` is the single source of truth.** One registry constant
+holds each design's name, mood, blurb, the beats it plays, its four themes
+(name, soft/bold side, two swatch colours) and — the part that does the work —
+the list of `fields` and `photos` that design actually reads. The dashboard
+renders its design cards, theme swatches and per-design field list from it, and
+`saveProposalContent` validates against it, so a fifth design or a fifth theme
+is one entry rather than an edit in four places.
+
+The registry also holds each design's `defaults` — its sample wording — and that
+is read in two places: the page falls back to it when a parameter is missing, and
+the wizard pre-fills its empty boxes from it. One copy, so the preview a client
+sees before typing is exactly what an untouched card would render.
+
+That list is also why the endpoint does not simply accept everything it is sent.
+Only the chosen design's own fields are validated and stored: a Balloon Pop card
+carrying a countdown length, or a Countdown card carrying a letter, would be
+values in the JSON that nothing ever reads and that the client never saw a box
+for. Photos are filtered the same way, and a photo left over from a previous
+design stays on disk but is not carried into the payload.
+
+`PROPOSAL_LIMITS` gives every text field the length its own slot can show, and
+the Design 1 letter gets a line cap on top of its character cap — it is the one
+field where the shape matters as much as the length, because the paper it is
+printed on has a fixed number of lines.
+
+### 35.3 The QR family is chosen by occasion, not by theme
+
+Proposal cards get **six designs of their own** — `QR_THEMES['proposal']`:
+*Rose Gold Vow*, *Midnight Velvet*, *Burgundy Seal*, *Blush Petal*, *Emerald
+Band*, *Bold Pop*.
+
+`qrThemesForCard()` used to name the anniversary case explicitly. It now reads
+`QR_THEMES[$card->occasion] ?? qrThemes($card->theme)` — the key in the registry
+*is* the occasion, so adding a family is adding a key. Birthday still falls
+through to its boy/girl sets because `'birthday'` is not a family in there.
+`saveStep10` already validated the chosen number against *that card's* set
+rather than a fixed list, so it accepts 1-6 for a proposal with no change.
+
+`ensureSlug` learned `gift1_data['to_name']` (the proposal's name field) and
+falls back to the occasion name for the stem.
+
+### 35.4 Dashboard
+
+`resources/views/client/dashboard.blade.php`:
+
+- The **Proposal** occasion card is no longer *Coming soon*; it calls
+  `chooseOccasion('proposal')` like the other two.
+- `chooseOccasion()` was rewritten from an if/else over one class into a toggle
+  over both: exactly one flow is on screen, so `occasion-anniversary` and
+  `occasion-proposal` are both set from the chosen value rather than one being
+  added and the other assumed absent.
+- **`#proposalFlow`** — four `.prop-panel`s with their own `.nav-prop` sidebar
+  list (`.prop-nav-item`, a distinct class again, so neither `goToStep()`'s nor
+  `goToAnnivStep()`'s index maths is touched). `goToPropStep(n)` drives it.
+- `body.occasion-proposal` hides the numbered steps, the anniversary nav, the
+  theme switcher and the progress pill, exactly as `occasion-anniversary` does.
+
+**Step 1 — Design & Theme.** Each of the four designs is a card carrying a mood,
+a summary, its five beats, and **the design itself running its whole flow on a
+loop** — an iframe on `?demo=1` (§35.4.1). A client watches the box open, the
+letter unfold, the question arrive, the No button run away and the celebration
+fire, all before choosing. The beat chips light up as the preview reaches them,
+so what is happening is named as well as shown.
+
+A CSS still holds the space until the page loads, and a real clip dropped at
+`public/videos/proposal/design{n}.mp4` is played over the top when one exists, so
+marketing footage can be added later without editing the blade. The previews load
+on first sight of the step rather than with the dashboard — a birthday card never
+opens this panel.
+
+Picking a design fills the theme row with **that design's own four palettes**
+(labelled *Soft* / *Bold* — two of each), not a shared set, and points the
+full-size preview below at the chosen design, playing through as well.
+
+**Step 2 — Your Words.** Only the chosen design's fields and photo slots are
+rendered, and **every empty box arrives pre-filled** with that design's sample
+wording. Nobody is handed a blank form: the client starts from a complete card
+and edits what they want to change. The text comes from
+`PROPOSAL_DESIGNS[n]['defaults']` — the same copy the page itself falls back to —
+so the preview before a keystroke is exactly what an untouched card would send.
+Anything already typed or already saved is left alone.
+
+Three buttons decide what the live preview holds: **Your words** (parked at the
+question, so a keystroke does not mean tapping through the reveal again),
+**After the Yes** (the celebration — the half of the page the other modes never
+reach), and **▶ Play it through** (the whole loop, with the client's own words
+in it).
+
+### 35.4.1 The previews are the pages, not videos
+
+`resources/views/birthday/partials/_proposal_demo.blade.php` is inert until a
+page is asked for with `?demo=1`, and then drives that page through its own
+sequence on a loop: idle, tap, the opening motion, the reveal, the question, the
+No button nudged twice until it runs, Yes, the celebration held for four
+seconds, and back to the start.
+
+Recording four videos would have meant four files to re-cut every time a design
+changed, and a preview that quietly lies the first time someone forgets. Driving
+the real page costs nothing to keep in step: the demo takes the same code path a
+real tap does — it even makes the No button run by dispatching a real
+`pointerenter`, so the tease module's own dodge does the work rather than a
+second copy of it.
+
+Each design registers `window.__proposalDemo` with `open` / `yes` / `reset` and
+its own `phases` — the milliseconds at which its beats land. Everything after
+the tap hangs off those, because the design already knows how long its sequence
+takes, so the captions and the action are one clock and cannot drift apart.
+Design 3 normally starts itself; under `?demo=1` it waits to be started, so the
+page and the loop never run one countdown between them.
+
+The current beat is posted to the parent as `{proposalBeat: n}` (which is what
+lights the chips) and written to `<html data-pd-beat>` (which is what makes the
+loop testable from a DOM dump). A preview scrolled off screen or in a hidden tab
+stops itself, so four of them are never animating for nobody.
+
+One sizing note: the proposal previews are **5:4**, not the 16:10 the rest of
+the dashboard uses. A proposal is a tall page — hero, question, two buttons and
+a closing line — and at 16:10 the bottom of every design was cut off.
+
+**Steps 3 & 4 — Music and QR** reuse `saveStep9` / `saveStep10`, the
+`music_data` / `qr_data` columns, and the *same* clip-picker element —
+`openClipPicker(url, 'propMusicClipMount')` moves the one picker into this step,
+as it already does for the birthday and anniversary flows. Skip leaves the page
+silent.
+
+Resume lands on `min(4, current_step)`: the shared music and QR steps still
+write 9 and 10, and for a four-step wizard both mean "the last step".
+
+### 35.4.2 Previews that only fitted after you resized the window
+
+Reported as: open the wizard on a laptop and the live preview does not fit its
+box; it only snaps into place once the window is resized (or devtools is opened,
+which resizes it). Reloading did not help.
+
+Every preview is a 900px-wide page rendered into a much smaller box and shrunk
+with `transform: scale()`. The scale was recomputed **only** by `window.resize`
+and by about thirty hand-placed `requestAnimationFrame(scaleVariantThumbs)`
+calls — and `scaleVariantThumbs` skips any box whose `clientWidth` is 0, because
+a box on an inactive step reports zero and must not be scaled to nothing.
+
+Those two facts combine badly. The one call on `load` runs at line 11432; the
+proposal panel is not revealed until `propRestore()` at line 11520. So on every
+load the boxes were measured while still `display:none`, skipped, and — because
+`goToPropStep()` was the one step function that never asked for a re-fit —
+never measured again. A reload reproduced it exactly. A resize was the only
+thing left that recomputed anything.
+
+Three changes, in order of how much they matter:
+
+1. **The boxes are observed, not polled by hand.** A single `ResizeObserver`
+   watches every `.variant-thumb`, `.live-page-preview` and `.prop-clip`. Now it
+   does not matter *who* reveals a panel, collapses the sidebar, rotates the
+   phone or lands a late web font — the box changes size and the fit is
+   recomputed. The thirty hand-placed calls became belt-and-braces.
+
+2. **The observer schedules one coalesced sweep per frame** rather than fitting
+   the entries it was handed. This is the part that actually made it reliable:
+   Chrome defers resize notifications it decides originated inside a callback,
+   and a per-entry handler could be told about a box *while it was still hidden*
+   (so it skipped it) and then never hear about it again. Re-fitting everything
+   costs one `querySelectorAll` and is idempotent, so a dropped notification can
+   no longer strand a preview.
+
+3. **Panels fit synchronously as they are revealed.** `goToPropStep`,
+   `goToAnnivStep` and `goToStep` now call `scaleVariantThumbs()` on the spot
+   instead of a frame later, so a panel is already the right size in the frame
+   that shows it rather than painting once cropped. `scaleVariantThumbs` queues
+   its own follow-up frame for anything still loading.
+
+`scalePreviewBox` also refuses to write a `transform` value identical to the one
+already there — a no-op style write is still a mutation, and the observer is
+watching.
+
+**Measured, not eyeballed.** A probe clicks a sidebar step and then compares
+each iframe's `getBoundingClientRect().width` against its box's `clientWidth`;
+anything more than a pixel apart is a failure. Before: proposal steps 1 and 2
+off by 407-706px at every desktop width, anniversary step 1 off by 426px and
+only self-correcting after ~3s (when the iframe's `load` event happened to fire
+another re-fit), birthday step 1 off by 426-685px. After: every step of all
+three flows fits within 120ms of the click, at 390 / 420 / 640 / 820 / 900 /
+1180 / 1440px, on a direct reload as well as on a click, with the window never
+resized.
+
+### 35.5 The public story
+
+`PublicStoryController`:
+
+- `isProposal()` joins `isAnniversary()` in `isLive()`.
+- **`lock()` is the proposal.** It is the route the QR encodes, and a proposal
+  has no code to enter, so for this occasion it renders the design page straight
+  away with the client's words.
+- `guard()` **404s** `welcome` / `gifts` / `gift/{n}` / `ending` for a proposal.
+  Without that they would have bounced back to a "lock screen" that is really
+  the whole card, which would have looked like a redirect loop that happened to
+  work.
+- `proposalView()` builds the view name from `variant` and
+  `gift_screen_variant` — the same two numbers the dashboard preview URL uses,
+  so the page a client approved and the page a recipient opens are one file.
+- `proposalParams()` hands over whatever was stored rather than a fixed list,
+  skipping `design`/`theme`/`photos` and resolving the photo paths to URLs.
+- `StoryChrome::proposal()` adds **only** the music control. No Next, no Back,
+  no curtain: the design already ends on its own celebration and there is
+  nowhere else to go. The gift gate, the side nav and the curtain of §34 are all
+  about a story with more pages after the current one, and a proposal has none.
+- The shell gets `side=proposal` (a badge palette in `story/shell.blade.php`)
+  and the title *"A Question For You"*. Music playback needed nothing:
+  `musicClip()` never cared about the occasion.
+
+### 35.6 Bugs found while building this
+
+- **A nested Blade comment dumped the docs onto the page.** The Yes/No partial's
+  header comment contained a `{{-- … --}}` inside its own markup example. The
+  inner `--}}` closed the outer comment, and the remaining paragraphs of
+  documentation rendered as body text beside the gift box on every design. Blade
+  comments do not nest; the example now uses plain parentheses.
+- **`i:first-child` matched nothing.** The dashboard's locket motion preview is
+  `<span class="lk"><b></b><i></i><i></i></span>`, so `i:first-child` selects
+  nothing — `<b>` is the first child. The left half of the heart was never
+  clipped and the thumbnail rendered as a gold square. `i:nth-of-type(n)`.
+- **An invisible letter still reserves its height.** Design 1's letter and ring
+  were hidden with opacity alone, which left a hand's width of empty page under
+  the closed box. They are now in a wrapper carrying `hidden`, taken off one
+  frame before the transitions start so there is still a state to animate from.
+- **An inline `transform` beats any class rule.** Design 4 wrote each balloon's
+  tilt into its `style` attribute, so `.balloon.popped`'s scale-up never
+  applied — they faded without bursting. The tilt travels as a `--rot` custom
+  property instead.
+- **`.prop-field.on { display: block }` broke the image slot.** `.image-slot`
+  brings its own display and sizing, and forcing it to `block` stretched the
+  thumbnail across the panel. Photo slots are hidden the other way round now,
+  with a `.prop-off` class that only ever removes them.
+- **Restored fields read 0/32.** The character counters are wired once and only
+  recount on input, so a reopened card showed empty counters over full fields.
+  `propRestore()` wires the counters first and dispatches an `input` event as it
+  sets each value.
+- **A preview only fitted its box after the window was resized.** The whole
+  story is §35.4.2; the short version is that the scale was recomputed by
+  hand-placed calls that all ran while the panel was still `display:none`, so
+  the one measurement that mattered was skipped and never retried.
+- **A polled "is it visible yet?" check never resolved.** The demo loop first
+  waited for the Yes button by polling its computed opacity before nudging the
+  No button. It reached the question and then stopped every time. The fix was
+  to delete the poll rather than debug it: the design already declares when its
+  beats land, so the tease and the Yes hang off those numbers. One clock, and
+  the captions cannot drift from the action either.
+- **Centring can trap the top of a tall page.** A flex item taller than the
+  viewport is centred by overflowing in *both* directions, and the part above
+  the top edge cannot be scrolled to. All four designs now carry
+  `align-items: center; align-items: safe center;` — the second line is ignored
+  by browsers that do not know it. Design 3 was also `overflow: hidden`
+  outright, which clipped its celebration on a short screen; it is
+  `overflow-x: hidden` now, and its drifting specks are `position: fixed` so
+  they never create a scrollbar of their own.
+
+### 35.7 Verified
+
+Server running, logged in as a client, real browser (headless Chrome) at 390×780
+and 1400×950:
+
+- **All 16 pages** `/proposal/design/{1..4}/{1..4}` return 200 and render
+  complete with **no query parameters at all**.
+- **Each design played through** on a phone viewport — closed state, the reveal,
+  the question, and the celebration — plus the `preview_stage=open|reveal|yes`
+  deep links.
+- **Endpoints**: occasion → design (1-4 / 1-4) → content. Photos land in
+  `birthday-cards/proposal` keyed by slot; a `letter_text` sent to Design 2 —
+  which has no letter — is dropped rather than stored.
+- **Validation**: `countdown_seconds=40` → "must not be greater than 10"; a
+  9-line letter → "longer than 8 lines"; a 70-character question → "must not be
+  greater than 60 characters".
+- **QR**: design 6 accepted and generated (birthday still rejects anything past
+  4); link + PNG/SVG.
+- **Public story**: `/c/{slug}` serves the shell with `side-proposal`, the frame
+  renders the chosen design and theme with the saved names, letter, question and
+  both uploaded photos. `welcome`, `gifts`, `gift/1` and `ending` all 404.
+- **The looping previews**: `data-pd-beat` walks 0 → 1 → 2 → 3 → 4 and back to
+  0 on all four designs; at the tease the No button really does carry
+  `pt-loose`, a moved `left`/`top`, a shrunk `transform` and the label "Really
+  sure?", and the celebration really does arrive (`class="party on"`). All four
+  cards were caught mid-flow in the dashboard, each on a different beat, with
+  the matching chip lit.
+- **Pre-fill**: a fresh proposal card opens step 2 with every box filled, the
+  character counters agreeing (7/32, 11/32, 152/400, 18/60 …), and the preview
+  showing those exact words. Posting the defaults back verbatim saves cleanly.
+- **Preview modes**: *Your words* parks at the question, *After the Yes* shows
+  the celebration with the closing line, *Play it through* runs the loop.
+- **Resume**: reopening the card restores the design, the theme, every field,
+  the photo thumbnails and the QR selection, and lands on the furthest step.
+- **Regression**: the same card flipped to `anniversary` renders
+  `body.occasion-anniversary`, flipped to `birthday` renders no body class; the
+  anniversary pages, gifts and ending, and the boy/girl pages, all still 200.
+
+### 35.8 Not included
+
+- A lock screen for proposals. Deliberate — a proposal is opened in person, in
+  the moment — but `story.lock` / `story.unlock` are still there if one is ever
+  wanted.
+- Payment for the subscription that gates the QR (manual admin approval, as
+  everywhere).
+- The slug stem still reads `birthday-…` for a proposal, because every card is
+  given its slug when the wizard page first loads — before the occasion is
+  picked — so the QR previews have a settled address to encode. Shared with
+  anniversary cards; the slug is only an address.
 
 ---
 
@@ -2035,6 +2422,10 @@ Headless Chrome over CDP, against the real rendered pages:
 - **Save as Draft with labels** (32.3) — name a card and park it from any step.
 - **Resume at last saved step** (32.4) — including landing on QR for finished cards.
 - **Theme persistence fix** (32.5) — saved design no longer discarded on reopen.
+- **Occasion picker + anniversary wizard** (33) — ten steps, live previews, six QR designs.
+- **Proposal occasion** (35) — four one-page designs with four colour themes each, a
+  four-step wizard (design & theme → words → music → link), six QR designs of its own,
+  and the public page at `/c/{slug}`. See [proposal.md](proposal.md).
 
 ### Still pending
 

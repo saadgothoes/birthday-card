@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\MusicController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Client\ClientAuthController;
@@ -13,8 +14,21 @@ use App\Http\Controllers\PublicStoryController;
 use App\Http\Controllers\MusicStreamController;
 
 Route::get('/', function () {
-    return view('welcome');
+    // The footer's social links are driven by whatever the Super Admin
+    // published, so a changed number needs no deploy.
+    return view('welcome', [
+        'supportContacts' => \App\Models\SupportContact::active()->get(),
+    ]);
 });
+
+// ─── Public contact page ──────────────────────────────────────
+// Its own page rather than a strip on the landing page, so it can be linked
+// to directly from the nav and shared on its own.
+Route::get('/contact', function () {
+    return view('contact', [
+        'supportContacts' => \App\Models\SupportContact::active()->get(),
+    ]);
+})->name('contact');
 
 // ─── Super Admin Routes ───────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -42,6 +56,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // ─── Payments ─────────────────────────────────────────
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+
+        // ─── Payment methods + support contacts ───────────────
+        // The accounts clients are told to send money to, and the channels
+        // they can reach support on. Both are edited on one screen.
+        Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment-methods.index');
+        Route::post('/payment-methods', [PaymentMethodController::class, 'store'])->name('payment-methods.store');
+        Route::put('/payment-methods/{paymentMethod}', [PaymentMethodController::class, 'update'])->name('payment-methods.update');
+        Route::patch('/payment-methods/{paymentMethod}/toggle', [PaymentMethodController::class, 'toggle'])->name('payment-methods.toggle');
+        Route::delete('/payment-methods/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->name('payment-methods.destroy');
+
+        Route::post('/support-contacts', [PaymentMethodController::class, 'storeContact'])->name('support-contacts.store');
+        Route::put('/support-contacts/{supportContact}', [PaymentMethodController::class, 'updateContact'])->name('support-contacts.update');
+        Route::patch('/support-contacts/{supportContact}/toggle', [PaymentMethodController::class, 'toggleContact'])->name('support-contacts.toggle');
+        Route::delete('/support-contacts/{supportContact}', [PaymentMethodController::class, 'destroyContact'])->name('support-contacts.destroy');
 
         // ─── BG Owner ─────────────────────────────────────────
         Route::get('/bg-owner', [SuperAdminController::class, 'bgOwner'])->name('bg-owner');
@@ -83,6 +111,8 @@ Route::prefix('client')->name('client.')->group(function () {
         // ─── Subscription request (no payment step yet) ────────
         Route::post('/subscription/request', [CardManagerController::class, 'requestSubscription'])->name('subscription.request');
         Route::get('/profile', [ClientAuthController::class, 'profile'])->name('profile');
+        // Chat support — the channels the Super Admin published.
+        Route::get('/contact', [ClientAuthController::class, 'contact'])->name('contact');
         Route::get('/settings', [ClientAuthController::class, 'settings'])->name('settings');
         Route::post('/settings/password', [ClientAuthController::class, 'updatePassword'])->name('settings.password');
         Route::post('/logout', [ClientAuthController::class, 'logout'])->name('logout');
@@ -99,6 +129,10 @@ Route::prefix('client')->name('client.')->group(function () {
         Route::post('/card/anniversary/gift-2', [BirthdayCardController::class, 'saveAnniversaryGift2'])->name('card.anniversary.gift2');
         Route::post('/card/anniversary/gift-3', [BirthdayCardController::class, 'saveAnniversaryGift3'])->name('card.anniversary.gift3');
         Route::post('/card/anniversary/ending', [BirthdayCardController::class, 'saveAnniversaryEnding'])->name('card.anniversary.ending');
+        // Proposal wizard — four steps, its own two endpoints; music (step 9)
+        // and the QR (step 10) are the shared ones, unchanged.
+        Route::post('/card/proposal/design', [BirthdayCardController::class, 'saveProposalDesign'])->name('card.proposal.design');
+        Route::post('/card/proposal/content', [BirthdayCardController::class, 'saveProposalContent'])->name('card.proposal.content');
         Route::post('/card/step1', [BirthdayCardController::class, 'saveStep1'])->name('card.step1');
         Route::post('/card/step2', [BirthdayCardController::class, 'saveStep2'])->name('card.step2');
         Route::post('/card/step3', [BirthdayCardController::class, 'saveStep3'])->name('card.step3');
@@ -150,6 +184,20 @@ Route::get('/anniversary/page/{page}/{variant}', function ($page, $variant) {
     }
     return view($viewName);
 })->name('anniversary.page.variant');
+
+// ─── Proposal Card Screens ────────────────────────────────────
+// A proposal is one page, not a five-screen story: the recipient opens the
+// link and the whole thing — reveal, question, answer — happens there. So the
+// URL carries the two things that decide what is rendered: which of the four
+// designs, and which of that design's four colour themes.
+Route::get('/proposal/design/{design}/{theme}', function ($design, $theme) {
+    $design = (int) $design;
+    $theme = (int) $theme;
+
+    abort_unless($design >= 1 && $design <= 4 && $theme >= 1 && $theme <= 4, 404);
+
+    return view('birthday.proposal-design-' . $design . '-theme-' . $theme);
+})->name('proposal.design.theme');
 
 // ─── Gift Pages (New Structure) ────────────────────────────────
 Route::get('/boy/page/{page}/{variant}/gift/{gift}/{giftPage}', function ($page, $variant, $gift, $giftPage) {
