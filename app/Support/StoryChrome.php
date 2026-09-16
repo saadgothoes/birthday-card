@@ -704,6 +704,13 @@ final class StoryChrome
      * a URL that was never built. Redefining it keeps the loading-screen
      * flourish the design plays and sends the recipient to their own story's
      * gift instead.
+     *
+     * The box-opening flourish is kept too. The designs install it by wrapping
+     * their own openGiftPage (see the _gift_reveal_fx partial), and this runs
+     * after them — assigning straight over the top would leave the story with
+     * a tap that goes nowhere but the loading screen, which is exactly what it
+     * did. The partial hands out its wrapper as `giftRevealFx`, so the story's
+     * navigation goes through the same light-burst the preview plays.
      */
     public static function gifts(array $urls, ?array $music = null): string
     {
@@ -715,7 +722,7 @@ final class StoryChrome
             const routes = {$map};
             let opening = false;
 
-            window.openGiftPage = function (gift) {
+            function go(gift) {
                 if (opening || !routes[gift]) return;
                 opening = true;
 
@@ -725,7 +732,11 @@ final class StoryChrome
                     loader.setAttribute('aria-hidden', 'false');
                 }
                 setTimeout(() => { window.location.href = routes[gift]; }, loader ? 900 : 0);
-            };
+            }
+
+            window.openGiftPage = typeof window.giftRevealFx === 'function'
+                ? window.giftRevealFx(go)
+                : go;
         })();
         </script>
         HTML . self::music($music);

@@ -224,10 +224,6 @@
 <script>
 (function () {
     'use strict';
-    if (typeof window.openGiftPage !== 'function') return;
-
-    var original = window.openGiftPage;
-    var busy = false;
     var dim = document.getElementById('grfxDim');
     var HANDOFF = 520;   // when to start the page's own loading/redirect
     var CLEANUP = 840;   // when to pull the flourish off the DOM
@@ -287,10 +283,34 @@
         setTimeout(function () { fx.remove(); }, CLEANUP);
     }
 
-    window.openGiftPage = function (n) {
-        if (busy) return;
-        busy = true;
-        playFX(pickTarget(n), function () { original(n); });
-    };
+    /*
+        Wrap a navigation so the flourish plays first.
+
+        This is exposed rather than only applied because the public story
+        rewrites openGiftPage itself: the design's version walks to a
+        hard-coded preview URL, and App\Support\StoryChrome::gifts() swaps in
+        one that goes to this recipient's own gift. That snippet is injected
+        before </body> — after this partial — so an outright assignment there
+        would drop the flourish and the tap would go straight to the loading
+        screen. It re-wraps through here instead.
+
+        Each call gets its own `busy`, so replacing the navigation never
+        leaves a stale latch behind that would swallow the first tap.
+    */
+    function withReveal(navigate) {
+        var busy = false;
+
+        return function (n) {
+            if (busy) return;
+            busy = true;
+            playFX(pickTarget(n), function () { navigate(n); });
+        };
+    }
+
+    window.giftRevealFx = withReveal;
+
+    if (typeof window.openGiftPage === 'function') {
+        window.openGiftPage = withReveal(window.openGiftPage);
+    }
 })();
 </script>
