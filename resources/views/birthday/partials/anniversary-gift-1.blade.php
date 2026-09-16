@@ -33,7 +33,7 @@
               'tape' => 'rgba(224,168,101,.24)', 'scene' => '#b08f62'],
         4 => ['name' => 'Bright Red & White', 'bg1' => '#e3bcab', 'bg2' => '#c4917c',
               'paper' => '#fdf6f2', 'paper2' => '#f3ded4', 'ink' => '#5c1712',
-              'accent' => '#dd281b', 'accent2' => '#ff6a5c', 'heart' => '#e8281a',
+              'accent' => '#e8281a', 'accent2' => '#ff6a5c', 'heart' => '#e8281a',
               'tape' => 'rgba(232,40,26,.16)', 'scene' => '#cf9880'],
     ];
     $t = $themes[$giftTheme] ?? $themes[1];
