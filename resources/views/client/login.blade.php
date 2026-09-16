@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Login — BirthdayCard</title>
+    <title>Client Login — Giftloft</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -287,6 +290,13 @@
                 font-size: 1.6rem;
             }
         }
+    
+        .brand-logo {
+            height: 58px;
+            width: auto;
+            display: block;
+            margin: 0 auto 1.4rem;
+        }
     </style>
 </head>
 
@@ -302,6 +312,7 @@
 
         <a href="{{ url('/') }}" class="back-home">&larr; Back to home</a>
 
+        <img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="brand-logo">
         <h2>Welcome Back!</h2>
         <p class="sub">Log in to create your magic</p>
 

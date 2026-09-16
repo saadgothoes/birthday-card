@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account — BirthdayCard</title>
+    <title>Create Account — Giftloft</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -338,6 +341,111 @@
             color: var(--text-muted);
             margin-top: 0.35rem;
         }
+
+        /* ── Optional-field chip ─────────────────────────── */
+        .opt-tag {
+            margin-left: 0.4rem;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            border-radius: 999px;
+            padding: 0.15rem 0.45rem;
+            text-transform: uppercase;
+        }
+
+        /* ── Live password checklist ─────────────────────── */
+        .pw-rules {
+            list-style: none;
+            margin-top: 0.55rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.25rem 0.7rem;
+        }
+
+        @media (max-width: 480px) {
+            .pw-rules {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pw-rules li {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+
+        /* The marker is the tick itself — two borders on a rotated box —
+           rather than a checkbox with a tick inside it. Grey while the rule is
+           unmet, green the moment it passes. */
+        .pw-rules li .mark {
+            width: 14px;
+            height: 15px;
+            flex: none;
+            position: relative;
+        }
+
+        .pw-rules li .mark::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 5px;
+            height: 10px;
+            border: solid #cbd5e1;
+            border-width: 0 2.2px 2.2px 0;
+            border-radius: 1px;
+            transform: rotate(45deg) scale(0.85);
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .pw-rules li.ok {
+            color: #15803d;
+            font-weight: 600;
+        }
+
+        .pw-rules li.ok .mark::after {
+            border-color: #16a34a;
+            transform: rotate(45deg) scale(1);
+        }
+
+        /* ── Confirm-password verdict ────────────────────── */
+        .pw-match {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.74rem;
+            font-weight: 600;
+            margin-top: 0.4rem;
+        }
+
+        .pw-match.ok {
+            color: #15803d;
+        }
+
+        .pw-match.bad {
+            color: #dc2626;
+        }
+
+        input.valid-ok {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        input.valid-ok:focus {
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12);
+        }
+    
+        .brand-logo {
+            height: 58px;
+            width: auto;
+            display: block;
+            margin: 0 auto 1.4rem;
+        }
     </style>
 </head>
 
@@ -351,6 +459,7 @@
 
         <a href="{{ url('/') }}" class="back-home">&larr; Back to home</a>
 
+        <img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="brand-logo">
         <h2>Create Your Account</h2>
         <p class="sub">Sign up free and build your first card</p>
 
@@ -377,34 +486,45 @@
 
             <div class="field-row">
                 <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" name="phone" value="{{ old('phone') }}" placeholder="03xx-xxxxxxx" required>
+                    <label>Phone <span class="opt-tag">Optional</span></label>
+                    <input type="text" name="phone" value="{{ old('phone') }}" placeholder="03xx-xxxxxxx">
                     @error('phone')<span class="field-error">{{ $message }}</span>@enderror
                 </div>
                 <div class="form-group">
-                    <label>City</label>
-                    <input type="text" name="city" value="{{ old('city') }}" placeholder="Your city" required>
+                    <label>City <span class="opt-tag">Optional</span></label>
+                    <input type="text" name="city" value="{{ old('city') }}" placeholder="Your city">
                     @error('city')<span class="field-error">{{ $message }}</span>@enderror
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Age</label>
-                <input type="number" name="age" value="{{ old('age') }}" min="1" max="120" placeholder="e.g. 24"
-                    required>
+                <label>Age <span class="opt-tag">Optional</span></label>
+                <input type="number" name="age" value="{{ old('age') }}" min="1" max="120" placeholder="e.g. 24">
                 @error('age')<span class="field-error">{{ $message }}</span>@enderror
             </div>
 
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" placeholder="••••••••" required>
-                <p class="hint">At least 8 characters, with upper and lower case letters and a number.</p>
+                <input type="password" name="password" id="pw" placeholder="••••••••" required>
+
+                {{-- The same four rules the server enforces, ticked live as
+                     they are met, so nobody learns their password was too weak
+                     only after the form comes back rejected. --}}
+                <ul class="pw-rules" id="pwRules">
+                    <li data-rule="len"><span class="mark"></span> 8+ characters</li>
+                    <li data-rule="upper"><span class="mark"></span> Uppercase letter</li>
+                    <li data-rule="lower"><span class="mark"></span> Lowercase letter</li>
+                    <li data-rule="number"><span class="mark"></span> A number</li>
+                </ul>
+
                 @error('password')<span class="field-error">{{ $message }}</span>@enderror
             </div>
 
             <div class="form-group" style="margin-bottom: 1.8rem;">
                 <label>Confirm Password</label>
-                <input type="password" name="password_confirmation" placeholder="••••••••" required>
+                <input type="password" name="password_confirmation" id="pwConfirm" placeholder="••••••••"
+                    required>
+                <p class="pw-match" id="pwMatch" hidden></p>
             </div>
 
             <button type="submit" class="submit-btn" id="signupSubmit">
@@ -417,6 +537,56 @@
             Already have an account? <a href="{{ route('client.login') }}">Sign in</a>
         </p>
     </div>
+
+    <script>
+        (function () {
+            const pw = document.getElementById('pw');
+            const confirm = document.getElementById('pwConfirm');
+            const rules = document.getElementById('pwRules');
+            const match = document.getElementById('pwMatch');
+
+            const checks = {
+                len: v => v.length >= 8,
+                upper: v => /[A-Z]/.test(v),
+                lower: v => /[a-z]/.test(v),
+                number: v => /[0-9]/.test(v),
+            };
+
+            function paint() {
+                const value = pw.value;
+                let allOk = value.length > 0;
+
+                rules.querySelectorAll('li').forEach(li => {
+                    const ok = checks[li.dataset.rule](value);
+                    li.classList.toggle('ok', ok);
+                    if (!ok) allOk = false;
+                });
+
+                pw.classList.toggle('valid-ok', allOk);
+
+                // The verdict only means something once they have started
+                // typing the second field.
+                if (!confirm.value) {
+                    match.hidden = true;
+                    confirm.classList.remove('valid-ok');
+                    return;
+                }
+
+                const same = confirm.value === value && allOk;
+                match.hidden = false;
+                match.classList.toggle('ok', same);
+                match.classList.toggle('bad', !same);
+                match.textContent = same
+                    ? '✓ Passwords matched'
+                    : (confirm.value === value ? '✓ Matched — finish the rules above' : '✕ Passwords do not match');
+                confirm.classList.toggle('valid-ok', same);
+            }
+
+            pw.addEventListener('input', paint);
+            confirm.addEventListener('input', paint);
+            paint();
+        })();
+    </script>
 </body>
 
 </html>

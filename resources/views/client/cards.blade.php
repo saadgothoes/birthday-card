@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — BirthdayCard</title>
+    <title>Dashboard — Giftloft</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -884,38 +887,128 @@
             border-color: var(--accent);
         }
 
+        /* ── Plan cards ──
+           Proper package cards rather than a stack of radio rows: the admin's
+           own plan name and blurb carry as much weight here as the price. */
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: .7rem;
+            margin-bottom: .4rem;
+        }
+
         .plan-opt {
+            position: relative;
             display: flex;
-            align-items: center;
-            gap: .8rem;
+            flex-direction: column;
             border: 1.5px solid var(--border);
-            border-radius: 12px;
-            padding: .85rem 1rem;
-            margin-bottom: .6rem;
+            border-radius: 16px;
+            padding: 1.1rem .9rem .95rem;
             cursor: pointer;
-            transition: border-color .18s ease, background .18s ease;
+            background: var(--surface);
+            transition: border-color .18s ease, background .18s ease, box-shadow .18s ease,
+                transform .18s ease;
         }
 
         .plan-opt:hover {
             border-color: var(--border2);
+            transform: translateY(-2px);
         }
 
         .plan-opt.selected {
             border-color: var(--accent);
             background: var(--accent-soft);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, .13);
         }
 
+        /* The radio still drives the form; the card is its label. */
         .plan-opt input {
-            accent-color: var(--accent);
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .plan-opt .tick {
+            position: absolute;
+            top: .6rem;
+            right: .6rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border2);
+            display: grid;
+            place-items: center;
+            font-size: .62rem;
+            color: transparent;
+            transition: all .18s ease;
+        }
+
+        .plan-opt.selected .tick {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .plan-opt .plan-name {
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: .3rem;
         }
 
         .plan-opt .amount {
+            font-family: 'Playfair Display', serif;
             font-weight: 700;
+            font-size: 1.5rem;
+            line-height: 1.1;
+            color: var(--text);
+        }
+
+        .plan-opt .amount small {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--text-dim);
         }
 
         .plan-opt .cards {
-            font-size: .78rem;
+            display: inline-block;
+            font-size: .76rem;
+            font-weight: 700;
+            color: #047857;
+            background: var(--green-soft);
+            border-radius: 999px;
+            padding: .18rem .5rem;
+            margin-top: .45rem;
+        }
+
+        .plan-opt .plan-desc {
+            font-size: .74rem;
+            line-height: 1.45;
             color: var(--text-muted);
+            margin-top: .5rem;
+        }
+
+        .plan-opt .per-card {
+            font-size: .68rem;
+            color: var(--text-dim);
+            margin-top: auto;
+            padding-top: .55rem;
+        }
+
+        .plan-opt .flag {
+            position: absolute;
+            top: -9px;
+            left: .8rem;
+            font-size: .6rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            color: #fff;
+            background: var(--accent);
+            border-radius: 999px;
+            padding: .16rem .45rem;
         }
 
         .modal-actions {
@@ -923,6 +1016,99 @@
             gap: .6rem;
             justify-content: flex-end;
             margin-top: 1.3rem;
+        }
+
+        /* ── Locked-card dialog ──────────────────────────── */
+        .lock-ico {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 1.35rem;
+            background: var(--amber-soft);
+            margin-bottom: .9rem;
+        }
+
+        .lock-card {
+            font-size: .82rem;
+            font-weight: 600;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: .7rem .85rem;
+            margin-bottom: 1rem;
+            overflow-wrap: anywhere;
+        }
+
+        .lock-card span {
+            display: block;
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: .15rem;
+        }
+
+        .lock-points {
+            list-style: none;
+            font-size: .83rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: .2rem;
+        }
+
+        .lock-points li {
+            padding-left: 1.3rem;
+            position: relative;
+            margin-bottom: .35rem;
+        }
+
+        .lock-points li::before {
+            content: '•';
+            position: absolute;
+            left: .35rem;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .lock-pending {
+            font-size: .82rem;
+            font-weight: 600;
+            color: #b45309;
+            background: var(--amber-soft);
+            border-radius: 12px;
+            padding: .7rem .85rem;
+            margin-top: .4rem;
+        }
+
+        /* ── Delete dialog ───────────────────────────────── */
+        .danger-ico {
+            background: var(--red-soft);
+        }
+
+        .del-note {
+            font-size: .8rem;
+            color: var(--text-muted);
+            background: var(--surface2);
+            border-radius: 12px;
+            padding: .7rem .85rem;
+            line-height: 1.5;
+        }
+
+        /* The tile's 🗑 stays a quiet ghost button — all it does is open the
+           dialog. The button that actually deletes is solid, so the two never
+           read as the same weight of action. */
+        .btn-danger-solid {
+            background: var(--red);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-danger-solid:hover {
+            background: #dc2626;
+            box-shadow: 0 8px 22px rgba(239, 68, 68, .3);
         }
 
         /* ── Payment step ────────────────────────────────── */
@@ -1401,7 +1587,10 @@
                 justify-content: center;
             }
 
-            .tile-actions form {
+            /* Rename and Delete are both bare buttons now that Delete opens a
+               dialog instead of carrying its own form, so both need pinning. */
+            .tile-actions form,
+            .tile-actions>button.btn-sm {
                 flex: 0 0 auto;
             }
 
@@ -1537,6 +1726,14 @@
                 font-size: 1.15rem;
             }
         }
+    
+        /* The wordmark replaces the emoji lockup — height-locked so the
+           sidebar keeps its spacing whatever the PNG measures. */
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
     </style>
 </head>
 
@@ -1547,7 +1744,7 @@
     <!-- ─── SIDEBAR ─── -->
     <aside class="sidebar" id="sidebar">
         <div class="sb-brand">
-            <div class="logo">🎂 Birthday<span>Card</span></div>
+            <div class="logo"><img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="brand-logo"></div>
             <p>Creator Dashboard</p>
         </div>
 
@@ -1842,18 +2039,44 @@
                 <h3>Choose a Plan</h3>
                 <p class="sub">Pick the plan you want, then pay into one of our accounts on the next step.</p>
 
-                @foreach ($plans as $i => $plan)
-                    <label class="plan-opt {{ $i === 0 ? 'selected' : '' }}"
-                        onclick="pickPlan(this, {{ $plan['amount'] }}, {{ $plan['cards'] }})">
-                        <input type="radio" name="plan_pick" value="{{ $plan['amount'] }}"
-                            {{ $i === 0 ? 'checked' : '' }}>
-                        <span>
-                            <span class="amount">Rs {{ number_format($plan['amount']) }}</span><br>
+                @php
+                    // Best value is derived from the plans themselves — the
+                    // cheapest rupees-per-card — so it follows whatever the
+                    // admin sets instead of being pinned to one package.
+                    $bestValue = count($plans) > 1
+                        ? collect($plans)->sortBy(fn ($p) => $p['amount'] / max(1, $p['cards']))->first()['amount']
+                        : null;
+                @endphp
+                <div class="plan-grid">
+                    @foreach ($plans as $i => $plan)
+                        <label class="plan-opt {{ $i === 0 ? 'selected' : '' }}"
+                            onclick="pickPlan(this, {{ $plan['amount'] }}, {{ $plan['cards'] }}, @js($plan['name'] ?? ''))">
+                            <input type="radio" name="plan_pick" value="{{ $plan['amount'] }}"
+                                {{ $i === 0 ? 'checked' : '' }}>
+
+                            @if ($bestValue === $plan['amount'])
+                                <span class="flag">BEST VALUE</span>
+                            @endif
+                            <span class="tick">✓</span>
+
+                            @if (!empty($plan['name']))
+                                <span class="plan-name">{{ $plan['name'] }}</span>
+                            @endif
+
+                            <span class="amount"><small>Rs</small> {{ number_format($plan['amount']) }}</span>
                             <span class="cards">{{ $plan['cards'] }}
                                 {{ $plan['cards'] === 1 ? 'card' : 'cards' }}</span>
-                        </span>
-                    </label>
-                @endforeach
+
+                            @if (!empty($plan['description']))
+                                <span class="plan-desc">{{ $plan['description'] }}</span>
+                            @endif
+
+                            <span class="per-card">
+                                Rs {{ number_format($plan['amount'] / max(1, $plan['cards'])) }} per card
+                            </span>
+                        </label>
+                    @endforeach
+                </div>
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-ghost" onclick="closePlanModal()">Cancel</button>
@@ -1880,6 +2103,7 @@
 
                 <div class="pay-plan-banner">
                     <div>
+                        <div class="cds" id="payPlanName" hidden></div>
                         <div class="amt" id="payPlanAmount">Rs 0</div>
                         <div class="cds" id="payPlanCards">— cards</div>
                     </div>
@@ -2016,6 +2240,47 @@
         </div>
     @endif
 
+    {{-- ── Locked card modal ──
+         A finished card is reopened by cloning it into a new version, which
+         costs a card slot. When there is none left, Edit lands here instead of
+         on a 403 page, so the client can see why and request more cards
+         without leaving the hub. --}}
+    <div class="modal" id="limitModal">
+        <div class="modal-box">
+            <div class="lock-ico">🔒</div>
+            <h3>No Card Slot Left</h3>
+            <p class="sub">You have used all {{ $cardLimit }} card{{ $cardLimit === 1 ? '' : 's' }} on your
+                {{ Auth::user()->planLabel() }} plan, so this finished card cannot be reopened right now.</p>
+
+            <div class="lock-card" id="limitModalCard" hidden>
+                <span>Card</span>
+                <strong id="limitModalCardName"></strong>
+            </div>
+
+            <ul class="lock-points">
+                <li>Editing a completed card saves it as a <strong>new version</strong>, and every version takes one
+                    card slot.</li>
+                <li>Your finished links and QR codes keep working — nothing you already shared is affected.</li>
+                <li>Request a new plan to unlock more slots, then Edit will open as usual.</li>
+            </ul>
+
+            @if ($pendingRequest)
+                <div class="lock-pending">⏳ Your plan request is with our team for review. We will unlock the extra
+                    cards as soon as it is approved.</div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" onclick="closeLimitModal()">Close</button>
+                    <a class="btn" href="{{ route('client.contact') }}">Contact Support →</a>
+                </div>
+            @else
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" onclick="closeLimitModal()">Not Now</button>
+                    <button type="button" class="btn" onclick="closeLimitModal(); openPlanModal();">Request More Cards
+                        →</button>
+                </div>
+            @endif
+        </div>
+    </div>
+
     {{-- ── Rename modal ── --}}
     <div class="modal" id="renameModal">
         <div class="modal-box">
@@ -2030,6 +2295,38 @@
                 <div class="modal-actions">
                     <button type="button" class="btn btn-ghost" onclick="closeRenameModal()">Cancel</button>
                     <button type="submit" class="btn">Save Name</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- ── Delete card modal ──
+         Deleting a draft also deletes the photos uploaded to it and there is no
+         undo, so this question was worth asking — but it was being asked by the
+         browser's own confirm(), which cannot be styled, opens under a
+         "127.0.0.1:8000 says" header, and reads like a browser warning rather
+         than part of the product. Same question, asked in the app's own voice,
+         and with room to name the card and say what deleting gives back. --}}
+    <div class="modal" id="deleteModal">
+        <div class="modal-box">
+            <div class="lock-ico danger-ico">🗑</div>
+            <h3>Delete this card?</h3>
+            <p class="sub">This removes the draft and every photo uploaded to it. It cannot be undone.</p>
+
+            <div class="lock-card">
+                <span>Card</span>
+                <strong id="deleteModalCardName"></strong>
+            </div>
+
+            <p class="del-note">Deleting a draft gives its slot back, so you can start a new card in its place.</p>
+
+            <form method="POST" id="deleteForm">
+                @csrf
+                @method('DELETE')
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" id="deleteCancel"
+                        onclick="closeDeleteModal()">Cancel</button>
+                    <button type="submit" class="btn btn-danger-solid">Delete Card</button>
                 </div>
             </form>
         </div>
@@ -2080,6 +2377,7 @@
         let chosenPlan = {
             amount: {{ $plans[0]['amount'] ?? 0 }},
             cards: {{ $plans[0]['cards'] ?? 0 }},
+            name: @js($plans[0]['name'] ?? ''),
         };
 
         function openPlanModal() {
@@ -2091,12 +2389,12 @@
             document.getElementById('planModal').classList.remove('open');
         }
 
-        function pickPlan(label, amount, cards) {
+        function pickPlan(label, amount, cards, name) {
             document.querySelectorAll('.plan-opt').forEach(el => el.classList.remove('selected'));
             label.classList.add('selected');
             const radio = label.querySelector('input');
             if (radio) radio.checked = true;
-            if (amount !== undefined) chosenPlan = { amount: amount, cards: cards };
+            if (amount !== undefined) chosenPlan = { amount: amount, cards: cards, name: name || '' };
         }
 
         function showPlanStep() {
@@ -2117,6 +2415,11 @@
                 'Rs ' + chosenPlan.amount.toLocaleString();
             document.getElementById('payPlanCards').textContent =
                 chosenPlan.cards + (chosenPlan.cards === 1 ? ' card' : ' cards');
+
+            // The admin's own name for the plan, when they gave it one.
+            const nameEl = document.getElementById('payPlanName');
+            nameEl.textContent = chosenPlan.name || '';
+            nameEl.hidden = !chosenPlan.name;
 
             document.getElementById('planStep').hidden = true;
             document.getElementById('payStep').hidden = false;
@@ -2164,9 +2467,32 @@
             window.addEventListener('DOMContentLoaded', () => {
                 const amount = {{ (int) old('plan_amount', $plans[0]['amount'] ?? 0) }};
                 const plan = @json(collect($plans)->keyBy('amount'));
-                if (plan[amount]) chosenPlan = { amount: amount, cards: plan[amount].cards };
+                if (plan[amount]) chosenPlan = {
+                    amount: amount,
+                    cards: plan[amount].cards,
+                    name: plan[amount].name || '',
+                };
                 openPlanModal();
                 goToPayStep();
+            });
+        @endif
+
+        function openLimitModal(cardName) {
+            const box = document.getElementById('limitModalCard');
+            box.hidden = !cardName;
+            if (cardName) document.getElementById('limitModalCardName').textContent = cardName;
+            document.getElementById('limitModal').classList.add('open');
+        }
+
+        function closeLimitModal() {
+            document.getElementById('limitModal').classList.remove('open');
+        }
+
+        // Someone who opened /cards/{id}/edit directly is bounced back here —
+        // show them the same explanation rather than a blank hub.
+        @if (session('card_limit_blocked'))
+            window.addEventListener('DOMContentLoaded', () => {
+                openLimitModal(@json(session('card_limit_blocked')));
             });
         @endif
 
@@ -2190,6 +2516,20 @@
 
         function closeRenameModal() {
             document.getElementById('renameModal').classList.remove('open');
+        }
+
+        function openDeleteModal(action, name) {
+            document.getElementById('deleteForm').action = action;
+            document.getElementById('deleteModalCardName').textContent = name;
+            document.getElementById('deleteModal').classList.add('open');
+            // Cancel takes the focus, not Delete. The default answer to a
+            // dialog that destroys something is no, and Enter should not be
+            // able to confirm it by accident.
+            document.getElementById('deleteCancel').focus();
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('open');
         }
 
         document.querySelectorAll('.modal').forEach(m => {

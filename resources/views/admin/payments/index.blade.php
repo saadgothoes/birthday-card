@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payments — Admin</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -675,7 +678,7 @@
                         <div class="stat-icon blue">📅</div>
                         <div class="stat-trend up">Today</div>
                     </div>
-                    <div class="stat-num">{{ number_format($clients->where('created_at', '>=', today())->sum('subscription_fee'), 2) }} PKR</div>
+                    <div class="stat-num">{{ number_format($todayPayments, 2) }} PKR</div>
                     <div class="stat-label">Daily Income</div>
                 </div>
                 <div class="stat-card">
@@ -683,39 +686,17 @@
                         <div class="stat-icon blue">📊</div>
                         <div class="stat-trend up">This Week</div>
                     </div>
-                    <div class="stat-num">{{ number_format($clients->where('created_at', '>=', now()->startOfWeek())->sum('subscription_fee'), 2) }} PKR</div>
+                    <div class="stat-num">{{ number_format($weekPayments, 2) }} PKR</div>
                     <div class="stat-label">Weekly Income</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-icon green">⚙️</div>
-                        <div class="stat-trend neu">Current</div>
+                        <div class="stat-icon green">🔁</div>
+                        <div class="stat-trend up">Approved</div>
                     </div>
-                    <div class="stat-num">{{ number_format(Auth::user()->default_subscription_fee, 2) }} PKR</div>
-                    <div class="stat-label">Default Rate</div>
-                    <button class="btn-edit-rate" onclick="toggleSettings()">Edit</button>
+                    <div class="stat-num">{{ number_format($approvedCount) }}</div>
+                    <div class="stat-label">Purchases {{ $repeatBuyers > 0 ? '· ' . $repeatBuyers . ' repeat' : '' }}</div>
                 </div>
-            </div>
-
-            <!-- Settings -->
-            <div class="section-head">
-                <div>
-                    <h3>Payment Settings</h3>
-                    <p>Configure default subscription fee for new clients</p>
-                </div>
-            </div>
-            <div class="settings-card" id="settingsCard" style="display: none;">
-                <form method="POST" action="{{ route('admin.settings.update') }}">
-                    @csrf
-                    <div class="setting-item">
-                        <label for="default_subscription_fee">Default Subscription Fee (PKR)</label>
-                        <input type="number" id="default_subscription_fee" name="default_subscription_fee" value="{{ Auth::user()->default_subscription_fee }}" step="0.01" min="0" required>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-save">Save Changes</button>
-                        <button type="button" class="btn-cancel" onclick="toggleSettings()">Cancel</button>
-                    </div>
-                </form>
             </div>
 
             <!-- Table -->
@@ -730,7 +711,8 @@
                             <th>#</th>
                             <th>Client</th>
                             <th>Email</th>
-                            <th>Subscription Fee</th>
+                            <th>Purchases</th>
+                            <th>Total Spent</th>
                             <th>Start Date</th>
                             <th>Status</th>
                         </tr>
@@ -746,13 +728,22 @@
                                 </div>
                             </td>
                             <td><span class="email-cell">{{ $client->email }}</span></td>
-                            <td><span class="fee-cell">{{ number_format($client->subscription_fee, 2) }} PKR</span></td>
+                            @php
+                                $bought = (int) ($purchaseCounts[$client->id] ?? 0);
+                            @endphp
+                            <td>
+                                <span class="fee-cell">{{ $bought }}×</span>
+                                @if ($bought > 1)
+                                    <span class="status-badge active">repeat</span>
+                                @endif
+                            </td>
+                            <td><span class="fee-cell">{{ number_format($spendTotals[$client->id] ?? 0, 2) }} PKR</span></td>
                             <td>{{ $client->subscription_start_date ? $client->subscription_start_date->format('M d, Y') : 'N/A' }}</td>
                             <td><span class="status-badge {{ $client->status == 'active' ? 'active' : 'disabled' }}">{{ $client->status }}</span></td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="empty-state">
                                     <div class="ei">💰</div>
                                     <h3>No payments yet</h3>
@@ -768,17 +759,6 @@
         </div>
 
     </main>
-
-    <script>
-        function toggleSettings() {
-            const settingsCard = document.getElementById('settingsCard');
-            if (settingsCard.style.display === 'none' || settingsCard.style.display === '') {
-                settingsCard.style.display = 'block';
-            } else {
-                settingsCard.style.display = 'none';
-            }
-        }
-    </script>
 
 </body>
 

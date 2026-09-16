@@ -30,6 +30,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex">
     <title>{{ $title }}</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
 
     {{--
         A shell that finds itself inside a frame means a navigation reached the

@@ -136,8 +136,14 @@ class CardManagerController extends Controller
         $model = BirthdayCard::where('user_id', Auth::id())->findOrFail($card);
 
         if ($model->is_published) {
-            abort_unless(Auth::user()->canCreateCard(), 403,
-                'This generated card is read-only. You have no card slot available for a new version.');
+            // Reopening a finished card clones it into a new version, and that
+            // costs a card slot. With none left, send the client back to the
+            // hub where the limit is explained in a dialog — the bare 403 page
+            // this used to throw told them nothing and left them stranded.
+            if (! Auth::user()->canCreateCard()) {
+                return redirect()->route('client.cards')
+                    ->with('card_limit_blocked', $model->displayTitle());
+            }
 
             $model = $this->duplicateCardForEditing($model);
         }
@@ -311,7 +317,17 @@ class CardManagerController extends Controller
             'status' => SubscriptionRequest::PENDING,
         ]);
 
-        $user->forceFill(['subscription_status' => \App\Models\User::SUB_PENDING])->save();
+        // Filing a top-up must not disturb a plan that is already running.
+        // Flipping an active client to "pending" here was the root of the
+        // repeat-purchase failure: every other part of the system reads this
+        // one flag, so the moment it flipped, (a) their card limit fell back
+        // to the free allowance while they waited, (b) the approver saw them
+        // as a first-time buyer and *replaced* their limit instead of adding
+        // to it — so a second purchase delivered nothing — and (c) a rejection
+        // revoked the plan they had already paid for.
+        if (! $user->hasActiveSubscription()) {
+            $user->forceFill(['subscription_status' => \App\Models\User::SUB_PENDING])->save();
+        }
 
         return $this->subscriptionResponse(
             $request,

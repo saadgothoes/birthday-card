@@ -3,8 +3,7 @@
         <div class="l-footer__top">
             <div>
                 <a href="/" class="l-nav__logo">
-                    <span class="l-nav__logo-mark">✦</span>
-                    Birthday<span>Card</span>
+                    <img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="l-nav__logo-img">
                 </a>
                 <p class="l-footer__tag">The gift-card builder studio — personalised,
                     PIN-locked birthday pages with animated gift reveals, ready to share in minutes.</p>
@@ -46,7 +45,7 @@
         </div>
 
         <div class="l-footer__bottom">
-            <span>&copy; {{ date('Y') }} BirthdayCard. All rights reserved.</span>
+            <span>&copy; {{ date('Y') }} Giftloft. All rights reserved.</span>
             <span>Made for celebrations that deserve a proper reveal.</span>
         </div>
     </div>

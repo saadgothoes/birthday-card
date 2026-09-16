@@ -259,6 +259,18 @@ html.has-custom-cursor, html.has-custom-cursor .landing, html.has-custom-cursor 
 
 .l-nav__logo span { color: var(--purple); }
 
+/* The wordmark is a drawn asset now — height-locked so the nav keeps its
+   rhythm whatever the source PNG measures. */
+.l-nav__logo-img {
+  height: 38px;
+  width: auto;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .l-nav__logo-img { height: 32px; }
+}
+
 .l-nav__links {
   display: flex;
   align-items: center;

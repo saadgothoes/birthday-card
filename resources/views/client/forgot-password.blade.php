@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password — BirthdayCard</title>
+    <title>Forgot Password — Giftloft</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -280,6 +283,13 @@
         .disabled-popup button {
             margin-bottom: 0;
         }
+    
+        .brand-logo {
+            height: 56px;
+            width: auto;
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 </head>
 
@@ -294,7 +304,7 @@
     <div class="login-card">
         <div class="logo-area">
             <div class="logo-icon">🔐</div>
-            <div class="logo-text"><span>🎂</span> BirthdayCard</div>
+            <div class="logo-text"><img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="brand-logo"></div>
         </div>
 
         <h2>Reset Password</h2>

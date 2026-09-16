@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clients — Admin</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -785,6 +788,14 @@
                             <span style="display:block;font-size:.72rem;color:var(--text-dim)">
                                 {{ $paymentCount }} payment{{ $paymentCount === 1 ? '' : 's' }}
                             </span>
+                            {{-- A client who has bought more than once is the
+                                 signal worth surfacing: they came back. --}}
+                            @if ($paymentCount > 1)
+                                <span style="display:inline-block;margin-top:.2rem;font-size:.66rem;font-weight:800;
+                                    color:#047857;background:#ecfdf5;border-radius:999px;padding:.1rem .4rem;">
+                                    ↻ REPEAT ×{{ $paymentCount }}
+                                </span>
+                            @endif
                         </td>
                         <td><span class="age-cell">{{ $devices }}</span></td>
                         <td><span class="status-badge {{ $client->status == 'active' ? 'active' : 'disabled' }}">{{ $client->status }}</span></td>

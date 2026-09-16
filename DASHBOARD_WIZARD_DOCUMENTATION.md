@@ -1510,6 +1510,10 @@ not a historical login audit.
 | Rs 399   | 3     |
 | Rs 599   | 6     |
 
+> **Superseded by [§36.3](#363-the-plan-catalogue-is-now-the-super-admins).** These
+> three are now only the *seed*: the catalogue lives in `subscription_plans` and
+> the Super Admin edits it at `/admin/plans`.
+
 `FREE_CARD_LIMIT = 1` is what an account gets before any plan is approved — enough to
 build one card all the way to the QR step, which is where the gate actually is.
 
@@ -1545,6 +1549,11 @@ client can generate QR
 - Approving sets `subscription_status = active`, `plan_amount`, `card_limit` and the
   activation date. Rejecting only clears a *pending* flag; it never revokes a plan that
   was already approved. `revoke` is the separate, deliberate action for that.
+
+> **See [§36.1](#361-the-repeat-purchase-bug).** Filing a request used to flip *every*
+> client to `pending`, including one whose plan was already running — which broke both
+> guarantees above for repeat buyers. A client can now buy again, and the new cards are
+> added to what they already have.
 
 ### 31.5 QR restriction
 
@@ -2405,6 +2414,384 @@ and 1400×950:
 
 ---
 
+## 36. A Disabled Link Now Has a Page
+
+A share link can be switched off from two places — the client's own card tile
+(`CardManagerController@toggleLink`) and the Super Admin's links table
+(`SuperAdminController@toggleCardLink`) — and both have worked for a while. What
+was missing was the other end of it: what the *recipient* saw.
+
+### 36.1 What it was
+
+`PublicStoryController::story()` ended with
+
+```php
+abort_unless($card->linkIsAvailable(), 410, 'This birthday card link is no longer available.');
+```
+
+so a switched-off link served Laravel's own error page. That page is the worst
+place this product can be seen from. The person opening the link has never used
+Giftloft, is not logged into anything, and is only here because somebody sent
+them a card — and a framework stack-trace page tells them nothing about why it
+did not open, whether it will open later, or what this thing even is.
+
+### 36.2 What it is now
+
+`resources/views/story/unavailable.blade.php` — a standalone page in the same
+purple-and-white system as the landing and login pages, self-contained the way
+every other standalone page here is (its own `<style>`, no Vite build needed, so
+it renders even if the asset build is stale).
+
+It carries a drawn gift box that is not going to open, a badge naming the
+reason, the reason in plain words, and one next step: **Create your own card**,
+pointing at `client.register`. Underneath, a quieter line for the case where the
+person opening the link is the one who made it — *"Sent this card yourself? Log
+in to your dashboard and enable the link again"* — with a link to
+`client.login`.
+
+Three reasons, chosen in `PublicStoryController::unavailable()`:
+
+| Reason | When | Heading | Status |
+| --- | --- | --- | --- |
+| `disabled` | `link_disabled_at` is set | This link has been disabled for now | **403** |
+| `expired` | past `link_expires_at` | This link has expired | **410** |
+| `unavailable` | anything else (never published, no QR) | This link is not available | **404** |
+
+**Expiry is checked first.** A link that has run out its 15 days cannot be
+enabled again — `toggleLink` refuses it — so an expired-*and*-disabled card is
+reported as expired rather than promising a return that is not coming.
+
+### 36.3 Two details that are load-bearing
+
+**A disabled link is 403, not 410.** 410 means *gone* — it tells caches and
+crawlers the address is permanently dead. A disabled link is the opposite: it is
+switched off and the owner can switch it back on, at the same address. Expiry
+keeps 410, because for expiry 410 is true.
+
+**`Cache-Control: no-store`** on the response. Without it a browser or an
+intermediary can hold on to this page, and the recipient would keep seeing "link
+disabled" after the owner re-enabled it, with no way to tell and nothing to
+press. This is the failure that would have been reported as "I turned it back on
+and it still doesn't work".
+
+The page also breaks itself out of the story shell's frame. A card switched off
+while the shell is already open would otherwise render this page *inside* the
+frame, boxed in behind a now-playing badge for a song that is not playing.
+
+### 36.4 Wiring
+
+One call site covers every entry point, because lock, unlock, welcome, gifts,
+gift and ending all resolve their card through `story()`:
+
+```php
+if (! $card->linkIsAvailable()) {
+    abort($this->unavailable($card));
+}
+```
+
+`abort()` takes a `Response` as well as a status code, so the helper can hand
+back a rendered view with its own status and headers without every caller having
+to check a return value.
+
+An unknown slug is untouched — `firstOrFail()` still 404s, because a slug that
+was never real is not a disabled card and should not be advertised as one.
+
+### 36.5 Verified
+
+End-to-end through the HTTP kernel against a real published card:
+
+- live card → **200** (control, before and after the test).
+- disabled → **403**, `no-store` present, "disabled for now" copy, CTA points at
+  `/client/register`.
+- expired *while also disabled* → **410**, expired copy — expiry wins.
+- an inner page (`/c/{slug}/welcome`) of a disabled card → **403** and the same
+  page, not a redirect to a lock screen that will not open either.
+- unknown slug → **404**, unchanged.
+- re-enabled → **200** again.
+
+Rendered and screenshotted at 1280px and 400px in all three reasons.
+
+---
+
+## 36. Repeat Purchases, an Editable Plan Catalogue, and Payment Reporting
+
+Section 31 shipped one-off subscriptions. This change makes a plan something a
+client can buy **again**, hands the catalogue itself to the Super Admin, and
+replaces the Default Rate setting with reporting that counts what was actually
+sold.
+
+### 36.1 The repeat-purchase bug
+
+A client who bought Rs 599 / 6 cards, used all six, paid again and was approved
+ended up with **six cards, nothing remaining** — they paid twice and received
+nothing the second time.
+
+One line caused it. `CardManagerController@requestSubscription` ended with:
+
+```php
+$user->forceFill(['subscription_status' => User::SUB_PENDING])->save();
+```
+
+`subscription_status` is the single flag the whole system reads, and this set it
+unconditionally — including for a client whose plan was already running. Three
+separate failures followed from that one flip:
+
+| Where | What happened |
+| --- | --- |
+| `User::cardLimit()` | Not active ⇒ falls back to `FREE_CARD_LIMIT`. The client's limit dropped from 6 to **1** the moment they asked to buy more, so their own paid cards went read-only while they waited. |
+| `SubscriptionController@approve` | Reads the same flag to decide top-up vs first purchase. Seeing "pending", it treated a returning client as new and **replaced** the limit (`= 6`) instead of adding (`6 + 6 = 12`). |
+| `SubscriptionController@reject` | `if (! $user->hasActiveSubscription())` → true, so rejecting a *top-up* **revoked the plan the client had already paid for** — the exact opposite of the behaviour documented in §31.4. |
+
+**The fix** is to leave a running plan alone when a top-up is filed:
+
+```php
+if (! $user->hasActiveSubscription()) {
+    $user->forceFill(['subscription_status' => User::SUB_PENDING])->save();
+}
+```
+
+A pending top-up is tracked by the `subscription_requests` row, which already
+exists and is what `pendingSubscriptionRequest()` reads — the flag was never
+needed for it. `approve()` and `reject()` are unchanged in behaviour; both now
+get the correct answer from the flag, and both carry a comment recording why it
+must not be flipped.
+
+**Verified** by running the whole flow twice, once against the old line and once
+against the fix:
+
+```
+OLD  2nd request filed -> status pending, limit 1    ← paid cards locked
+     top-up approved   -> limit 6,  remaining 0      ← paid twice, got nothing
+NEW  2nd request filed -> status active,  limit 6    ← plan untouched
+     top-up approved   -> limit 12, remaining 6      ← correct
+```
+
+One pending request at a time is unchanged: a client cannot queue two.
+
+### 36.2 Accounts already damaged
+
+`2026_09_15_100001_repair_stuck_subscription_states` repairs rows the bug left
+behind. An account flagged `pending` with **no pending request** behind it is
+stranded — it reads everywhere as "no plan". The migration rebuilds those from
+their approved history: `card_limit` is re-summed over every approved request
+(the stored value cannot be trusted, since a bugged approval may have
+overwritten it with only the last plan), and an account that never bought
+anything is set back to `none`. A genuinely pending client is not touched.
+
+### 36.3 The plan catalogue is now the Super Admin's
+
+`SubscriptionPlans::PLANS` was a PHP constant, so changing a price meant a
+deploy. Plans now live in `subscription_plans`
+(`2026_09_15_100000`), seeded with the same Rs 199/399/599 → 1/3/6 so nothing
+changed for clients mid-flight.
+
+| Column | Holds |
+| --- | --- |
+| `amount` | PKR, **unique** — also the plan's identity |
+| `cards` | what the plan buys |
+| `name`, `description` | optional headline and one-liner |
+| `is_active` | whether clients are shown it |
+| `sort_order` | order on the plan screen |
+
+`app/Support/SubscriptionPlans.php` keeps the API every caller already used and
+becomes the read side of that table, memoised per request. The split that makes
+an editable catalogue safe for rows that already point at a plan:
+
+- **Client-facing** — `all()`, `amounts()`, `isValidAmount()` — active plans only.
+- **Historical** — `cardsFor()`, `label()`, `nameFor()` — resolve *any* plan,
+  active or hidden, so an approved request keeps reporting what it bought.
+
+It falls back to the old hard-coded three when the table is absent, so a
+checkout that has not migrated still boots.
+
+**Screen:** `/admin/plans` (`Admin\SubscriptionPlanController`,
+`admin/plans/index.blade.php`, sidebar entry 🎟️ Plans). Per plan it reports
+times sold, clients currently on it, and revenue, and offers add / edit /
+show-hide / delete.
+
+Two edits are fenced off, because `amount` is what past rows point at:
+
+- **A plan that has been sold cannot be repriced.** The field renders disabled
+  and the amount is dropped server-side even if posted, so repricing cannot
+  rewrite what past buyers paid. Hide it and add a new plan instead.
+- **A plan that has been sold cannot be deleted**, only deactivated — which
+  removes it from the client plan screen while leaving every historical row
+  resolvable. An unsold plan can be freely repriced or deleted.
+
+### 36.4 Default Rate removed, real reporting in its place
+
+`default_subscription_fee` was a per-admin number that no client-facing code
+ever read — the plan decided the price. The Default Rate tile, the "Payment
+Settings" form, `SuperAdminController@updateSettings`, the
+`admin.settings.update` route and the model's fillable/cast entries are all
+gone. The column is left in the table: dropping it is a destructive migration
+for a value nothing reads.
+
+`Admin\PaymentController` now sums income from **approved subscription
+requests** instead of `users.subscription_fee`. That column only ever holds the
+*last* plan a client bought, so before this a client who topped up three times
+was counted once. Totals, daily and weekly income are all computed from
+`reviewed_at`.
+
+### 36.5 Seeing who bought more than once
+
+| Screen | Shows |
+| --- | --- |
+| Clients list | total spent, payment count, and a green **↻ REPEAT ×n** badge for anyone past their first purchase |
+| Client detail | approved total plus "bought n×" |
+| Payments | per client: purchases and total spent; header tile counts approved purchases and how many clients are repeat buyers |
+| Plans | per plan: times sold, current subscribers, revenue |
+
+### 36.5.1 What the client sees
+
+The plan picker was a stack of radio rows showing only a price and a card count,
+so the `name` and `description` the Super Admin can set had nowhere to land.
+Both pickers are now package cards, and both read the same
+`SubscriptionPlans::all()` payload:
+
+| Shown | From |
+| --- | --- |
+| Plan name (accent caps) | `name`, omitted entirely when the admin left it blank |
+| Price | `amount` |
+| Cards pill | `cards` |
+| One-line blurb | `description`, omitted when blank |
+| "Rs n per card" | derived (hub only) |
+| **BEST VALUE** ribbon | derived — the lowest rupees-per-card, so it follows whatever the admin configures rather than being pinned to one package |
+
+- **Card hub modal** (`client/cards.blade.php`, `.plan-grid` / `.plan-opt`) — a
+  responsive grid, the radio hidden behind the card with a tick badge marking
+  the selection. The chosen plan's name is carried into the payment step's
+  banner, so the client confirms the package by name as well as by price.
+- **QR gate** (`client/dashboard.blade.php`, `.sub-plan`) — the same shape kept
+  in the gate's amber palette, since it sits inside the "you need a plan"
+  notice.
+
+Both degrade correctly when a plan has no name or description: the element is
+not rendered rather than left empty.
+
+### 36.6 Verified
+
+- Repeat purchase, end to end: buy 6 → use 6 → buy again → **limit 12,
+  remaining 6**, and the old line reproduced the failure for comparison (§36.1).
+- A top-up request leaves `subscription_status` on `active` and the card limit
+  untouched while it waits.
+- Admin plan CRUD: add Rs 999/12 → appears for clients; edit to 20 cards →
+  clients see 20; reprice a **sold** plan → refused, price unchanged; delete a
+  sold plan → refused; hide it → gone from the client picker while
+  `cardsFor(599)` still returns 6 and `isValidAmount(599)` is false.
+- Plan cards: with names and blurbs set on all three seeded plans, the hub
+  renders each name, its description, the per-card line and one BEST VALUE
+  ribbon (correctly on Rs 599 at Rs 100/card); the QR gate renders the same; the
+  rendered hub JavaScript parses clean.
+- All six admin screens and four client screens render 200; Blade compiles clean.
+
+### 36.7 Still pending
+
+- **Payment integration is still not built.** Approval remains a manual Super
+  Admin action against an uploaded transfer screenshot.
+- **No expiry or renewal** — an approved plan stays active until revoked, and a
+  top-up adds cards without adding time.
+
+---
+
+## 37. Deleting a Draft Asks in the App's Own Voice
+
+The card hub's 🗑 ran on `window.confirm()`:
+
+```blade
+onsubmit="return confirm('Delete ' + @js($card->displayTitle()) + '? This cannot be undone.')"
+```
+
+The question was the right one to ask — `destroy` removes the draft *and* the
+photos uploaded to it, with no undo — but it was being asked by a grey OS dialog
+headed **"127.0.0.1:8000 says"**, which cannot be styled, reads as a browser
+warning rather than part of the product, and has room for one sentence and two
+generic buttons.
+
+`#deleteModal` in `client/cards.blade.php` replaces it, built exactly like the
+Rename dialog that was already there: the tile's button carries no form any
+more, it only calls `openDeleteModal(action, name)`, and the one form in the
+modal is pointed at that card. The existing click-outside and Escape handlers
+(`document.querySelectorAll('.modal')`) cover it with no extra wiring.
+
+What the space bought:
+
+- The card is **named in the dialog**, in the same `.lock-card` block the
+  locked-card dialog uses — not concatenated into a sentence.
+- A note that **deleting gives the plan slot back**, which is the thing a client
+  at 1/1 with a "Limit reached" New Card tile actually wants to know at the
+  moment they are deciding.
+- Two weights of red: the tile's 🗑 stays a quiet ghost `.btn-danger` because
+  all it does is open a dialog; the button that deletes is a solid
+  `.btn-danger-solid`.
+- **Cancel takes focus**, not Delete. The default answer to a dialog that
+  destroys something is no, and Enter should not be able to confirm it.
+
+One layout follow-on: the mobile rule that pins the tile's icon buttons was
+written as `.tile-actions form { flex: 0 0 auto }` back when Delete carried its
+own form. Delete is a bare `<button>` now, like Rename, so the rule takes
+`.tile-actions > button.btn-sm` as well and both icons still stay square with
+Continue taking the slack.
+
+Verified by rendering the hub and the tile: `_token` and `_method=DELETE` are in
+the form, the action resolves to `client.cards.destroy`, no `confirm(` is left
+in the output, and the dialog and the tile were screenshotted at 1280px and
+400px. The native dialogs on the **admin** side (plans, music, payment methods,
+subscription revoke) are untouched.
+
+---
+
+## 37. QR Designs Were Blank Until You Refreshed
+
+On the QR step, the design thumbnails came up empty the first time a card
+reached it. Refreshing the page filled them in, which made it look
+intermittent.
+
+**Cause.** The anniversary and proposal grids carried their images as a
+server-rendered `src`, built behind an occasion check:
+
+```php
+$annivQrPreviews = ($cardOccasion === 'anniversary')
+    ? BirthdayCardController::qrPreviews('anniversary', $card->slug, 300)
+    : [];
+```
+
+`$cardOccasion` is the occasion **as it stood when the page was served**. But the
+wizard is one page: a client opens a fresh card (no occasion yet), picks
+Anniversary — saved over AJAX, no reload — and walks to step 10 inside that same
+document. The previews had already been rendered as `[]`, so every `<img>` was
+emitted with `src=""`. Only a reload, by which point the occasion was in the
+database, produced them. Measured on a fresh card: **0 of 6** anniversary images,
+**0 of 6** proposal.
+
+The birthday grid never had this problem, because it paints its thumbnails from
+the `QR_PREVIEWS` JavaScript constant, which was built for every side without
+consulting the occasion.
+
+**Fix.** Both grids now work the way the birthday one does.
+
+- `$qrPreviewsBySide` builds **every** family, so nothing depends on load-time
+  state. (It already skipped only `anniversary`; proposal was being rendered
+  twice over — once here and once inline.)
+- The anniversary and proposal `<img>` ship with no `src`, like the birthday
+  grid's.
+- `paintQrThumbs(family, idPrefix)` fills a grid from `QR_PREVIEWS`, and
+  `annivSyncQrStep()` / `propSyncQrStep()` call it. Those already run whenever
+  the step is opened (`goToAnnivStep(10)`, `goToPropStep(4)`), including on
+  resume, so the grid follows the card as it is *now*.
+
+Dropping the duplicated proposal previews made the page **smaller** despite
+anniversary's six being added: 1234 KB → 1174 KB.
+
+**Verified.** On a fresh card with no occasion, and again with the occasion set
+to anniversary and to proposal, the page ships
+`QR_PREVIEWS[boy:4 girl:4 anniversary:6 proposal:6]` every time; all twelve
+anniversary/proposal thumbnails render with no `src` and both painters are
+wired; the rendered dashboard JavaScript parses clean; all admin and client
+screens still return 200.
+
+---
+
 ## Final Summary
 
 ### Completed
@@ -2426,6 +2813,17 @@ and 1400×950:
 - **Proposal occasion** (35) — four one-page designs with four colour themes each, a
   four-step wizard (design & theme → words → music → link), six QR designs of its own,
   and the public page at `/c/{slug}`. See [proposal.md](proposal.md).
+- **Disabled/expired links have a designed page** (36) — a recipient who opens a link
+  that is switched off gets a real Giftloft page explaining why and offering a signup,
+  instead of a framework error page.
+- **Delete draft is an in-app dialog** (37) — `window.confirm()` replaced with a styled
+  modal that names the card and says the slot comes back.
+
+- **QR thumbnails blank until refresh** (section 37) — anniversary and proposal
+  grids no longer depend on the occasion as it stood at page load.
+- **Repeat purchases, editable plans, payment reporting** (section 36) — a client can
+  buy again and the cards add up; the Super Admin owns the plan catalogue at
+  `/admin/plans`; Default Rate removed in favour of reporting that counts what sold.
 
 ### Still pending
 

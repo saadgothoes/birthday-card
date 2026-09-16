@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-#[Fillable(['name', 'email', 'password', 'role', 'phone', 'city', 'age', 'plain_password', 'password_changed', 'status', 'subscription_start_date', 'subscription_fee', 'default_subscription_fee', 'bg_owner_pin', 'subscription_status', 'plan_amount', 'card_limit', 'subscription_activated_at'])]
+#[Fillable(['name', 'email', 'password', 'role', 'phone', 'city', 'age', 'plain_password', 'password_changed', 'status', 'subscription_start_date', 'subscription_fee', 'bg_owner_pin', 'subscription_status', 'plan_amount', 'card_limit', 'subscription_activated_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -29,7 +29,6 @@ class User extends Authenticatable
             'password'          => 'hashed',
             'subscription_start_date' => 'date',
             'subscription_fee' => 'decimal:2',
-            'default_subscription_fee' => 'decimal:2',
             'subscription_activated_at' => 'datetime',
         ];
     }

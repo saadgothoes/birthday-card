@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscriptions — Admin</title>
+    <title>Plans — Admin</title>
     {{-- Tab icon — the app tile, same mark on every surface. --}}
     <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
@@ -663,149 +663,284 @@
         tbody tr.hidden {
             display: none;
         }
-    </style>
-    <style>
+
+        /* ─── Payment methods page ─── */
         .panel {
             background: var(--surface);
             border: 1.5px solid var(--border);
             border-radius: var(--radius);
-            padding: 1.4rem 1.5rem;
             box-shadow: var(--shadow);
+            padding: 1.6rem;
             margin-bottom: 1.6rem;
         }
 
         .panel h3 {
             font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-            margin-bottom: .3rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
         }
 
         .panel p.sub {
-            font-size: .82rem;
             color: var(--text-muted);
+            font-size: 0.84rem;
             margin-bottom: 1.2rem;
         }
 
-        .mini-table {
-            width: 100%;
-            border-collapse: collapse;
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
         }
 
-        .mini-table th {
-            text-align: left;
-            font-size: .7rem;
-            text-transform: uppercase;
-            letter-spacing: .05em;
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .field.wide {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 0.78rem;
+            font-weight: 700;
             color: var(--text-muted);
-            padding: .5rem .6rem;
-            border-bottom: 1.5px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .mini-table td {
-            padding: .8rem .6rem;
-            border-bottom: 1px solid var(--border);
-            font-size: .85rem;
-            vertical-align: middle;
+        .field input[type=text],
+        .field input[type=number],
+        .field input[type=file],
+        .field select,
+        .field textarea {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.9rem;
+            padding: 0.7rem 0.85rem;
+            border: 1.5px solid var(--border2);
+            border-radius: 10px;
+            background: var(--surface2);
+            color: var(--text);
+            width: 100%;
         }
 
-        .mini-table tr:last-child td {
-            border-bottom: none;
+        .field textarea {
+            resize: vertical;
+            min-height: 80px;
         }
 
-        .table-scroll {
-            overflow-x: auto;
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+        }
+
+        .field .hint {
+            font-size: 0.74rem;
+            color: var(--text-dim);
+        }
+
+        .check-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.86rem;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 0.86rem;
+            padding: 0.75rem 1.4rem;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 14px var(--accent-g);
+        }
+
+        .btn:hover {
+            filter: brightness(1.06);
+        }
+
+        .btn.ghost {
+            background: var(--surface2);
+            color: var(--text-muted);
+            border: 1.5px solid var(--border2);
+            box-shadow: none;
+        }
+
+        .btn.danger {
+            background: var(--red);
+            box-shadow: none;
+        }
+
+        .btn.sm {
+            padding: 0.45rem 0.85rem;
+            font-size: 0.76rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.7rem;
+            justify-content: flex-end;
+            margin-top: 1.2rem;
+        }
+
+        .method-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.1rem;
+        }
+
+        .method-card {
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            background: var(--surface2);
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .method-card.off {
+            opacity: 0.6;
+        }
+
+        .method-head {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .method-ico {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--accent-g);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .method-head strong {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            display: block;
+        }
+
+        .method-head span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .method-rows {
+            font-size: 0.84rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .method-rows div {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.8rem;
+        }
+
+        .method-rows .k {
+            color: var(--text-muted);
+        }
+
+        .method-rows .v {
+            font-weight: 600;
+            word-break: break-all;
+            text-align: right;
+        }
+
+        .state-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .state-pill.on {
+            background: var(--green-s);
+            color: var(--green);
+        }
+
+        .state-pill.off {
+            background: var(--red-s);
+            color: var(--red);
+        }
+
+        .method-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: auto;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .method-qr {
+            width: 100%;
+            max-width: 150px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            align-self: center;
         }
 
         .none-note {
-            color: var(--text-dim);
-            font-size: .85rem;
-            padding: 1rem 0;
-        }
-
-        .plan-legend {
-            display: flex;
-            gap: .6rem;
-            flex-wrap: wrap;
-            margin-bottom: 1.6rem;
-        }
-
-        .plan-chip {
-            background: var(--surface);
-            border: 1.5px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            padding: 1.4rem;
+            text-align: center;
+            background: var(--surface2);
             border-radius: 12px;
-            padding: .7rem 1.1rem;
-            box-shadow: var(--shadow);
+            border: 1.5px dashed var(--border2);
         }
 
-        .plan-chip .amt {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            font-size: 1.05rem;
+        details.editor {
+            margin-top: 0.4rem;
         }
 
-        .plan-chip .cds {
-            font-size: .74rem;
-            color: var(--text-muted);
-        }
-
-        .pay-to,
-        .pay-acct,
-        .pay-from,
-        .pay-txn,
-        .pay-note {
-            display: block;
-            font-size: .74rem;
-            line-height: 1.5;
-        }
-
-        .pay-to {
+        details.editor > summary {
+            cursor: pointer;
+            font-size: 0.78rem;
             font-weight: 700;
-            font-size: .8rem;
+            color: var(--accent);
+            list-style: none;
         }
 
-        .pay-acct {
-            color: var(--text-muted);
-            font-variant-numeric: tabular-nums;
+        details.editor > summary::-webkit-details-marker {
+            display: none;
         }
 
-        .pay-from {
-            color: var(--text-muted);
-            margin-top: .25rem;
+        details.editor .form-grid {
+            margin-top: 0.9rem;
+            grid-template-columns: 1fr;
         }
 
-        .pay-txn {
-            color: var(--text-dim);
-            font-variant-numeric: tabular-nums;
+        .alert-error {
+            background: var(--red-s);
+            color: var(--red);
+            border: 1.5px solid var(--red);
         }
 
-        .pay-note {
-            color: var(--text-dim);
-            font-style: italic;
-            max-width: 220px;
-        }
-
-        .proof-thumb {
-            width: 64px;
-            height: 64px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1.5px solid var(--border2);
-            display: block;
-            cursor: zoom-in;
-        }
-
-        .proof-thumb:hover {
-            border-color: var(--accent);
-        }
-
-        .pending-flag {
-            display: inline-block;
-            background: var(--amber-s);
-            color: var(--amber);
-            font-weight: 700;
-            font-size: .72rem;
-            padding: .25rem .6rem;
-            border-radius: 999px;
+        .alert-error ul {
+            margin: 0.4rem 0 0 1rem;
+            font-size: 0.84rem;
         }
     </style>
 </head>
@@ -817,180 +952,225 @@
     <main class="main">
         <div class="topbar">
             <div>
-                <h1>Subscription Requests</h1>
-                <p>Approve a request to activate the client's plan — payment is not collected online yet</p>
+                <h1>Plans</h1>
+                <p>What clients are offered when they subscribe — the price, how many cards it buys, and whether it
+                    is shown at all</p>
             </div>
-            <div class="count-pill"><strong>{{ $pending->count() }}</strong> pending</div>
+            <div class="count-pill"><strong>{{ $plans->where('is_active', true)->count() }}</strong> active</div>
         </div>
 
         @if (session('success'))
             <div class="alert alert-success">✓ {{ session('success') }}</div>
         @endif
+        @if (session('error'))
+            <div class="alert alert-error">{{ session('error') }}</div>
+        @endif
 
-        <div class="plan-legend">
-            @foreach ($plans as $plan)
-                <div class="plan-chip">
-                    <div class="amt">Rs {{ number_format($plan['amount']) }}</div>
-                    <div class="cds">{{ $plan['cards'] }} {{ $plan['cards'] === 1 ? 'card' : 'cards' }}</div>
-                </div>
-            @endforeach
+        @if ($errors->any())
+            <div class="alert alert-error">
+                <strong>Please fix the following:</strong>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="alert alert-warning">
+            Every account starts with <strong>{{ $freeCardLimit }}</strong> free
+            card{{ $freeCardLimit === 1 ? '' : 's' }} so a new client can build one all the way to the QR step. A plan
+            is what unlocks generating the share link — and a client who runs out can buy again, which
+            <strong>adds</strong> to the cards they already have.
         </div>
 
-        {{-- ── Waiting for review ── --}}
-        <div class="panel">
-            <h3>Pending</h3>
-            <p class="sub">Approving sets the client's card limit and unlocks QR generation for them.</p>
+        {{-- ── The catalogue ── --}}
+        <div class="table-card">
+            <div class="table-toolbar">
+                <h3>Current plans</h3>
+                <span class="muted">{{ $plans->count() }} total</span>
+            </div>
 
-            @if ($pending->isEmpty())
-                <p class="none-note">Nothing waiting for review.</p>
-            @else
-                <div class="table-scroll">
-                    <table class="mini-table">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Requested Plan</th>
-                                <th>Cards</th>
-                                <th>Payment Sent</th>
-                                <th>Proof</th>
-                                <th>Requested On</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($pending as $req)
-                                <tr>
-                                    <td>
-                                        <a href="{{ route('admin.clients.show', $req->user_id) }}"
-                                            style="text-decoration:none;color:inherit;">
-                                            <strong>{{ $req->user?->name ?? 'Deleted user' }}</strong>
-                                            <span style="display:block;font-size:.74rem;color:var(--text-dim)">
-                                                {{ $req->user?->email }}
-                                            </span>
-                                        </a>
-                                    </td>
-                                    <td><strong>Rs {{ number_format($req->plan_amount) }}</strong></td>
-                                    <td>{{ \App\Support\SubscriptionPlans::cardsFor($req->plan_amount) }}</td>
-                                    <td>
-                                        @if ($req->paymentMethod)
-                                            <span class="pay-to">
-                                                {{ $req->paymentMethod->typeIcon() }} {{ $req->paymentMethod->label }}
-                                            </span>
-                                            <span class="pay-acct">{{ $req->paymentMethod->account_number }}</span>
-                                        @else
-                                            <span class="pay-acct">No account recorded</span>
-                                        @endif
-                                        <span class="pay-from">
-                                            From <strong>{{ $req->sender_name ?? '—' }}</strong>
-                                            @if ($req->sender_number)
-                                                · {{ $req->sender_number }}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plan</th>
+                        <th>Price</th>
+                        <th>Cards</th>
+                        <th>Sold</th>
+                        <th>On this plan</th>
+                        <th>Revenue</th>
+                        <th>Shown to clients</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($plans as $plan)
+                        @php
+                            // A plan that has been bought is historical: its price is
+                            // locked and it can only be hidden, never deleted.
+                            $sold = (int) ($purchaseCounts[$plan->amount] ?? 0);
+                        @endphp
+                        <tr>
+                            <td>
+                                <strong>{{ $plan->name ?: 'Rs ' . number_format($plan->amount) }}</strong>
+                                @if ($plan->description)
+                                    <div class="muted">{{ $plan->description }}</div>
+                                @endif
+                            </td>
+                            <td>Rs {{ number_format($plan->amount) }}</td>
+                            <td>{{ $plan->cards }}</td>
+                            <td>{{ $sold }}×</td>
+                            <td>{{ $subscriberCounts[$plan->amount] ?? 0 }}</td>
+                            <td>Rs {{ number_format($revenue[$plan->amount] ?? 0) }}</td>
+                            <td>
+                                <span class="status-badge {{ $plan->is_active ? 'active' : '' }}">
+                                    {{ $plan->is_active ? 'Visible' : 'Hidden' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display:flex;gap:.4rem;flex-wrap:wrap;justify-content:flex-end;">
+                                    <button type="button" class="btn ghost sm"
+                                        onclick="togglePlanForm({{ $plan->id }})">Edit</button>
+
+                                    <form method="POST" action="{{ route('admin.plans.toggle', $plan) }}">
+                                        @csrf @method('PATCH')
+                                        <button type="submit"
+                                            class="btn-toggle {{ $plan->is_active ? 'disable' : 'enable' }}">
+                                            {{ $plan->is_active ? 'Hide' : 'Show' }}
+                                        </button>
+                                    </form>
+
+                                    @if ($sold === 0)
+                                        <form method="POST" action="{{ route('admin.plans.destroy', $plan) }}"
+                                            onsubmit="return confirm('Delete this plan? Nobody has bought it, so nothing is lost.')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn danger sm">Delete</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+
+                        {{-- Inline editor, one row down so the table stays readable. --}}
+                        <tr id="planForm{{ $plan->id }}" hidden>
+                            <td colspan="8">
+                                <form method="POST" action="{{ route('admin.plans.update', $plan) }}">
+                                    @csrf @method('PUT')
+                                    <div class="form-grid">
+                                        <div class="field">
+                                            <label>Price (PKR)</label>
+                                            @if ($sold > 0)
+                                                <input type="number" value="{{ $plan->amount }}" disabled>
+                                                <span class="hint">Locked — this plan has been purchased
+                                                    {{ $sold }} time{{ $sold === 1 ? '' : 's' }}. Changing the price
+                                                    would rewrite what those clients paid. Hide it and add a new plan
+                                                    instead.</span>
+                                            @else
+                                                <input type="number" name="amount" value="{{ $plan->amount }}"
+                                                    min="1" required>
+                                                <span class="hint">Nobody has bought this yet, so it is safe to
+                                                    reprice.</span>
                                             @endif
-                                        </span>
-                                        @if ($req->transaction_id)
-                                            <span class="pay-txn">TXN {{ $req->transaction_id }}</span>
-                                        @endif
-                                        @if ($req->client_note)
-                                            <span class="pay-note">“{{ $req->client_note }}”</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($req->screenshotUrl())
-                                            {{-- Opens full size in a new tab: verifying a transfer means
-                                                 reading the amount and time off the screenshot. --}}
-                                            <a href="{{ $req->screenshotUrl() }}" target="_blank" rel="noopener">
-                                                <img class="proof-thumb" src="{{ $req->screenshotUrl() }}"
-                                                    alt="Payment screenshot from {{ $req->user?->name }}">
-                                            </a>
-                                        @else
-                                            <span class="pay-acct">None</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $req->created_at?->format('d M Y, g:i A') ?? '—' }}</td>
-                                    <td>
-                                        <form action="{{ route('admin.subscriptions.approve', $req->id) }}"
-                                            method="POST" style="display:inline;"
-                                            onsubmit="this.querySelector('button[type=submit]').disabled = true;">
-                                            @csrf @method('PATCH')
-                                            <button type="submit" class="btn-toggle enable">Approve</button>
-                                        </form>
-                                        <form action="{{ route('admin.subscriptions.reject', $req->id) }}"
-                                            method="POST" style="display:inline;">
-                                            @csrf @method('PATCH')
-                                            <button type="submit" class="btn-toggle disable">Reject</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
+                                        </div>
+                                        <div class="field">
+                                            <label>Cards this plan buys</label>
+                                            <input type="number" name="cards" value="{{ $plan->cards }}" min="1"
+                                                max="500" required>
+                                        </div>
+                                        <div class="field">
+                                            <label>Name <span class="muted">(optional)</span></label>
+                                            <input type="text" name="name" value="{{ $plan->name }}" maxlength="60"
+                                                placeholder="e.g. Starter">
+                                        </div>
+                                        <div class="field">
+                                            <label>Order</label>
+                                            <input type="number" name="sort_order" value="{{ $plan->sort_order }}"
+                                                min="0" max="999">
+                                        </div>
+                                        <div class="field wide">
+                                            <label>Description <span class="muted">(optional)</span></label>
+                                            <input type="text" name="description" value="{{ $plan->description }}"
+                                                maxlength="160" placeholder="One line shown under the plan">
+                                        </div>
+                                        <div class="field">
+                                            <label>
+                                                <input type="checkbox" name="is_active" value="1"
+                                                    {{ $plan->is_active ? 'checked' : '' }}>
+                                                Show this plan to clients
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div style="display:flex;gap:.5rem;margin-top:1rem;">
+                                        <button type="submit" class="btn">Save plan</button>
+                                        <button type="button" class="btn ghost"
+                                            onclick="togglePlanForm({{ $plan->id }})">Cancel</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8">
+                                <div class="muted" style="padding:1.5rem;text-align:center;">
+                                    No plans yet — add one below and clients will see it on the plan screen.
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
-        {{-- ── Already reviewed ── --}}
+        {{-- ── Add a plan ── --}}
         <div class="panel">
-            <h3>Reviewed</h3>
-            <p class="sub">The 50 most recently reviewed requests.</p>
+            <h3>Add a plan</h3>
+            <p class="sub">A plan's price is its identity — past purchases point at it by price — so each price can
+                only be used once.</p>
 
-            @if ($reviewed->isEmpty())
-                <p class="none-note">No requests have been reviewed yet.</p>
-            @else
-                <div class="table-scroll">
-                    <table class="mini-table">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Plan</th>
-                                <th>Paid Via</th>
-                                <th>Proof</th>
-                                <th>Status</th>
-                                <th>Reviewed By</th>
-                                <th>Reviewed On</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($reviewed as $req)
-                                <tr>
-                                    <td>
-                                        <a href="{{ route('admin.clients.show', $req->user_id) }}"
-                                            style="text-decoration:none;color:inherit;">
-                                            <strong>{{ $req->user?->name ?? 'Deleted user' }}</strong>
-                                        </a>
-                                    </td>
-                                    <td>Rs {{ number_format($req->plan_amount) }}</td>
-                                    <td>
-                                        @if ($req->paymentMethod)
-                                            <span class="pay-to">
-                                                {{ $req->paymentMethod->typeIcon() }} {{ $req->paymentMethod->label }}
-                                            </span>
-                                        @endif
-                                        <span class="pay-from">{{ $req->sender_number ?? '—' }}</span>
-                                    </td>
-                                    <td>
-                                        @if ($req->screenshotUrl())
-                                            <a href="{{ $req->screenshotUrl() }}" target="_blank" rel="noopener">
-                                                <img class="proof-thumb" src="{{ $req->screenshotUrl() }}"
-                                                    alt="Payment screenshot from {{ $req->user?->name }}">
-                                            </a>
-                                        @else
-                                            <span class="pay-acct">None</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <span class="status-badge {{ $req->status === 'approved' ? 'active' : 'disabled' }}">
-                                            {{ $req->status }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $req->reviewer?->name ?? '—' }}</td>
-                                    <td>{{ $req->reviewed_at?->format('d M Y, g:i A') ?? '—' }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+            <form method="POST" action="{{ route('admin.plans.store') }}">
+                @csrf
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="amount">Price (PKR)</label>
+                        <input type="number" name="amount" id="amount" min="1" required
+                            value="{{ old('amount') }}" placeholder="e.g. 799">
+                    </div>
+                    <div class="field">
+                        <label for="cards">Cards this plan buys</label>
+                        <input type="number" name="cards" id="cards" min="1" max="500" required
+                            value="{{ old('cards') }}" placeholder="e.g. 10">
+                    </div>
+                    <div class="field">
+                        <label for="name">Name <span class="muted">(optional)</span></label>
+                        <input type="text" name="name" id="name" maxlength="60" value="{{ old('name') }}"
+                            placeholder="e.g. Studio">
+                    </div>
+                    <div class="field wide">
+                        <label for="description">Description <span class="muted">(optional)</span></label>
+                        <input type="text" name="description" id="description" maxlength="160"
+                            value="{{ old('description') }}" placeholder="One line shown under the plan">
+                    </div>
+                    <div class="field">
+                        <label>
+                            <input type="checkbox" name="is_active" value="1" checked>
+                            Show this plan to clients straight away
+                        </label>
+                    </div>
                 </div>
-            @endif
+                <div style="margin-top:1rem;">
+                    <button type="submit" class="btn">Add plan</button>
+                </div>
+            </form>
         </div>
     </main>
+
+    <script>
+        function togglePlanForm(id) {
+            const row = document.getElementById('planForm' + id);
+            row.hidden = !row.hidden;
+        }
+    </script>
 
 </body>
 

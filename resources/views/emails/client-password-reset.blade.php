@@ -87,14 +87,14 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🎂 <span>BirthdayCard</span></div>
+            <img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" width="150" style="display:block;margin:0 auto;height:auto;border:0;max-width:150px;">
             <h1>Reset Your Password</h1>
         </div>
 
         <div class="content">
             <p>Hello {{ $user->name }},</p>
 
-            <p>You have requested to reset your password for your Birthday Card account. Click the button below to create a new password:</p>
+            <p>You have requested to reset your password for your Giftloft account. Click the button below to create a new password:</p>
 
             <div style="text-align: center;">
                 <a href="{{ $resetUrl }}" class="button">Reset Password</a>
@@ -111,11 +111,11 @@
 
             <p>If you have any questions or need help, please contact our support team.</p>
 
-            <p>Best regards,<br>The Birthday Card Team</p>
+            <p>Best regards,<br>The Giftloft Team</p>
         </div>
 
         <div class="footer">
-            <p>This email was sent to {{ $user->email }} because a password reset was requested for your Birthday Card account.</p>
+            <p>This email was sent to {{ $user->email }} because a password reset was requested for your Giftloft account.</p>
             <p>If you no longer wish to receive these emails, please contact support.</p>
         </div>
     </div>

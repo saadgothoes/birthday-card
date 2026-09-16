@@ -5,8 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Get in touch with BirthdayCard — message us on WhatsApp, Instagram or email about payments, plans or your card.">
-    <title>Contact — BirthdayCard</title>
+        content="Get in touch with Giftloft — message us on WhatsApp, Instagram or email about payments, plans or your card.">
+    <title>Contact — Giftloft</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

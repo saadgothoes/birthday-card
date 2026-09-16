@@ -11,6 +11,7 @@
         ['route' => 'admin.subscriptions.index', 'match' => 'admin.subscriptions.*', 'icon' => '🎫', 'label' => 'Subscriptions'],
         ['route' => 'admin.links.index',      'match' => 'admin.links.*',          'icon' => '🔗', 'label' => 'Generated Links'],
         ['route' => 'admin.payments.index',   'match' => 'admin.payments.*',       'icon' => '💰', 'label' => 'Payments'],
+        ['route' => 'admin.plans.index',      'match' => 'admin.plans.*',          'icon' => '🎟️', 'label' => 'Plans'],
         ['route' => 'admin.payment-methods.index', 'match' => ['admin.payment-methods.*', 'admin.support-contacts.*'], 'icon' => '💳', 'label' => 'Payment Methods'],
         ['route' => 'admin.bg-owner',         'match' => 'admin.bg-owner*',        'icon' => '🔒', 'label' => 'BG Owner'],
         ['route' => 'admin.music.index',      'match' => 'admin.music.*',          'icon' => '🎵', 'label' => 'Music Library'],
@@ -19,8 +20,12 @@
 
 <aside class="sidebar" id="adminSidebar">
     <div class="sidebar-logo">
-        <div class="logo-mark">⚡</div>
-        <div class="logo-text">Admin<span>Panel</span></div>
+        {{-- The app tile already is a rounded purple square, so it drops
+             straight into the 36px mark slot; the accent word keeps admins
+             sure which side of the product they are on. --}}
+        <img src="{{ asset('images/logo/clean/appicon.png') }}" alt="" class="logo-mark"
+            style="object-fit: contain; background: none; box-shadow: none;">
+        <div class="logo-text">Giftloft<span> Admin</span></div>
     </div>
 
     <nav class="sidebar-nav">

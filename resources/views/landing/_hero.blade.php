@@ -34,7 +34,7 @@
         <div class="l-hero__mock" id="heroMock">
             <div class="mock-app" id="mockApp">
                 <div class="mock-sidebar">
-                    <div class="mock-sidebar__brand" id="mockBrand">✦ BirthdayCard</div>
+                    <div class="mock-sidebar__brand" id="mockBrand"><img src="{{ asset('images/logo/clean/coloricon.png') }}" alt="" style="height:15px;width:auto;vertical-align:-2px;margin-right:.3rem;">Giftloft</div>
                     <div class="mock-step mock-step--active" data-mock-step>
                         <span class="mock-step__num">1</span> Choose Theme
                     </div>

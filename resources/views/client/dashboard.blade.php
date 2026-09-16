@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Card Creator — Client Dashboard</title>
+    <title>Card Creator — Giftloft</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -2933,49 +2936,112 @@
         margin-bottom: .6rem;
     }
 
+    /* ── Plan cards in the QR gate ──
+       Same package-card shape as the hub, kept in the gate's amber palette so
+       it still reads as part of the "you need a plan" notice. */
     .sub-plan-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
         gap: .6rem;
         margin-bottom: 1.1rem;
     }
 
     .sub-plan {
+        position: relative;
         border: 1.5px solid #f3d9a4;
         background: #fff;
-        border-radius: 11px;
-        padding: .8rem .6rem;
-        text-align: center;
+        border-radius: 14px;
+        padding: .95rem .7rem .8rem;
+        text-align: left;
         cursor: pointer;
-        display: block;
-        transition: border-color .18s ease, box-shadow .18s ease;
+        display: flex;
+        flex-direction: column;
+        transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
     }
 
     .sub-plan:hover {
         border-color: #d97706;
+        transform: translateY(-2px);
     }
 
     .sub-plan.selected {
         border-color: #d97706;
         box-shadow: 0 0 0 3px rgba(217, 119, 6, .12);
+        background: #fffdf7;
     }
 
     .sub-plan input {
         display: none;
     }
 
+    .sub-plan .tick {
+        position: absolute;
+        top: .55rem;
+        right: .55rem;
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        border: 1.5px solid #f3d9a4;
+        display: grid;
+        place-items: center;
+        font-size: .6rem;
+        color: transparent;
+        transition: all .18s ease;
+    }
+
+    .sub-plan.selected .tick {
+        background: #d97706;
+        border-color: #d97706;
+        color: #fff;
+    }
+
+    .sub-plan-name {
+        display: block;
+        font-size: .67rem;
+        font-weight: 800;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        color: #b45309;
+        margin-bottom: .25rem;
+    }
+
     .sub-plan-amount {
         display: block;
-        font-weight: 700;
-        font-size: 1rem;
+        font-weight: 800;
+        font-size: 1.25rem;
+        line-height: 1.1;
         color: #92400e;
     }
 
     .sub-plan-cards {
-        display: block;
-        font-size: .76rem;
+        display: inline-block;
+        font-size: .72rem;
+        font-weight: 700;
+        color: #92400e;
+        background: #fef3c7;
+        border-radius: 999px;
+        padding: .16rem .45rem;
+        margin-top: .4rem;
+    }
+
+    .sub-plan-desc {
+        font-size: .71rem;
+        line-height: 1.45;
         color: #a16207;
-        margin-top: .15rem;
+        margin-top: .45rem;
+    }
+
+    .sub-plan-flag {
+        position: absolute;
+        top: -8px;
+        left: .7rem;
+        font-size: .57rem;
+        font-weight: 800;
+        letter-spacing: .06em;
+        color: #fff;
+        background: #d97706;
+        border-radius: 999px;
+        padding: .14rem .42rem;
     }
 
     .sub-gate-btn {
@@ -4430,6 +4496,14 @@
         .pc-3 .num:nth-child(1) { opacity: 1; }
     }
 
+    
+        /* The wordmark replaces the emoji lockup — height-locked so the
+           sidebar keeps its spacing whatever the PNG measures. */
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
     </style>
 </head>
 
@@ -4448,7 +4522,7 @@
     <!-- ─── SIDEBAR ─── -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <div class="logo"><span>🎂</span> BirthdayCard</div>
+            <div class="logo"><img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="brand-logo"></div>
             <p>Creator Dashboard</p>
         </div>
 
@@ -5540,9 +5614,6 @@
             // They are only rendered for an anniversary card, so a birthday
             // dashboard doesn't carry six unused QR images.
             $annivQrThemes = \App\Http\Controllers\Client\BirthdayCardController::qrThemes('anniversary');
-            $annivQrPreviews = ($cardOccasion === 'anniversary')
-            ? \App\Http\Controllers\Client\BirthdayCardController::qrPreviews('anniversary', $card->slug ?? null, 300)
-            : [];
             $savedAnnivQrTheme = ($cardOccasion === 'anniversary') ? ($card->qr_data['theme'] ?? null) : null;
             @endphp
             <div id="annivPanelQr" class="anniv-panel">
@@ -5562,7 +5633,7 @@
                                 <div class="variant-choice" id="annivQrTheme{{ $n }}" onclick="selectAnnivQrTheme({{ $n }})">
                                     <div class="variant-check">✓</div>
                                     <div class="qr-thumb"><img id="annivQrThemeImg{{ $n }}"
-                                            src="{{ $annivQrPreviews[$n] ?? '' }}" alt="{{ $design['name'] }}"></div>
+                                            alt="{{ $design['name'] }}"></div>
                                     <div class="variant-label" id="annivQrThemeName{{ $n }}">{{ $design['name'] }}</div>
                                     <div class="qr-blurb" id="annivQrThemeBlurb{{ $n }}">{{ $design['blurb'] }}</div>
                                 </div>
@@ -5624,9 +5695,6 @@
                     ? asset("videos/proposal/design{$n}.mp4") : null;
             }
             $propQrThemes = \App\Http\Controllers\Client\BirthdayCardController::qrThemes('proposal');
-            $propQrPreviews = ($cardOccasion === 'proposal')
-                ? \App\Http\Controllers\Client\BirthdayCardController::qrPreviews('proposal', $card->slug ?? null, 300)
-                : [];
             $savedPropQrTheme = ($cardOccasion === 'proposal') ? ($card->qr_data['theme'] ?? null) : null;
 
             // Which text box each field gets. Everything else is a plain input.
@@ -5921,7 +5989,7 @@
                                 <div class="variant-choice" id="propQrTheme{{ $n }}" onclick="selectPropQrTheme({{ $n }})">
                                     <div class="variant-check">✓</div>
                                     <div class="qr-thumb"><img id="propQrThemeImg{{ $n }}"
-                                            src="{{ $propQrPreviews[$n] ?? '' }}" alt="{{ $design['name'] }}"></div>
+                                            alt="{{ $design['name'] }}"></div>
                                     <div class="variant-label">{{ $design['name'] }}</div>
                                     <div class="qr-blurb">{{ $design['blurb'] }}</div>
                                 </div>
@@ -7365,9 +7433,16 @@
             // Only the sides that are actually wired up are rendered, so the
             // page doesn't carry four unused QR images. When the girl designs
             // are switched on, their previews appear here automatically.
+            // Every family, unconditionally. These used to be filtered by the
+            // card's occasion as it stood *at page load* — but the occasion is
+            // picked later, over AJAX, in the same page. So a client who chose
+            // Anniversary or Proposal and walked to the QR step reached a grid
+            // whose <img> had been rendered with an empty src, and only a
+            // refresh (by which time the occasion was in the database) filled
+            // it in. Building them all removes the dependency on load-time
+            // state entirely.
             $qrPreviewsBySide = [];
             foreach (array_keys($qrThemeMeta) as $side) {
-            if ($side === 'anniversary') { continue; }
             $sideThemes = \App\Http\Controllers\Client\BirthdayCardController::qrThemes($side);
             if (\App\Http\Controllers\Client\BirthdayCardController::themeSideIsAvailable($sideThemes)) {
             $qrPreviewsBySide[$side] = \App\Http\Controllers\Client\BirthdayCardController::qrPreviews(
@@ -7462,15 +7537,34 @@
                                     </div>
                                 @else
                                     <p class="sub-gate-label">1 · Choose a plan:</p>
+                                    @php
+                                        $bestValue = count($plans) > 1
+                                            ? collect($plans)->sortBy(fn ($p) => $p['amount'] / max(1, $p['cards']))->first()['amount']
+                                            : null;
+                                    @endphp
                                     <div class="sub-plan-grid">
                                         @foreach ($plans as $i => $plan)
                                             <label class="sub-plan {{ $i === 0 ? 'selected' : '' }}"
                                                 onclick="pickSubPlan(this)">
                                                 <input type="radio" name="sub_plan_amount"
                                                     value="{{ $plan['amount'] }}" {{ $i === 0 ? 'checked' : '' }}>
+
+                                                @if ($bestValue === $plan['amount'])
+                                                    <span class="sub-plan-flag">BEST VALUE</span>
+                                                @endif
+                                                <span class="tick">✓</span>
+
+                                                @if (!empty($plan['name']))
+                                                    <span class="sub-plan-name">{{ $plan['name'] }}</span>
+                                                @endif
+
                                                 <span class="sub-plan-amount">Rs {{ number_format($plan['amount']) }}</span>
                                                 <span class="sub-plan-cards">{{ $plan['cards'] }}
                                                     {{ $plan['cards'] === 1 ? 'Card' : 'Cards' }}</span>
+
+                                                @if (!empty($plan['description']))
+                                                    <span class="sub-plan-desc">{{ $plan['description'] }}</span>
+                                                @endif
                                             </label>
                                         @endforeach
                                     </div>
@@ -9643,6 +9737,25 @@
         });
     }
 
+    /**
+     * Fill one QR grid's thumbnails from QR_PREVIEWS.
+     *
+     * The anniversary and proposal grids used to carry their images as a
+     * server-rendered `src`, chosen from the card's occasion at page load.
+     * The occasion is picked *during* that same page though, so the first walk
+     * to the QR step found empty images and only a refresh fixed them. Painting
+     * them here, when the step is opened, makes the grid follow the card as it
+     * is now rather than as it was when the page was served.
+     */
+    function paintQrThumbs(family, idPrefix) {
+        const previews = QR_PREVIEWS[family];
+        if (!previews) return;
+        Object.entries(previews).forEach(([n, dataUri]) => {
+            const img = document.getElementById(idPrefix + n);
+            if (img && img.src !== dataUri) img.src = dataUri;
+        });
+    }
+
     function selectQrTheme(n) {
         selectedQrTheme = n;
         document.querySelectorAll('#qrThemeGrid .variant-choice').forEach(el => el.classList.remove(
@@ -11254,6 +11367,7 @@
     }
 
     function annivSyncQrStep() {
+        paintQrThumbs('anniversary', 'annivQrThemeImg');
         if (selectedAnnivQrTheme) selectAnnivQrTheme(selectedAnnivQrTheme);
 
         if (ANNIV_QR_DONE && ANNIV_QR_SHARE && !annivQrSvg) {
@@ -11764,6 +11878,7 @@
     }
 
     function propSyncQrStep() {
+        paintQrThumbs('proposal', 'propQrThemeImg');
         if (selectedPropQrTheme) selectPropQrTheme(selectedPropQrTheme);
 
         if (PROP_QR_DONE && PROP_QR_SHARE && !propQrSvg) {

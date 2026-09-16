@@ -12,7 +12,7 @@
         <div class="l-builder__stage" id="builderStage">
             <div class="mock-app" id="builderApp">
                 <div class="mock-sidebar">
-                    <div class="mock-sidebar__brand">✦ BirthdayCard</div>
+                    <div class="mock-sidebar__brand"><img src="{{ asset('images/logo/clean/coloricon.png') }}" alt="" style="height:15px;width:auto;vertical-align:-2px;margin-right:.3rem;">Giftloft</div>
                     <div class="mock-step mock-step--active" data-b-step="1"><span class="mock-step__num">1</span> Choose Theme</div>
                     <div class="mock-step" data-b-step="2"><span class="mock-step__num">2</span> Set Lock Code</div>
                     <div class="mock-step" data-b-step="3"><span class="mock-step__num">3</span> Welcome Screen</div>

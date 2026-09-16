@@ -1,8 +1,7 @@
 <header class="l-nav" id="lNav">
     <div class="l-nav__inner">
         <a href="/" class="l-nav__logo">
-            <span class="l-nav__logo-mark">✦</span>
-            Birthday<span>Card</span>
+            <img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="l-nav__logo-img">
         </a>
 
         {{-- The in-page anchors only resolve on the landing page itself, so

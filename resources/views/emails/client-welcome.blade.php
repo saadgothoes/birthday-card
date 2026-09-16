@@ -155,8 +155,7 @@
     <div class="email-container">
         <!-- Logo Header -->
         <div class="brand-header">
-            <div class="logo-circle">🎂</div>
-            <div class="brand-name">Birthday<span>Card</span></div>
+            <img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" width="150" style="display:block;margin:0 auto;height:auto;border:0;max-width:150px;">
         </div>
 
         <!-- Welcome Text -->
@@ -189,8 +188,8 @@
 
         <!-- Footer -->
         <div class="footer">
-            &copy; {{ date('Y') }} BirthdayCard. All rights reserved.<br>
-            Need help? <a href="mailto:support@birthdaycard.com">Contact Support</a>
+            &copy; {{ date('Y') }} Giftloft. All rights reserved.<br>
+            Need help? <a href="mailto:support@giftloft.com">Contact Support</a>
         </div>
     </div>
 </body>

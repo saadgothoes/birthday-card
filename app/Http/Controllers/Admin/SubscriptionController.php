@@ -42,6 +42,15 @@ class SubscriptionController extends Controller
 
         $newCards = SubscriptionPlans::cardsFor($subscriptionRequest->plan_amount);
         $user = $subscriptionRequest->user;
+
+        // A client who already has a running plan is topping up, so the cards
+        // they just bought are ADDED to what they had. Everyone else — a first
+        // purchase, or an account whose plan was revoked — starts from the new
+        // plan alone.
+        //
+        // This reads `subscription_status`, which is exactly why filing a
+        // request must never flip an active client to "pending"; see
+        // CardManagerController@requestSubscription.
         $cards = $user->hasActiveSubscription()
             ? $user->cardLimit() + $newCards
             : $newCards;
@@ -80,7 +89,9 @@ class SubscriptionController extends Controller
         $user = $subscriptionRequest->user;
 
         // A rejection only clears the "pending" flag — an already-active plan
-        // from an earlier approval is left alone.
+        // from an earlier approval is left alone. This holds because filing a
+        // top-up no longer marks an active client pending; when it did, a
+        // rejected top-up fell into this branch and revoked a paid plan.
         if (! $user->hasActiveSubscription()) {
             $user->forceFill(['subscription_status' => User::SUB_NONE])->save();
         }

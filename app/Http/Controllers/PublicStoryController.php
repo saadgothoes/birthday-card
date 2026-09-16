@@ -66,9 +66,44 @@ class PublicStoryController extends Controller
     {
         $card = BirthdayCard::where('slug', $slug)->firstOrFail();
 
-        abort_unless($card->linkIsAvailable(), 410, 'This birthday card link is no longer available.');
+        if (! $card->linkIsAvailable()) {
+            abort($this->unavailable($card));
+        }
 
         return $card;
+    }
+
+    /**
+     * The page a recipient gets when the link will not open.
+     *
+     * This used to be a bare `abort(410)`, which handed the framework's error
+     * page to someone who has never seen this product and is only here because
+     * a friend sent them a link. So it is a real page now — see
+     * resources/views/story/unavailable.blade.php.
+     *
+     * Two things the status codes are carrying:
+     *
+     * - A **disabled** link is 403, not 410. It is switched off, not gone: the
+     *   owner can turn it back on and the same address works again. 410 tells
+     *   every cache and crawler the opposite.
+     * - `no-store` matters for the same reason. A disabled link that a browser
+     *   or an intermediary caches would keep showing this page after the owner
+     *   re-enables it, and the recipient would have no way to tell.
+     */
+    private function unavailable(BirthdayCard $card)
+    {
+        // Expiry is the terminal state — a link that ran out its 15 days cannot
+        // be enabled again (see CardManagerController@toggleLink), so it is
+        // reported as expired even when it was also switched off.
+        [$reason, $status] = match (true) {
+            $card->linkIsExpired() => ['expired', 410],
+            $card->linkIsDisabled() => ['disabled', 403],
+            default => ['unavailable', 404],
+        };
+
+        return response()
+            ->view('story.unavailable', ['reason' => $reason], $status)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
     /** Session key holding whether this browser has entered the right code. */

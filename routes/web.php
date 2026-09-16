@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\MusicController;
 use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\SubscriptionPlanController;
 use App\Http\Controllers\Client\ClientAuthController;
 use App\Http\Controllers\Client\BirthdayCardController;
 use App\Http\Controllers\Client\CardManagerController;
@@ -39,7 +40,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth', 'super_admin'])->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [SuperAdminController::class, 'logout'])->name('logout');
-        Route::post('/settings', [SuperAdminController::class, 'updateSettings'])->name('settings.update');
 
         // ─── Clients ──────────────────────────────────────────
         // Clients sign themselves up now, so the Super Admin only views
@@ -56,6 +56,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // ─── Payments ─────────────────────────────────────────
         Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+
+        // ─── Plan catalogue ───────────────────────────────────
+        // What clients are offered: price, cards, and whether it is shown.
+        Route::get('/plans', [SubscriptionPlanController::class, 'index'])->name('plans.index');
+        Route::post('/plans', [SubscriptionPlanController::class, 'store'])->name('plans.store');
+        Route::put('/plans/{plan}', [SubscriptionPlanController::class, 'update'])->name('plans.update');
+        Route::patch('/plans/{plan}/toggle', [SubscriptionPlanController::class, 'toggle'])->name('plans.toggle');
+        Route::delete('/plans/{plan}', [SubscriptionPlanController::class, 'destroy'])->name('plans.destroy');
 
         // ─── Payment methods + support contacts ───────────────
         // The accounts clients are told to send money to, and the channels

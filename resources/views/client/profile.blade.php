@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile — Client Dashboard</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
         rel="stylesheet">
@@ -548,6 +551,14 @@
                 grid-template-columns: 1fr;
             }
         }
+    
+        /* The wordmark replaces the emoji lockup — height-locked so the
+           sidebar keeps its spacing whatever the PNG measures. */
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
     </style>
 </head>
 
@@ -555,7 +566,7 @@
     <!-- ─── SIDEBAR ─── -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <div class="logo"><span>🎂</span> BirthdayCard</div>
+            <div class="logo"><img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="brand-logo"></div>
             <p>Creator Dashboard</p>
         </div>
 
@@ -764,7 +775,6 @@
                 document.querySelector('.sidebar').classList.remove('open');
                 document.body.style.overflow = 'auto';
             }
-        }
         }
 
         window.addEventListener('resize', updateMenuButton);

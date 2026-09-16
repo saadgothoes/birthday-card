@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin — BirthdayCard</title>
+    <title>Super Admin — Giftloft</title>
+    {{-- Tab icon — the app tile, same mark on every surface. --}}
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <style>
@@ -192,7 +195,8 @@
 
 <body>
     <div class="card">
-        <div class="logo-badge">🛡️</div>
+        <img src="{{ asset('images/logo/clean/appicon.png') }}" alt="Giftloft" class="logo-badge"
+            style="object-fit: contain; background: none;">
         <h2>Super Admin</h2>
         <p class="sub">Control center authentication</p>
 

@@ -1,6 +1,10 @@
 {{-- One card in the Recent/Drafts/Completed grids. --}}
 @php
     $step = min(10, max(1, (int) $card->current_step));
+    // Editing a finished card makes a new version, which costs a card slot.
+    // With none left, Edit opens the explainer dialog instead of walking the
+    // client into a 403 page.
+    $needsSlot = $card->is_published && ! Auth::user()->canCreateCard();
 @endphp
 <div class="tile">
     <div class="tile-top">
@@ -67,9 +71,14 @@
         </span>
         <div class="tile-actions">
             {{-- Edit reopens the wizard at the step this card was left on. --}}
-            <a href="{{ route('client.cards.edit', $card->id) }}" class="btn btn-ghost btn-sm">
-                {{ $card->isDraft() ? 'Continue' : 'Edit' }}
-            </a>
+            @if ($needsSlot)
+                <button type="button" class="btn btn-ghost btn-sm" title="Card limit reached"
+                    onclick="openLimitModal(@js($card->displayTitle()))">🔒 Edit</button>
+            @else
+                <a href="{{ route('client.cards.edit', $card->id) }}" class="btn btn-ghost btn-sm">
+                    {{ $card->isDraft() ? 'Continue' : 'Edit' }}
+                </a>
+            @endif
             <button type="button" class="btn btn-ghost btn-sm" title="Rename"
                 onclick="openRenameModal(@js(route('client.cards.rename', $card->id)), @js($card->title ?? ''))">✏️</button>
             @if ($card->is_published)
@@ -83,12 +92,11 @@
                 </form>
             @endif
             @if ($card->isDraft())
-                <form method="POST" action="{{ route('client.cards.destroy', $card->id) }}"
-                    onsubmit="return confirm('Delete ' + @js($card->displayTitle()) + '? This cannot be undone.')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm" title="Delete">🗑</button>
-                </form>
+                {{-- The form that actually deletes lives in #deleteModal on the
+                     hub page, the same way Rename works. This button only says
+                     which card to point it at. --}}
+                <button type="button" class="btn btn-danger btn-sm" title="Delete"
+                    onclick="openDeleteModal(@js(route('client.cards.destroy', $card->id)), @js($card->displayTitle()))">🗑</button>
             @endif
         </div>
     </div>

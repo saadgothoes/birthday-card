@@ -91,7 +91,7 @@
             </div>
             <div class="feature-row__visual" style="--fv-photo:url('https://images.unsplash.com/photo-1512909006721-3d6018887383?w=900&h=700&fit=crop&q=60')">
                 <div class="fv-share">
-                    <div class="fv-share__url">birthdaycard.app/c/aisha-25</div>
+                    <div class="fv-share__url">giftloft.app/c/aisha-25</div>
                     <div class="fv-share__qr" id="fvQr"></div>
                 </div>
             </div>

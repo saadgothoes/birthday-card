@@ -66,18 +66,21 @@ class ClientAuthController extends Controller
         $data = $request->validate([
             'name'     => 'required|string|max:100',
             'email'    => 'required|email|max:190|unique:users,email',
-            'phone'    => 'required|string|max:20',
-            'city'     => 'required|string|max:100',
-            'age'      => 'required|integer|min:1|max:120',
+            // Phone, city and age are nice to have, not a gate — asking for
+            // them up front cost signups, and none of them are needed to build
+            // a card. The columns have always been nullable.
+            'phone'    => 'nullable|string|max:20',
+            'city'     => 'nullable|string|max:100',
+            'age'      => 'nullable|integer|min:1|max:120',
             'password' => ['required', 'confirmed', PasswordRule::min(8)->mixedCase()->numbers()],
         ]);
 
         $user = User::create([
             'name'             => $data['name'],
             'email'            => $data['email'],
-            'phone'            => $data['phone'],
-            'city'             => $data['city'],
-            'age'              => $data['age'],
+            'phone'            => $data['phone'] ?? null,
+            'city'             => $data['city'] ?? null,
+            'age'              => $data['age'] ?? null,
             'password'         => $data['password'],
             // Self-chosen from the start, so there is no generated password to
             // keep around and nothing to nag them about changing.

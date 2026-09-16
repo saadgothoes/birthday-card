@@ -32,7 +32,7 @@ class ClientPasswordReset extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reset Your Birthday Card Password',
+            subject: 'Reset Your Giftloft Password',
         );
     }
 
