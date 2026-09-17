@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 4 ("Balloon Pop") — theme 3, "Mint & Sunshine".
+    Proposal · Design 4 ("The Roll") — theme 3, "Darkroom".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

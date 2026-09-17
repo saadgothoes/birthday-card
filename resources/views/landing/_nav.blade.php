@@ -9,17 +9,16 @@
         @php $onLanding = request()->routeIs('landing') || request()->path() === '/'; @endphp
 
         <nav class="l-nav__links">
-            <a href="{{ $onLanding ? '#showcase' : url('/#showcase') }}">Themes</a>
-            <a href="{{ $onLanding ? '#builder' : url('/#builder') }}">How it works</a>
+            <a href="{{ $onLanding ? '#how' : url('/#how') }}">How it works</a>
+            <a href="{{ $onLanding ? '#themes' : url('/#themes') }}">Themes</a>
             <a href="{{ $onLanding ? '#features' : url('/#features') }}">Features</a>
-            <a href="{{ $onLanding ? '#gallery' : url('/#gallery') }}">Gallery</a>
             <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'is-active' : '' }}">Contact</a>
         </nav>
 
         <div class="l-nav__actions">
             @if (($supportContacts ?? collect())->isNotEmpty())
                 <div class="l-nav__social">
-                    @foreach ($supportContacts->take(3) as $contact)
+                    @foreach ($supportContacts->take(2) as $contact)
                         <a href="{{ $contact->url() }}" target="_blank" rel="noopener" data-cursor-hover
                             style="--brand: {{ $contact->brandColour() }}"
                             aria-label="{{ $contact->channelLabel() }}" title="{{ $contact->label }}">
@@ -38,6 +37,21 @@
                     <span class="btn-magnetic__icon">→</span>
                 </span>
             </a>
+
+            {{-- Below 860px the links collapse; without this they were simply
+                 gone, so the whole nav was a logo and a button. --}}
+            <button type="button" class="l-nav__burger" id="navBurger" aria-expanded="false"
+                aria-controls="navDrawer" aria-label="Menu">
+                <span></span><span></span>
+            </button>
         </div>
+    </div>
+
+    <div class="l-nav__drawer" id="navDrawer">
+        <a href="{{ $onLanding ? '#how' : url('/#how') }}">How it works</a>
+        <a href="{{ $onLanding ? '#themes' : url('/#themes') }}">Themes</a>
+        <a href="{{ $onLanding ? '#features' : url('/#features') }}">Features</a>
+        <a href="{{ route('contact') }}">Contact</a>
+        <a href="{{ route('client.login') }}">Login</a>
     </div>
 </header>

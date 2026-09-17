@@ -333,14 +333,21 @@ Full palettes, params and behaviour: [proposal.md](proposal.md).
 
 | Design | Composition | Theme 1 | Theme 2 | Theme 3 | Theme 4 |
 | - | --- | --- | --- | --- | --- |
-| 1 Box & Ring Reveal | box → letter → ring → question | Rose Gold & Cream `#f7ece2 → #e8c9b0` | Blush Pearl `#fdf2f5 → #f3d6e0` | Midnight Velvet `#2f3a63 → #161b31` | Emerald & Gold `#1e5c4d → #0e332c` |
-| 2 Locket / Heart Open | heart splits on its seam | Burgundy & Gold `#a35a56 → #5c1420` | Rose Quartz `#f6dce4 → #dba9bd` | Champagne Ivory `#f7efe3 → #e2cdae` | Onyx & Silver `#33393f → #14171b` |
-| 3 Countdown Reveal | countdown → wipe → question | Midnight Violet `#3a1f3d → #0d0918` | Deep Sea `#0d3b4d → #03121b` | Starlit Rose `#5c2a44 → #150a13` | Aurora Ice `#2b3566 → #080b1a` |
-| 4 Balloon Pop | bouquet pops → ring drops | Pastel Sky `#cfe8f0 → #f6d9e3` | Candy Blush `#ffeef4 → #ffd9c7` | Mint & Sunshine `#d8f3e6 → #fdf3cf` | Bold Pop `#dbe7ff → #ffe2e2` |
+| 1 The Last Message | a chat thread types itself out → the question | Paper `#f7f3ec → #e6ded1` | Bubblegum `#fff1f6 → #ffd9e6` | Night Mode `#1b1c22 → #0b0c10` | Matcha `#1c3a31 → #0d1f1a` |
+| 2 Scratch the Foil | foil scratched away → ring + question | Gold on Cream `#fbf5ea → #ead9bd` | Rose Foil `#fff4f5 → #f3d3d9` | Holo Black `#1a1b21 → #0a0b0e` | Emerald Foil `#17493d → #0a241e` |
+| 3 Written in the Stars | stars join into a ring → the question | Deep Indigo `#1b2450 → #05070f` | Nebula Rose `#43184a → #0d060f` | Aurora `#0d3a48 → #030b10` | Obsidian `#1a1a1e → #000000` |
+| 4 The Roll | polaroids flicked away → the last one develops | Film Cream `#f6efe3 → #e4d8c6` | Sunwash `#fff3e6 → #ffd9c0` | Darkroom `#202124 → #0e0f11` | Cobalt `#1e3c70 → #101f3c` |
 
 Two of every design's four themes are the **soft** side and two the **bold**
 side; which number is which differs per design, because theme 1 is that design's
-own signature look rather than a shared slot.
+own signature look rather than a shared slot. All four of Design 3's stay dark —
+a lit sky is not a sky.
+
+All four designs end on the same letter sheet (`_proposal_after`) — skinned by
+the theme, but arriving a different way in each design: they are typing again,
+the foil card turns over, it resolves out of the sky, the last photograph is
+turned over. They also share one particle layer (`_proposal_fx`) and one Yes/No
+module (`_proposal_tease`).
 
 Proposal QR designs (six, `QR_THEMES['proposal']`): Rose Gold Vow · Midnight
 Velvet · Burgundy Seal · Blush Petal · Emerald Band · Bold Pop.

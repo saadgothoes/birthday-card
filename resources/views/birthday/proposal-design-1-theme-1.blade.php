@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 1 ("Box & Ring Reveal") — theme 1, "Rose Gold & Cream".
+    Proposal · Design 1 ("The Last Message") — theme 1, "Paper".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 3 ("Countdown Reveal") — theme 2, "Deep Sea".
+    Proposal · Design 3 ("Written in the Stars") — theme 2, "Nebula Rose".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

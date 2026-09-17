@@ -442,113 +442,134 @@ class BirthdayCardController extends Controller
      */
     public const PROPOSAL_DESIGNS = [
         1 => [
-            'name' => 'Box & Ring Reveal',
-            'mood' => 'Classic · warm-romantic',
-            'blurb' => 'A wrapped box unties itself, the lid lifts on its hinge, and a folded letter rises and opens with the ring glowing at its base.',
-            'beats' => ['Tap the box', 'Ribbon off, lid up', 'The letter unfolds', 'The question', 'Confetti and petals'],
-            'fields' => ['heading', 'tap_label', 'letter_text', 'question', 'yes_label', 'no_label', 'yes_heading', 'closing_line', 'signed'],
-            'photos' => ['ring_photo'],
-            'defaults' => [
-                'to_name' => 'Ayesha',
-                'from_name' => 'Bilal',
-                'heading' => 'For you',
-                'tap_label' => 'Tap to open',
-                'letter_text' => "From the first day, it was always you.\n"
-                    . "I have thought about this a hundred times,\n"
-                    . "and every time the answer is the same.\n"
-                    . 'So here it is, in my own words.',
-                'question' => 'Will you marry me?',
-                'yes_label' => 'Yes 💍',
-                'no_label' => 'No',
-                'yes_heading' => 'She Said YES! 💍',
-                'closing_line' => 'The rest of my life starts here.',
-                'signed' => '— always yours',
-            ],
-            'themes' => [
-                1 => ['name' => 'Rose Gold & Cream', 'side' => 'soft', 'swatch' => '#e8c9b0', 'accent' => '#a35a56'],
-                2 => ['name' => 'Blush Pearl',       'side' => 'soft', 'swatch' => '#f3d6e0', 'accent' => '#c2607f'],
-                3 => ['name' => 'Midnight Velvet',   'side' => 'bold', 'swatch' => '#2f3a63', 'accent' => '#d9b26a'],
-                4 => ['name' => 'Emerald & Gold',    'side' => 'bold', 'swatch' => '#1e5c4d', 'accent' => '#e2b866'],
-            ],
-        ],
-        2 => [
-            'name' => 'Locket / Heart Open',
-            'mood' => 'Premium · heirloom',
-            'blurb' => 'A heart-shaped locket breathes, then splits down its seam and swings open on a photo of the two of you and the ring.',
-            'beats' => ['Tap the locket', 'The halves swing open', 'Photo and ring inside', 'The question', 'They drift together'],
-            'fields' => ['heading', 'tap_label', 'question', 'yes_label', 'no_label', 'yes_heading', 'closing_line', 'signed'],
+            'name' => 'The Last Message',
+            'mood' => 'Modern · the way you actually talk',
+            'blurb' => 'A chat thread that types itself out, message by message, in the language you two already use — and the last message is the question.',
+            'beats' => ['Tap to open', 'Typing…', 'The messages land', 'The question', 'The thread turns to hearts'],
+            'fields' => ['heading', 'tap_label', 'chat_text', 'question', 'yes_label', 'no_label', 'yes_heading', 'letter_text', 'closing_line', 'signed'],
             'photos' => ['couple_photo', 'ring_photo'],
             'defaults' => [
                 'to_name' => 'Ayesha',
                 'from_name' => 'Bilal',
-                'heading' => 'Open me',
+                'heading' => 'Us',
                 'tap_label' => 'Tap to open',
+                'chat_text' => "hey. are you free for a second\n"
+                    . "i have been rewriting this all day\n"
+                    . "so i am just going to say it\n"
+                    . 'it was always going to be you',
                 'question' => 'Will you marry me?',
                 'yes_label' => 'Yes 💍',
                 'no_label' => 'No',
-                'yes_heading' => 'She Said YES! 💍',
-                'closing_line' => 'Kept in a locket, and now kept for good.',
+                'yes_heading' => 'she said yes 🥹',
+                'letter_text' => "i have typed this out about forty times.\n"
+                    . "every version said the same thing.\n"
+                    . "you are the person i tell everything to.\n"
+                    . "good news, stupid news, all of it.\n"
+                    . 'so: from here, all of it.',
+                'closing_line' => 'Pinned to the top of the chat, and to the rest of my life.',
                 'signed' => '— always yours',
             ],
             'themes' => [
-                1 => ['name' => 'Burgundy & Gold',  'side' => 'bold', 'swatch' => '#5c1420', 'accent' => '#c9a75c'],
-                2 => ['name' => 'Rose Quartz',      'side' => 'soft', 'swatch' => '#dba9bd', 'accent' => '#a4485f'],
-                3 => ['name' => 'Champagne Ivory',  'side' => 'soft', 'swatch' => '#e2cdae', 'accent' => '#9c7247'],
-                4 => ['name' => 'Onyx & Silver',    'side' => 'bold', 'swatch' => '#33393f', 'accent' => '#cfd6dd'],
+                1 => ['name' => 'Paper',     'side' => 'soft', 'swatch' => '#efe9df', 'accent' => '#b5654a'],
+                2 => ['name' => 'Bubblegum', 'side' => 'soft', 'swatch' => '#ffd9e6', 'accent' => '#e0507f'],
+                3 => ['name' => 'Night Mode','side' => 'bold', 'swatch' => '#15161a', 'accent' => '#8b9cff'],
+                4 => ['name' => 'Matcha',    'side' => 'bold', 'swatch' => '#14302a', 'accent' => '#9fe0b4'],
+            ],
+        ],
+        2 => [
+            'name' => 'Scratch the Foil',
+            'mood' => 'Tactile · they make it happen',
+            'blurb' => 'A foil card with something under it. They scratch it away with their own finger, the dust falls, and the ring and the question are what was underneath.',
+            'beats' => ['A foil card', 'Scratching it away', 'The foil falls', 'The question', 'Gold dust, then the keepsake'],
+            'fields' => ['heading', 'tap_label', 'question', 'yes_label', 'no_label', 'yes_heading', 'letter_text', 'closing_line', 'signed'],
+            'photos' => ['ring_photo'],
+            'defaults' => [
+                'to_name' => 'Ayesha',
+                'from_name' => 'Bilal',
+                'heading' => 'One card. One question.',
+                'tap_label' => 'Scratch here',
+                'question' => 'Will you marry me?',
+                'yes_label' => 'Yes 💍',
+                'no_label' => 'No',
+                'yes_heading' => 'Yes.',
+                'letter_text' => "Under the shine, this is the part I meant.\n"
+                    . "I am no good at speeches, so here is the short one.\n"
+                    . "I want the ordinary days with you.\n"
+                    . "The ones nobody takes a photo of.\n"
+                    . 'All of them, if you will let me.',
+                'closing_line' => 'Best odds I have ever had.',
+                'signed' => '— always yours',
+            ],
+            'themes' => [
+                1 => ['name' => 'Gold on Cream', 'side' => 'soft', 'swatch' => '#e9dcc3', 'accent' => '#a8813c'],
+                2 => ['name' => 'Rose Foil',     'side' => 'soft', 'swatch' => '#f2d9dc', 'accent' => '#c06078'],
+                3 => ['name' => 'Holo Black',    'side' => 'bold', 'swatch' => '#141419', 'accent' => '#9ad7ff'],
+                4 => ['name' => 'Emerald Foil',  'side' => 'bold', 'swatch' => '#123b31', 'accent' => '#d8b262'],
             ],
         ],
         3 => [
-            'name' => 'Countdown Reveal',
-            'mood' => 'Suspense · anticipation',
-            'blurb' => 'A dark screen and a numeral counting down. At zero it bursts, a wipe opens the reveal, and the question lands with fireworks behind the answer.',
-            'beats' => ['A warning line', 'The countdown runs', 'Zero — the wipe', 'The question', 'Fireworks and the date'],
-            'fields' => ['pre_label', 'countdown_seconds', 'question', 'yes_label', 'no_label', 'yes_heading', 'wedding_date', 'altar_label', 'fallback_line', 'closing_line', 'signed'],
+            'name' => 'Written in the Stars',
+            'mood' => 'Cinematic · quiet and huge',
+            'blurb' => 'A night sky with seven stars brighter than the rest. They join themselves one at a time into a ring, the sky settles, and the question is written underneath it.',
+            'beats' => ['Look up', 'The stars join', 'The constellation holds', 'The question', 'A meteor shower'],
+            'fields' => ['heading', 'tap_label', 'question', 'yes_label', 'no_label', 'yes_heading', 'letter_text', 'closing_line', 'signed'],
             'photos' => ['ring_photo'],
             'defaults' => [
                 'to_name' => 'Ayesha',
                 'from_name' => 'Bilal',
-                'pre_label' => 'Something special is coming…',
-                'countdown_seconds' => '5',
+                'heading' => 'Look up',
+                'tap_label' => 'Tap a star',
                 'question' => 'Will you marry me?',
                 'yes_label' => 'Yes 💍',
                 'no_label' => 'No',
-                'yes_heading' => 'She Said YES! 💍',
-                'altar_label' => 'See you at the altar',
-                'fallback_line' => 'We will pick the date together.',
-                'closing_line' => 'Every second of the wait was worth it.',
+                'yes_heading' => 'It was always yes',
+                'letter_text' => "I used to think these things were written somewhere.\n"
+                    . "I do not think that any more.\n"
+                    . "I think you choose them, out loud.\n"
+                    . "So here is mine, chosen:\n"
+                    . 'you, and the long ordinary rest of it.',
+                'closing_line' => 'Some things are decided long before anyone asks.',
                 'signed' => '— always yours',
             ],
             'themes' => [
-                1 => ['name' => 'Midnight Violet', 'side' => 'bold', 'swatch' => '#3a1f3d', 'accent' => '#f0d08a'],
-                2 => ['name' => 'Deep Sea',        'side' => 'bold', 'swatch' => '#0d3b4d', 'accent' => '#7fe3d4'],
-                3 => ['name' => 'Starlit Rose',    'side' => 'soft', 'swatch' => '#5c2a44', 'accent' => '#ffc2d4'],
-                4 => ['name' => 'Aurora Ice',      'side' => 'soft', 'swatch' => '#2b3566', 'accent' => '#bcd6ff'],
+                1 => ['name' => 'Deep Indigo', 'side' => 'bold', 'swatch' => '#101733', 'accent' => '#ffe9a8'],
+                2 => ['name' => 'Nebula Rose', 'side' => 'soft', 'swatch' => '#2a1030', 'accent' => '#ffbcd6'],
+                3 => ['name' => 'Aurora',      'side' => 'soft', 'swatch' => '#08202a', 'accent' => '#8ff0de'],
+                4 => ['name' => 'Obsidian',    'side' => 'bold', 'swatch' => '#0a0a0c', 'accent' => '#e8e6e1'],
             ],
         ],
         4 => [
-            'name' => 'Balloon Pop',
-            'mood' => 'Playful · light',
-            'blurb' => 'A tied bouquet sways until it is tapped, then pops balloon by balloon and drops the ring into the middle. The Yes sends a whole screen of balloons up.',
-            'beats' => ['Tap the balloons', 'They pop, 80ms apart', 'The ring drops in', 'The question', 'A screen of balloons'],
-            'fields' => ['heading', 'tap_label', 'question', 'yes_label', 'no_label', 'yes_heading', 'closing_line', 'signed'],
-            'photos' => ['ring_photo'],
+            'name' => 'The Roll',
+            'mood' => 'Memory · your photos, your story',
+            'blurb' => 'A stack of polaroids, each one captioned. They flick through them, and the last one develops in front of them into the question.',
+            'beats' => ['A stack of photos', 'Flicking through', 'The last one develops', 'The question', 'The whole roll flies back'],
+            'fields' => ['heading', 'tap_label', 'caption_text', 'question', 'yes_label', 'no_label', 'yes_heading', 'letter_text', 'closing_line', 'signed'],
+            'photos' => ['photo_1', 'photo_2', 'photo_3', 'ring_photo'],
             'defaults' => [
                 'to_name' => 'Ayesha',
                 'from_name' => 'Bilal',
-                'heading' => 'A little something',
-                'tap_label' => 'Tap the balloons',
+                'heading' => 'Us, in order',
+                'tap_label' => 'Swipe the photos',
+                'caption_text' => "the day we met\n"
+                    . "every day after that\n"
+                    . 'and this one',
                 'question' => 'Will you marry me?',
-                'yes_label' => 'Yes! 🎉',
+                'yes_label' => 'Yes 💍',
                 'no_label' => 'No',
-                'yes_heading' => 'She Said YES! 💍',
-                'closing_line' => 'Best day ever — and it only gets better from here.',
+                'yes_heading' => 'Roll one, frame one',
+                'letter_text' => "Turn over any photo we have ever taken.\n"
+                    . "The same two people, getting happier.\n"
+                    . "I want a whole roll of them.\n"
+                    . "Then another roll. Then another.\n"
+                    . 'Every frame, if you are in it.',
+                'closing_line' => 'Roll one of however many we get.',
                 'signed' => '— always yours',
             ],
             'themes' => [
-                1 => ['name' => 'Pastel Sky',      'side' => 'soft', 'swatch' => '#cfe8f0', 'accent' => '#e2698c'],
-                2 => ['name' => 'Candy Blush',     'side' => 'soft', 'swatch' => '#ffd9c7', 'accent' => '#ef6f8e'],
-                3 => ['name' => 'Mint & Sunshine', 'side' => 'bold', 'swatch' => '#d8f3e6', 'accent' => '#2f9e7a'],
-                4 => ['name' => 'Bold Pop',        'side' => 'bold', 'swatch' => '#dbe7ff', 'accent' => '#2f5fe0'],
+                1 => ['name' => 'Film Cream', 'side' => 'soft', 'swatch' => '#efe7db', 'accent' => '#c0654e'],
+                2 => ['name' => 'Sunwash',    'side' => 'soft', 'swatch' => '#ffe6cf', 'accent' => '#e57a52'],
+                3 => ['name' => 'Darkroom',   'side' => 'bold', 'swatch' => '#17181b', 'accent' => '#f0c05a'],
+                4 => ['name' => 'Cobalt',     'side' => 'bold', 'swatch' => '#16305e', 'accent' => '#ffd66b'],
             ],
         ],
     ];
@@ -566,23 +587,32 @@ class BirthdayCardController extends Controller
         'from_name' => 24,
         'heading' => 32,
         'tap_label' => 32,
-        'letter_text' => 400,
-        'pre_label' => 60,
+        'chat_text' => 300,
+        'caption_text' => 200,
+        'letter_text' => 420,
         'question' => 60,
         'yes_label' => 20,
         'no_label' => 20,
         'yes_heading' => 44,
-        'altar_label' => 40,
-        'fallback_line' => 60,
         'closing_line' => 160,
         'signed' => 30,
     ];
 
     /** Every image slot any proposal design offers. */
-    public const PROPOSAL_PHOTO_KEYS = ['ring_photo', 'couple_photo'];
+    public const PROPOSAL_PHOTO_KEYS = ['ring_photo', 'couple_photo', 'photo_1', 'photo_2', 'photo_3'];
 
-    /** The Design 1 letter is the one multi-line field; keep it to a stanza. */
-    public const PROPOSAL_LETTER_MAX_LINES = 8;
+    /**
+     * The fields where the *shape* matters as much as the length.
+     *
+     * Each line of these becomes one object on the page — a chat bubble, a
+     * polaroid caption — so the page has room for exactly this many, and the
+     * limit is enforced on the way in rather than dropped on the way out.
+     */
+    public const PROPOSAL_MULTILINE = [
+        'chat_text' => 5,
+        'caption_text' => 4,
+        'letter_text' => 6,
+    ];
 
     /** One design's definition, design 1 by default. */
     public static function proposalDesign(?int $design): array
@@ -653,25 +683,22 @@ class BirthdayCardController extends Controller
         foreach (self::proposalTextKeys($design) as $key) {
             $rules[$key] = 'nullable|string|max:' . self::PROPOSAL_LIMITS[$key];
         }
-        if (in_array('countdown_seconds', $spec['fields'], true)) {
-            $rules['countdown_seconds'] = 'nullable|integer|min:1|max:10';
-        }
-        if (in_array('wedding_date', $spec['fields'], true)) {
-            $rules['wedding_date'] = 'nullable|date';
-        }
 
         $validator = Validator::make($request->all(), $rules);
 
-        // The letter is the only field where the shape matters as much as the
-        // length — the paper it is printed on has a fixed number of lines.
+        // A chat thread has room for so many bubbles and a roll for so many
+        // captions, so these fields are checked for shape as well as length:
+        // one line in is one object on the page.
         $validator->after(function ($validator) use ($request, $spec) {
-            if (! in_array('letter_text', $spec['fields'], true)) {
-                return;
-            }
-            $lines = preg_split('/\r\n|\r|\n/', (string) $request->input('letter_text'));
-            if (count(array_filter($lines, fn ($l) => trim($l) !== '')) > self::PROPOSAL_LETTER_MAX_LINES) {
-                $validator->errors()->add('letter_text',
-                    'The letter is longer than ' . self::PROPOSAL_LETTER_MAX_LINES . ' lines.');
+            foreach (self::PROPOSAL_MULTILINE as $key => $maxLines) {
+                if (! in_array($key, $spec['fields'], true)) {
+                    continue;
+                }
+                $lines = preg_split('/\r\n|\r|\n/', (string) $request->input($key));
+                if (count(array_filter($lines, fn ($l) => trim($l) !== '')) > $maxLines) {
+                    $validator->errors()->add($key,
+                        'That is more than ' . $maxLines . ' lines.');
+                }
             }
         });
 
@@ -703,12 +730,6 @@ class BirthdayCardController extends Controller
         ];
         foreach (self::proposalTextKeys($design) as $key) {
             $content[$key] = $this->normaliseNewlines($data[$key] ?? null);
-        }
-        if (isset($rules['countdown_seconds'])) {
-            $content['countdown_seconds'] = $data['countdown_seconds'] ?? null;
-        }
-        if (isset($rules['wedding_date'])) {
-            $content['wedding_date'] = $data['wedding_date'] ?? null;
         }
 
         $card->gift1_data = $content;

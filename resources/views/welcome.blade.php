@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Design a personalised, PIN-locked birthday gift page in minutes — pick a theme, drop a photo, hide a surprise, share a link.">
-    <title>Giftloft — Craft. Surprise. Celebrate.</title>
+    <meta name="description" content="Make a birthday they actually remember — a PIN-locked gift page with a photo, a hidden surprise and an animated reveal, shared as one link.">
+    <title>Giftloft — Birthday cards worth opening.</title>
     {{-- Tab icon — the app tile, same mark on every surface. --}}
     <link rel="icon" type="image/png" href="{{ asset('images/logo/clean/appicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('images/logo/clean/appicon.png') }}">
@@ -24,11 +24,8 @@
 
     <main>
         @include('landing._hero')
-        @include('landing._showcase')
-        @include('landing._builder-demo')
-        @include('landing._creation')
-        @include('landing._morph')
-        @include('landing._gallery')
+        @include('landing._how')
+        @include('landing._themes')
         @include('landing._features')
         @include('landing._final-cta')
     </main>

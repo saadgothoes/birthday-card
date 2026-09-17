@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 2 ("Locket / Heart Open") — theme 3, "Champagne Ivory".
+    Proposal · Design 2 ("Scratch the Foil") — theme 3, "Holo Black".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

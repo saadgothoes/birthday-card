@@ -40,11 +40,13 @@ special case.
 resources/views/birthday/
   proposal-design-{1..4}-theme-{1..4}.blade.php     16 thin wrappers
   partials/
-    proposal-design-1.blade.php    Box & Ring Reveal
-    proposal-design-2.blade.php    Locket / Heart Open
-    proposal-design-3.blade.php    Countdown Reveal
-    proposal-design-4.blade.php    Balloon Pop
-    _proposal_tease.blade.php      the shared Yes / No module
+    proposal-design-1.blade.php    The Last Message
+    proposal-design-2.blade.php    Scratch the Foil
+    proposal-design-3.blade.php    Written in the Stars
+    proposal-design-4.blade.php    The Roll
+    _proposal_tease.blade.php      the shared question + Yes / No module
+    _proposal_after.blade.php      the letter the Yes opens, and its four entrances
+    _proposal_fx.blade.php         the shared particle layer
     _proposal_demo.blade.php       plays a design's whole flow on a loop
     _proposal_ring.blade.php       the drawn ring, used when no photo is given
 ```
@@ -59,93 +61,189 @@ lives once; the sixteen files are only addresses.
 
 Every design is a complete page on its own: **it renders with zero query
 parameters**, phone-first, with visible keyboard focus on both buttons, and it
-honours `prefers-reduced-motion` (the sequence still runs, the particles do
-not).
+honours `prefers-reduced-motion` — under which the page still moves through
+every state, it just arrives at each one rather than travelling there.
 
-### Design 1 — Box & Ring Reveal
-*Classic · warm-romantic.* One orchestrated sequence, and nothing in it starts
-on its own — every step answers the tap before it.
+The brief they share: a proposal is read by someone in their twenties, usually
+standing up, usually with someone watching their face. Anything that performs
+too hard reads as a greeting card, so each of these earns its moment a
+different way — one is written in the language the couple already uses, one is
+worked for with a finger, one withholds, and one is made of their own
+photographs.
+
+### Design 1 — The Last Message
+*Modern · the way you actually talk.* A chat thread that types itself out. It
+is the one that does not perform: no box, no ornament, just the words in the
+shape they would really arrive in.
 
 ```
-closed box  →  ribbon unties and slides off (400ms)
-            →  lid lifts on a left hinge (600ms)
-            →  the folded letter rises and unfolds (scaleY .3→1, 500ms)
-            →  the letter's lines fade in, one every 320ms
-            →  the ring fades up at the letter's base, glowing
-            →  the question and Yes / No
-Yes         →  confetti + rose petals, the ring to hero size, "She Said YES!"
+a thread with one unread  →  tap
+→  typing…                 (a real pause, not a loading state)
+→  the messages land, one at a time, each after its own typing
+→  the last one is the question, in a bubble of its own
+→  the reply row slides up where the keyboard would be
+Yes  →  the answer is sent as a bubble and read, hearts burst out of it,
+        then they are typing again — and the letter arrives
 ```
 
-Two typefaces with clearly separate jobs: Cormorant Garamond for the question
-and the letter, Inter for every piece of chrome.
+The typing pause before each message is the whole trick: it is the only part of
+the page that makes a reader wait, and waiting for a message is a feeling they
+already have. Two faces with separate jobs — Inter for the thread, Instrument
+Serif for the one bubble that is the question.
 
-### Design 2 — Locket / Heart Open
-*Premium · heirloom.* The boldness is spent in exactly one place — the heart
-splitting down its seam — and everything around it is kept quiet on purpose: a
-slow breathing idle before the tap, and a celebration that is two portraits
-drifting into one another rather than a firework.
+Themes 3 and 4 are dark, because a chat thread is one of the few places a dark
+theme is the *expected* one.
 
-Each half is the **same heart, clipped to its own side** (`inset(0 50% 0 0)` /
-`inset(0 0 0 50%)`) and hinged on its outer edge, so the seam is exactly down
-the middle and the two doors are guaranteed to match.
+### Design 2 — Scratch the Foil
+*Tactile · they make it happen.* A gold foil card that does not move until they
+move it. The question is something they uncover, at whatever speed they choose,
+rather than something they are shown.
 
-### Design 3 — Countdown Reveal
-*Suspense · anticipation.* The countdown **is** the hero — there is no box,
-locket or bouquet competing with it, so the withholding does the work. Faint
-specks drifting upward are the only other motion. Each second the digit
-**crossfades**; it never flips or reloads. At zero the digit bursts outward
-(200ms), a radial wipe opens the reveal (500ms), and the question lands. The
-payoff is sized to match: three staggered firework bursts, then the heading and
-either the wedding-date card or the fallback line.
+The foil is a real canvas with `destination-out` under the finger, not an image
+fading out — the torn edge follows exactly where they went. How much is gone is
+**measured off the pixels** (every tenth, for speed), not guessed from the
+number of strokes, and past 48% the card gives up the rest of itself at once so
+nobody has to scrub the corners. Each stroke throws a little metal dust off the
+canvas through the shared particle layer.
 
-Space Grotesk for the numerals — the one place all-caps geometric numerals
-genuinely fit — and Cormorant Garamond for the question once it is revealed.
+The shimmer sweeping across the metal stops the moment they touch it: after
+that the torn edge is the interesting part.
 
-It is also the only design that starts by itself. There is nothing on screen to
-tap first, so the countdown begins ~1.1s after load.
+### Design 3 — Written in the Stars
+*Cinematic · quiet and huge.* A night sky, seven stars brighter than the rest,
+and no interface at all. It is the design that trusts the question to be
+enough — the one to choose when anything sweeter would be too much.
 
-### Design 4 — Balloon Pop
-*Playful · light.* The one design that is not trying to be solemn, and it
-commits to that front to back: a **single** rounded sans (Quicksand) with no
-serif or script anywhere, and balloon colours drawn from one curated set per
-theme rather than picked at random. The balloons pop 80ms apart, each with a
-flash and a small confetti spray, then the ring drops in and bounce-settles.
-The Yes sends a second, much larger wave of balloons up the whole screen. Its
-sad-emoji set includes 🎈 alongside 😢.
+The constellation is one SVG drawn with `stroke-dashoffset`, so each segment is
+*drawn* rather than faded in, 340ms apart. The band is an **arc** between each
+pair of stars and the stone a shallow triangle over the one gap in it: joining
+seven points with straight lines gives a kite every time, however the points
+are moved — the curve is what makes it read as a ring.
 
-The six strings are not eyeballed: each one's length and angle is worked out in
-PHP from where its own balloon hangs, so they all converge on the same bow.
+The sky behind it is its own canvas — ~190 stars that drift and twinkle on a
+single rAF loop, paused when the tab is hidden.
+
+### Design 4 — The Roll
+*Memory · your photos, your story.* A stack of polaroids, each captioned, that
+the recipient flicks away one at a time. The last frame is blank and **develops
+in front of them** into the ring and the question.
+
+This is the one design that is different for every couple who sends it, and the
+only one that ends where it started: on the Yes, every photograph that was
+thrown away comes back, scattered across the screen, and then the frame they are
+holding is turned over — the letter is written on the back of it.
+
+The flick is a real drag — the card follows the finger, rotates with the
+distance, and is thrown when it is let go past 74px; under that it springs
+back, which is what makes the threshold discoverable without a word of
+instruction. A tap counts as a flick too.
+
+A card with no photo uploaded for it is not an empty box: it falls back to a
+duotone in the theme's own colours, so a card sent with no photos at all still
+looks deliberate. Quicksand is gone; captions are Caveat, the question is
+Instrument Serif.
 
 ---
 
-## The Yes / No module
+## The question and the two buttons
 
 `resources/views/birthday/partials/_proposal_tease.blade.php`. All four designs
 `@include` it and call `initTeaseButtons({root, onYes})` — the joke is written
 once, not four times.
 
-- Pointer over **No** (or a tap on it) moves the button somewhere else inside
-  the row and shrinks it a little each time, puffing a sad emoji out of where
-  it was.
-- Its label runs through *"No" → "Are you sure?" → … → "Just say yes 🥹"*, so
-  the joke reads even to someone who never catches it, and an optional
-  `[data-tease-stage]` line adds running commentary.
-- **Yes** always answers, and grows as No shrinks.
+- Pointer over **No** (or a tap on it) springs the button somewhere else inside
+  the row and shrinks it a little each time, puffing an emoji out of where it
+  was.
+- Its label runs down a ladder — *"No" → "are you sure" → … → "ok fine"* — so
+  the joke reads even to someone who never catches the button.
+- After **five dodges it gives up**: it shrinks out of existence and the Yes
+  takes the whole row. A gag with no ending is just an obstacle, and an endless
+  chase on a page like this one starts to feel mean — so the page makes the
+  decision the moment the joke stops being funny.
+- A short `navigator.vibrate` on each dodge and on the Yes, where the device
+  has it.
 
 **Accessibility.** The dodge is bound to *pointer* events only. A keyboard user
 tabbing to No is never teleported off the control they are focused on — that is
-a trap, not a joke. Pressing it plays the same emoji puff, advances the label,
-and returns focus to Yes, which is always one Tab away. Both buttons carry a
-visible focus ring. Under `prefers-reduced-motion` the button still moves, but
-instantly and without the emoji shower.
+a trap, not a joke. Pressing it plays the same puff, advances the ladder,
+reaches the same ending, and returns focus to Yes, which is always one Tab
+away. Both buttons carry a visible focus ring.
+
+Designs 2 and 4 also carry a plain **"Reveal it instead" / "Skip to the last
+one"** button: a canvas you have to drag and a stack you have to swipe are not
+interfaces on their own, and that button is the way through for a keyboard, a
+screen reader, or anyone who would rather not.
 
 The module is skinned by whichever theme is on the page, through the custom
 properties each design defines: `--pt-yes-bg`, `--pt-yes-ink`, `--pt-no-bg`,
-`--pt-no-ink`, `--pt-ink`, `--pt-ring`.
+`--pt-no-ink`, `--pt-ink`, `--pt-ring`. A design can override the emoji set,
+the label ladder, the commentary and `giveUpAt` without touching the logic.
 
-A design can override the emoji set, the label ladder and the commentary
-(`emojis`, `labels`, `stages`) without touching the logic — that is how Balloon
-Pop gets its own tone.
+---
+
+## What the Yes opens
+
+`resources/views/birthday/partials/_proposal_after.blade.php`. The Yes used to
+land on a heading and one line of text, which made the best moment on the page
+the least designed one — and the least *surprising*. It now opens **a letter**:
+the thing they will read twice, written out line by line, sealed with both names
+and the date it happened.
+
+The sheet is shared, so all four designs end on something equally finished. What
+is **not** shared is how it arrives — each design hands over its own entrance,
+because the surprise has to come out of the thing they were just looking at:
+
+| Design | `afterEnter` | The surprise |
+| --- | --- | --- |
+| 1 The Last Message | `chat` | They are *typing again* — the answer was not the end of the conversation — and the letter swells up out of the last message |
+| 2 Scratch the Foil | `flip` | The card turns over. The letter was on the back of it the whole time |
+| 3 Written in the Stars | `sky` | A meteor shower first, and the letter resolves out of the sky the way the constellation did |
+| 4 The Roll | `photo` | The whole roll flies back, then the frame they are holding is turned over — people write on the back of photographs |
+
+```html
+@include('birthday.partials._proposal_after', ['afterEnter' => 'flip'])
+```
+```js
+showAfter({ fx: 'hearts' });   // 'confetti' | 'hearts' | 'petals' | 'stars' | 'meteors'
+hideAfter();                   // the looping demo, starting over
+```
+
+The sheet lands first and the letter writes itself after it, one line every
+190ms, with the closing line and then the seal (ring, both names, signature,
+date) timed off the number of lines rather than a fixed delay — so a
+three-line letter does not sit waiting for a six-line one's clock.
+
+The letter body is set **left-aligned** while everything around it is centred:
+at this width the lines wrap, and centred wrapped lines fray into a diamond.
+
+Skinned through `--pk-scrim`, `--pk-bg`, `--pk-ink`, `--pk-soft`, `--pk-accent`,
+`--pk-line`, `--pk-display` and `--pk-letter`.
+
+---
+
+## The particle layer
+
+`resources/views/birthday/partials/_proposal_fx.blade.php`. One canvas, one rAF
+loop, shared by all four. Before it existed every design carried its own
+confetti — four copies of the same maths, each drifting a little from the
+others.
+
+It is a *flavour* API rather than a particle API: a design asks for the thing it
+means and the engine owns how that looks, so two designs asking for confetti get
+the same confetti.
+
+```js
+pfx.burst('confetti', { x, y, count, colors, power, spread });
+pfx.rain('hearts',    { count, colors, duration });
+pfx.meteors({ count });
+pfx.clear();
+```
+
+Flavours: `confetti`, `hearts`, `petals`, `dust`, `stars`, plus `meteors`.
+Colours default to the page's own `--fx-colors` list, so a design that has set
+its theme can ask for a burst with no arguments at all. The loop runs only while
+there are particles and stops itself when the tab is hidden; under
+`prefers-reduced-motion` nothing is drawn at all.
 
 ---
 
@@ -163,7 +261,7 @@ idle (1.1s, so the invitation can be read)
 → the question
 → the No button is nudged twice and runs away
 → Yes
-→ the celebration, held 4.2s
+→ the Yes, and the letter it opens, held 6.2s
 → back to the start
 ```
 
@@ -186,10 +284,10 @@ window.__proposalDemo = {
 ```
 
 Everything after the tap runs off those `phases`, because the design already
-knows how long its own sequence takes — the captions and the moment the No
-button starts running are the same clock, so they cannot drift apart. Design 3
-is the one that normally starts itself; under `?demo=1` it waits for the loop to
-start it instead, so the two never run one countdown between them.
+knows how long its own sequence takes — and each design *computes* them rather
+than hardcoding them (`questionAt()` is one message count, one segment count,
+one card count away from the truth), so adding a line to the sample wording
+cannot put the captions out of step with the page.
 
 The five beats it reports (0-4) are the five in `PROPOSAL_DESIGNS[n]['beats']`.
 Each is posted to the parent window as `{proposalBeat: n}` and written to
@@ -211,44 +309,47 @@ it is what "2 for her, 2 for him" means in the picker.
 Which palette is theme 1 differs per design, because theme 1 is that design's
 own signature look rather than a shared slot.
 
-### Design 1 — Box & Ring Reveal
+### Design 1 — The Last Message
 
 | # | Name | Side | bg | accent |
 | - | --- | --- | --- | --- |
-| 1 | Rose Gold & Cream | soft | `#f7ece2 → #e8c9b0` | `#a35a56` |
-| 2 | Blush Pearl | soft | `#fdf2f5 → #f3d6e0` | `#c2607f` |
-| 3 | Midnight Velvet | bold | `#2f3a63 → #161b31` | `#d9b26a` |
-| 4 | Emerald & Gold | bold | `#1e5c4d → #0e332c` | `#e2b866` |
+| 1 | Paper | soft | `#f7f3ec → #e6ded1` | `#b5654a` |
+| 2 | Bubblegum | soft | `#fff1f6 → #ffd9e6` | `#e0507f` |
+| 3 | Night Mode | bold | `#1b1c22 → #0b0c10` | `#8b9cff` |
+| 4 | Matcha | bold | `#1c3a31 → #0d1f1a` | `#9fe0b4` |
 
-### Design 2 — Locket / Heart Open
-
-| # | Name | Side | bg | accent |
-| - | --- | --- | --- | --- |
-| 1 | Burgundy & Gold | bold | `#a35a56 → #5c1420` | `#c9a75c` |
-| 2 | Rose Quartz | soft | `#f6dce4 → #dba9bd` | `#a4485f` |
-| 3 | Champagne Ivory | soft | `#f7efe3 → #e2cdae` | `#9c7247` |
-| 4 | Onyx & Silver | bold | `#33393f → #14171b` | `#cfd6dd` |
-
-### Design 3 — Countdown Reveal
-
-All four stay dark; a light countdown would give the withholding away. 1 & 2 are
-the cool pair, 3 & 4 the warm-lit pair.
+### Design 2 — Scratch the Foil
 
 | # | Name | Side | bg | accent |
 | - | --- | --- | --- | --- |
-| 1 | Midnight Violet | bold | `#3a1f3d → #1b1330 → #0d0918` | `#f0d08a` |
-| 2 | Deep Sea | bold | `#0d3b4d → #07202e → #03121b` | `#7fe3d4` |
-| 3 | Starlit Rose | soft | `#5c2a44 → #2a1526 → #150a13` | `#ffc2d4` |
-| 4 | Aurora Ice | soft | `#2b3566 → #151a33 → #080b1a` | `#bcd6ff` |
+| 1 | Gold on Cream | soft | `#fbf5ea → #ead9bd` | `#a8813c` |
+| 2 | Rose Foil | soft | `#fff4f5 → #f3d3d9` | `#c06078` |
+| 3 | Holo Black | bold | `#1a1b21 → #0a0b0e` | `#9ad7ff` |
+| 4 | Emerald Foil | bold | `#17493d → #0a241e` | `#d8b262` |
 
-### Design 4 — Balloon Pop
+Each theme also carries the three stops of the metal itself (`foil1`-`foil3`),
+which is what the canvas paints and what the dust is coloured with.
+
+### Design 3 — Written in the Stars
+
+All four stay dark; a lit sky is not a sky. They differ in what colour the dark
+is, and what the stars are made of.
 
 | # | Name | Side | bg | accent |
 | - | --- | --- | --- | --- |
-| 1 | Pastel Sky | soft | `#cfe8f0 → #f6d9e3` | `#e2698c` |
-| 2 | Candy Blush | soft | `#ffeef4 → #ffd9c7` | `#ef6f8e` |
-| 3 | Mint & Sunshine | bold | `#d8f3e6 → #fdf3cf` | `#2f9e7a` |
-| 4 | Bold Pop | bold | `#dbe7ff → #ffe2e2` | `#2f5fe0` |
+| 1 | Deep Indigo | bold | `#1b2450 → #101733 → #05070f` | `#ffe9a8` |
+| 2 | Nebula Rose | soft | `#43184a → #2a1030 → #0d060f` | `#ffbcd6` |
+| 3 | Aurora | soft | `#0d3a48 → #08202a → #030b10` | `#8ff0de` |
+| 4 | Obsidian | bold | `#1a1a1e → #0d0d10 → #000000` | `#e8e6e1` |
+
+### Design 4 — The Roll
+
+| # | Name | Side | bg | accent |
+| - | --- | --- | --- | --- |
+| 1 | Film Cream | soft | `#f6efe3 → #e4d8c6` | `#c0654e` |
+| 2 | Sunwash | soft | `#fff3e6 → #ffd9c0` | `#e57a52` |
+| 3 | Darkroom | bold | `#202124 → #0e0f11` | `#f0c05a` |
+| 4 | Cobalt | bold | `#1e3c70 → #101f3c` | `#ffd66b` |
 
 ---
 
@@ -256,8 +357,8 @@ the cool pair, 3 & 4 the warm-lit pair.
 
 Every design accepts the shared set, so the dashboard can offer one "closing
 message" field across all four. Only the fields a design actually reads are
-stored for it (see §35) — a Balloon Pop card carries no countdown length, and a
-Countdown card carries no letter.
+stored for it (see §35) — a Scratch card carries no captions, and a Roll carries
+no chat thread.
 
 Fallbacks are not written into the pages. They live once, in
 `PROPOSAL_DESIGNS[n]['defaults']`, and are read from there both by the page and
@@ -270,12 +371,15 @@ exactly what an untouched card would send.
 | --- | --- | --- |
 | `to_name` | who it is for | Ayesha |
 | `from_name` | who it is from | Bilal |
+| `heading` | the line at the top | *(per design)* |
+| `tap_label` | what the page asks them to do | *(per design)* |
 | `question` | the question | Will you marry me? |
 | `yes_label`, `no_label` | the two buttons | Yes 💍 / No |
-| `yes_heading` | the celebration heading | She Said YES! 💍 |
+| `yes_heading` | the heading on the letter the Yes opens | *(per design)* |
+| `letter_text` | that letter, one line per line, max 6 | *(per design)* |
 | `closing_line` | the line under it | *(per design)* |
 | `signed` | the signature | — always yours |
-| `ring_photo` | a photo of the ring | the drawn ring |
+| `ring_photo` | a photo of the ring — the seal on the letter too | the drawn ring |
 | `theme` | overrides `proposalTheme` when the partial is included without one | 1 |
 | `preview_stage` | skip ahead — see below | — |
 | `demo` | `1` plays the whole flow on a loop — see above | — |
@@ -284,10 +388,10 @@ exactly what an untouched card would send.
 
 | Design | Extra params |
 | --- | --- |
-| 1 Box & Ring | `heading` · `tap_label` · `letter_text` (one line per newline, max 8) |
-| 2 Locket | `heading` · `tap_label` · `couple_photo` (drawn silhouette fallback) |
-| 3 Countdown | `pre_label` · `countdown_seconds` (1-10, default 5) · `wedding_date` · `altar_label` · `fallback_line` |
-| 4 Balloon Pop | `heading` · `tap_label` |
+| 1 The Last Message | `chat_text` (one message per line, max 5) · `couple_photo` (the thread's avatar; falls back to the sender's initial) |
+| 2 Scratch the Foil | — (the shared set is all it reads) |
+| 3 Written in the Stars | — (the shared set is all it reads) |
+| 4 The Roll | `caption_text` (one caption per line, max 4) · `photo_1`, `photo_2`, `photo_3` |
 
 ### `preview_stage`
 
@@ -296,9 +400,8 @@ words without tapping through the reveal every keystroke.
 
 | Value | Effect |
 | --- | --- |
-| `open` | designs 1, 2, 4 — the box open / locket open / balloons popped, with the question showing |
-| `reveal` | design 3 — skip the countdown straight to the reveal |
-| `yes` | any design — play the celebration |
+| `open` / `reveal` | every design — the thread filled in / the foil off / the constellation joined / the roll gone through, with the question showing |
+| `yes` | any design — play the celebration and open the letter |
 
 ---
 
@@ -317,12 +420,13 @@ anniversary flows are untouched.
 
 **Step 1** shows the four designs as cards, each with its mood, a one-paragraph
 summary, and **the design itself, running its whole flow on a loop** — an iframe
-on `?demo=1` (see above), so the client watches the box open, the letter unfold,
-the question arrive, the No button run away and the celebration fire, before
-choosing. The five beat chips under each card light up as its preview reaches
-them, so what is happening is also named. A CSS still holds the space until the
-page has loaded, and a real clip dropped at
-`public/videos/proposal/design{n}.mp4` is played over the top when one exists.
+on `?demo=1` (see above), so the client watches the thread type itself out, the
+foil come off, the stars join, the No button run away and the celebration fire,
+before choosing. The five beat chips under each card light up as its preview
+reaches them, so what is happening is also named. A CSS still holds the space
+until the page has loaded — one loop per design, in that design's theme-1
+colours — and a real clip dropped at `public/videos/proposal/design{n}.mp4` is
+played over the top when one exists.
 
 The previews are loaded on first sight of this step rather than with the
 dashboard, because a birthday card never opens this panel. Picking a design
@@ -331,8 +435,9 @@ the full-size preview below them at the chosen design, also playing through.
 
 **Step 2** renders only the fields the chosen design reads — a design's unused
 fields are not disabled, they are not there, and photo slots follow the same
-rule. **Every empty box is pre-filled with that design's sample wording**, from
-the one copy in `PROPOSAL_DESIGNS[n]['defaults']` that the page itself falls back
+rule (The Roll shows four slots, The Last Message two, the other two one).
+**Every empty box is pre-filled with that design's sample wording**, from the
+one copy in `PROPOSAL_DESIGNS[n]['defaults']` that the page itself falls back
 to, so the client starts from a complete, sensible card and edits what they want
 to change rather than writing one from nothing. Anything already typed or already
 saved is left alone.
@@ -342,7 +447,7 @@ Three buttons decide what the live preview holds:
 | Mode | Shows |
 | --- | --- |
 | **Your words** *(default)* | parked at the question, so the client reads what they typed without tapping through the reveal on every keystroke |
-| **After the Yes** | the celebration — the half of the page the other modes never reach |
+| **After the Yes** | the letter the Yes opens — the half of the page the other modes never reach |
 | **▶ Play it through** | the whole thing on a loop, with *their* words in it (`?demo=1`) |
 
 Steps 3 and 4 are the *same* endpoints and the *same* clip-picker element the
@@ -415,13 +520,14 @@ No migration. A proposal reuses the generic columns:
   "theme": 3,
   "to_name": "Sara",
   "from_name": "Umair",
-  "photos": { "ring_photo": "birthday-cards/proposal/….png" },
-  "heading": "For you",
+  "photos": { "couple_photo": "birthday-cards/proposal/….png" },
+  "heading": "Us",
   "tap_label": "Tap to open",
-  "letter_text": "line\nline",
+  "chat_text": "line\nline",
   "question": "Will you marry me?",
   "yes_label": "Yes", "no_label": "No",
-  "yes_heading": "She Said YES!",
+  "yes_heading": "she said yes 🥹",
+  "letter_text": "line\nline",
   "closing_line": "…", "signed": "— always yours"
 }
 ```
@@ -443,12 +549,17 @@ rather than trimmed on the way out.
 | `question` | 60 |
 | `yes_label`, `no_label` | 20 |
 | `yes_heading` | 44 |
-| `pre_label`, `fallback_line` | 60 |
-| `altar_label` | 40 |
 | `closing_line` | 160 |
 | `signed` | 30 |
-| `letter_text` | 400 characters **and** 8 lines |
-| `countdown_seconds` | integer 1-10 |
+| `chat_text` | 300 characters **and** 5 lines |
+| `caption_text` | 200 characters **and** 4 lines |
+| `letter_text` | 420 characters **and** 6 lines |
+
+The three multi-line fields are in `PROPOSAL_MULTILINE`, which is read three
+times: the page splits on it, the wizard's textarea enforces it through
+`data-max-lines`, and `saveProposalContent` validates against it. One line in is
+one object on the page — a bubble, a photograph — so the cap is a count of
+things, not a guess at a height.
 
 ---
 
@@ -482,6 +593,14 @@ width its box actually has. Three things keep that honest:
 - **No lock screen.** By design: a proposal is opened in person, in the moment.
   If one is ever wanted, the `story.lock` / `story.unlock` pair is still there —
   it is only skipped for this occasion.
+- **Cards saved under the previous four designs** keep their `gift1_data`. Every
+  field the new designs share (names, question, buttons, closing line,
+  signature) still renders, and a `letter_text` saved for the old Design 1 is
+  read straight back in as the letter the Yes opens — same key, better home. The
+  fields only the old designs had (`countdown_seconds`, `wedding_date`,
+  `pre_label`, `altar_label`, `fallback_line`) are ignored by the page and
+  dropped the next time the card is saved. Nothing 500s, and nothing needed a
+  migration.
 - The dashboard's four previews are the live pages on `?demo=1`, not video
   files. A real clip can still be dropped in
   `public/videos/proposal/design{1..4}.mp4` and is played over the top

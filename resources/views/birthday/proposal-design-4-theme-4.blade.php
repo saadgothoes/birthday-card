@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 4 ("Balloon Pop") — theme 4, "Bold Pop".
+    Proposal · Design 4 ("The Roll") — theme 4, "Cobalt".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

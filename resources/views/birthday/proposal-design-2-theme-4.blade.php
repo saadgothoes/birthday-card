@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 2 ("Locket / Heart Open") — theme 4, "Onyx & Silver".
+    Proposal · Design 2 ("Scratch the Foil") — theme 4, "Emerald Foil".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

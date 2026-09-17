@@ -1,68 +1,48 @@
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export function initHero() {
     const section = document.getElementById('hero');
     if (!section) return;
 
     const lines = section.querySelectorAll('[data-line] span');
-    const sub = document.getElementById('heroSub');
-    const actions = document.getElementById('heroActions');
-    const mock = document.getElementById('heroMock');
-    const eyebrow = section.querySelector('.eyebrow');
+    const bits = section.querySelectorAll('[data-hero-in]');
+    const visual = document.getElementById('heroVisual');
+    const floats = visual ? visual.querySelectorAll('[data-parallax]') : [];
 
-    // Entrance (plays once, independent of scroll direction)
+    // The hero used to pin for a screen and a half before you could read it.
+    // It now just plays once, on load.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        gsap.set([lines, bits, visual], { opacity: 1, y: 0, yPercent: 0 });
+        return;
+    }
+
     gsap.set(lines, { yPercent: 115 });
 
-    const intro = gsap.timeline({ delay: 0.15 });
-    intro
-        .from(eyebrow, { opacity: 0, y: 14, duration: 0.6, ease: 'power3.out' })
-        .to(lines, { yPercent: 0, duration: 0.9, ease: 'power4.out', stagger: 0.1 }, 0.1)
-        .from(sub, { opacity: 0, y: 18, duration: 0.7, ease: 'power3.out' }, 0.55)
-        .from(actions, { opacity: 0, y: 18, duration: 0.7, ease: 'power3.out' }, 0.68)
-        .from(mock, { opacity: 0, scale: 0.5, duration: 0.9, ease: 'power3.out' }, 0.4);
+    gsap.timeline({ delay: 0.12 })
+        .to(lines, { yPercent: 0, duration: 0.95, ease: 'power4.out', stagger: 0.09 }, 0.1)
+        .from(bits, { opacity: 0, y: 18, duration: 0.7, ease: 'power3.out', stagger: 0.09 }, 0.35)
+        .from(visual, { opacity: 0, y: 40, scale: 0.94, duration: 1, ease: 'power3.out' }, 0.25);
 
-    const mm = gsap.matchMedia();
+    if (!visual || !floats.length) return;
 
-    mm.add({
-        desktop: '(min-width: 901px) and (prefers-reduced-motion: no-preference)',
-        reduced: '(max-width: 900px), (prefers-reduced-motion: reduce)',
-    }, (context) => {
-        const { desktop } = context.conditions;
+    // Depth on pointer move: each layer drifts by its own weight.
+    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
 
-        if (desktop) {
-            const steps = section.querySelectorAll('[data-mock-step]');
-            const cards = section.querySelectorAll('[data-mock-card]');
-            const brand = document.getElementById('mockBrand');
-            const topbar = document.getElementById('mockTopbar');
+    const movers = Array.from(floats).map((el) => ({
+        el,
+        depth: parseFloat(el.dataset.parallax) || 4,
+        x: gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3.out' }),
+        y: gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power3.out' }),
+    }));
 
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: section,
-                    start: 'top top',
-                    end: '+=160%',
-                    scrub: 1,
-                    pin: true,
-                    anticipatePin: 1,
-                },
-            });
+    section.addEventListener('mousemove', (e) => {
+        const rect = section.getBoundingClientRect();
+        const rx = (e.clientX - rect.left) / rect.width - 0.5;
+        const ry = (e.clientY - rect.top) / rect.height - 0.5;
+        movers.forEach((m) => { m.x(rx * m.depth * 6); m.y(ry * m.depth * 6); });
+    });
 
-            tl.to([eyebrow, lines, sub, actions], { opacity: 0, yPercent: -40, duration: 1, ease: 'none' }, 0)
-                .to(mock, { scale: 1.05, duration: 1.4, ease: 'none' }, 0.05)
-                .to(brand, { opacity: 1, duration: 0.4 }, 0.25)
-                .to(steps, { opacity: 1, x: 0, stagger: 0.08, duration: 0.6 }, 0.3)
-                .to(topbar, { opacity: 1, duration: 0.4 }, 0.55)
-                .to(cards, { opacity: 1, y: 0, stagger: 0.12, duration: 0.6 }, 0.6)
-                .to(mock, { scale: 1.35, duration: 1, ease: 'none' }, 0.85);
-
-            return () => tl.scrollTrigger && tl.scrollTrigger.kill();
-        }
-
-        // Reduced-motion / mobile: simple reveal, no pin
-        gsap.set([section.querySelectorAll('[data-mock-step]'), section.querySelectorAll('[data-mock-card]'), '#mockBrand', '#mockTopbar'], {
-            opacity: 1, x: 0, y: 0,
-        });
-
-        return () => {};
+    section.addEventListener('mouseleave', () => {
+        movers.forEach((m) => { m.x(0); m.y(0); });
     });
 }

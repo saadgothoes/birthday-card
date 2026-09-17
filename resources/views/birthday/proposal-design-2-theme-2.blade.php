@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 2 ("Locket / Heart Open") — theme 2, "Rose Quartz".
+    Proposal · Design 2 ("Scratch the Foil") — theme 2, "Rose Foil".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

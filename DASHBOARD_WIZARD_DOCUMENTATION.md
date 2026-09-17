@@ -2122,16 +2122,17 @@ the wizard pre-fills its empty boxes from it. One copy, so the preview a client
 sees before typing is exactly what an untouched card would render.
 
 That list is also why the endpoint does not simply accept everything it is sent.
-Only the chosen design's own fields are validated and stored: a Balloon Pop card
-carrying a countdown length, or a Countdown card carrying a letter, would be
-values in the JSON that nothing ever reads and that the client never saw a box
-for. Photos are filtered the same way, and a photo left over from a previous
+Only the chosen design's own fields are validated and stored: a Scratch the Foil
+card carrying a chat thread, or a Last Message card carrying photo captions,
+would be values in the JSON that nothing ever reads and that the client never
+saw a box for. Photos are filtered the same way, and a photo left over from a previous
 design stays on disk but is not carried into the payload.
 
 `PROPOSAL_LIMITS` gives every text field the length its own slot can show, and
-the Design 1 letter gets a line cap on top of its character cap — it is the one
-field where the shape matters as much as the length, because the paper it is
-printed on has a fixed number of lines.
+the fields in `PROPOSAL_MULTILINE` — the chat thread and the photo captions —
+get a line cap on top of their character cap. They are the fields where the
+shape matters as much as the length: one line in is one object out, a bubble or
+a photograph, and the page has room for exactly so many.
 
 ### 35.3 The QR family is chosen by occasion, not by theme
 
@@ -2167,9 +2168,9 @@ falls back to the occasion name for the stem.
 
 **Step 1 — Design & Theme.** Each of the four designs is a card carrying a mood,
 a summary, its five beats, and **the design itself running its whole flow on a
-loop** — an iframe on `?demo=1` (§35.4.1). A client watches the box open, the
-letter unfold, the question arrive, the No button run away and the celebration
-fire, all before choosing. The beat chips light up as the preview reaches them,
+loop** — an iframe on `?demo=1` (§35.4.1). A client watches the thread type
+itself out, the foil come off, the stars join, the No button run away and the
+celebration fire, all before choosing. The beat chips light up as the preview reaches them,
 so what is happening is named as well as shown.
 
 A CSS still holds the space until the page loads, and a real clip dropped at
@@ -2215,8 +2216,9 @@ Each design registers `window.__proposalDemo` with `open` / `yes` / `reset` and
 its own `phases` — the milliseconds at which its beats land. Everything after
 the tap hangs off those, because the design already knows how long its sequence
 takes, so the captions and the action are one clock and cannot drift apart.
-Design 3 normally starts itself; under `?demo=1` it waits to be started, so the
-page and the loop never run one countdown between them.
+Each design works its own `phases` out from what it is actually showing — a
+message count, a segment count, a card count — so adding a line to the sample
+wording cannot put the captions out of step with the page.
 
 The current beat is posted to the parent as `{proposalBeat: n}` (which is what
 lights the chips) and written to `<html data-pd-beat>` (which is what makes the
@@ -2411,6 +2413,75 @@ and 1400×950:
   given its slug when the wizard page first loads — before the occasion is
   picked — so the QR previews have a settled address to encode. Shared with
   anniversary cards; the slug is only an address.
+
+---
+
+### 35.9 All four designs were replaced
+
+The first four — Box & Ring Reveal, Locket, Countdown, Balloon Pop — were
+correct and did what they said, and they read as greeting cards. A proposal is
+opened by someone in their twenties with an audience watching their face, and
+four variations on *an ornament opening* is one idea four times. They were
+replaced outright:
+
+| # | Was | Is | What it does differently |
+| - | --- | --- | --- |
+| 1 | Box & Ring Reveal | **The Last Message** | The proposal written as a chat thread that types itself out. No ornament at all — the words in the shape they would really arrive in. |
+| 2 | Locket / Heart Open | **Scratch the Foil** | A real canvas scratch card. The page does not move until the recipient moves it. |
+| 3 | Countdown Reveal | **Written in the Stars** | Seven stars joining into a ring on a drifting starfield. The one that withholds. |
+| 4 | Balloon Pop | **The Roll** | A stack of the couple's own polaroids, flicked away; the last frame develops into the question. |
+
+Three things came out of the designs and into shared modules while that was
+done, because four copies of each was what made the old set drift apart:
+
+- **`_proposal_after.blade.php`** — what the Yes opens. Every design used to end
+  on its own loose heading and a line of text, which made the best moment on the
+  page the least designed one, and the least surprising. All four now open **a
+  letter**: a shared sheet carrying the ring, the words line by line, both names,
+  the signature and *the date it happened* — but with a per-design entrance,
+  because the surprise has to come out of the thing they were just looking at.
+  They are typing again (chat), the card turns over (foil), it resolves out of
+  the sky (stars), the frame is turned over (roll). `letter_text` is a field on
+  all four designs, capped at 420 characters and 6 lines.
+- **`_proposal_fx.blade.php`** — one canvas and one rAF loop for every
+  celebration, with a flavour API (`pfx.burst('hearts')`) rather than a particle
+  API, so two designs asking for confetti get the same confetti.
+- **`_proposal_tease.blade.php`** — rewritten so the No button **gives up**
+  after five dodges: it shrinks out of existence and the Yes takes the row. A
+  gag with no ending is an obstacle, not a joke. Designs 2 and 4 also carry a
+  plain "reveal it instead" button, because a canvas you have to drag and a
+  stack you have to swipe are not interfaces on their own.
+
+**Fields changed with them**, which is the whole point of the registry: the
+wizard's step 2 is generated from `PROPOSAL_DESIGNS[n]['fields']` and
+`['photos']`, so `letter_text` / `pre_label` / `countdown_seconds` /
+`wedding_date` / `altar_label` / `fallback_line` left and `chat_text`,
+`caption_text`, `letter_text` and `photo_1`-`photo_3` arrived without a single
+new branch in the panel. `PROPOSAL_LETTER_MAX_LINES` became `PROPOSAL_MULTILINE` (a map of
+field → line cap) for the same reason.
+
+**Two bugs this turned up in the dashboard's own CSS:**
+
+- **The design-card still was pinned to the top-left corner.** `.pc-inner` was
+  declared twice — a `220x168` fixed stage from the first build, and the
+  `inset: 0` stage the new stills assume. The later rule won on `position` and
+  `inset` but *not* on `width`/`height`, so every still was a 220x168 box in the
+  corner of a much wider card rather than a full-bleed loop. The stale rule is
+  gone.
+- **The chat thread's last bubble was clipped.** `.log` had `padding: 1rem 1rem 0`
+  and `justify-content: flex-end`, so the question — the one bubble that
+  matters — sat flush against the composer and lost its bottom edge.
+
+**Old cards keep working.** A card saved under the previous designs renders on
+the new one with the same numbers: every shared field (names, question, buttons,
+closing line, signature) still shows, and the fields only the old designs had are
+ignored by the page and dropped the next time that card is saved. No migration,
+and `/c/{slug}` never 500s on one.
+
+Covered by `tests/Feature/ProposalDesignTest.php`: all sixteen design/theme
+pages render, out-of-range numbers 404, the per-design fields are what gets
+stored, an over-long thread is refused, a proposal card still carries its music,
+and the published page is the design the client chose.
 
 ---
 

@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 3 ("Countdown Reveal") — theme 3, "Starlit Rose".
+    Proposal · Design 3 ("Written in the Stars") — theme 3, "Aurora".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

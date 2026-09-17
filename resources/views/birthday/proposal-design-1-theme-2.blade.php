@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 1 ("Box & Ring Reveal") — theme 2, "Blush Pearl".
+    Proposal · Design 1 ("The Last Message") — theme 2, "Bubblegum".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

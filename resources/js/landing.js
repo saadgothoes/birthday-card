@@ -5,11 +5,7 @@ import { initCursor } from './landing/cursor';
 import { initMagneticButtons } from './landing/magneticButton';
 import { initNavbar } from './landing/navbar';
 import { initHero } from './landing/hero';
-import { initShowcase } from './landing/showcase';
-import { initBuilderDemo } from './landing/builderDemo';
-import { initCreation } from './landing/creation';
-import { initMorph } from './landing/morph';
-import { initGallery } from './landing/gallery';
+import { initHow } from './landing/how';
 import { initFeatures } from './landing/features';
 import { initFinalCta } from './landing/finalCta';
 
@@ -27,11 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initMagneticButtons(isTouch);
 
         initHero();
-        initShowcase();
-        initBuilderDemo();
-        initCreation();
-        initMorph();
-        initGallery();
+        initHow();
         initFeatures();
         initFinalCta();
     }, root);

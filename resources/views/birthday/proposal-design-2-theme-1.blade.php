@@ -1,5 +1,5 @@
 {{--
-    Proposal · Design 2 ("Locket / Heart Open") — theme 1, "Burgundy & Gold".
+    Proposal · Design 2 ("Scratch the Foil") — theme 1, "Gold on Cream".
 
     A thin wrapper, exactly like the anniversary gift views: the design itself
     lives once in the partial, and each of its four colour themes is one file

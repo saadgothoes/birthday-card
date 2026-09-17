@@ -5,8 +5,8 @@
                 <a href="/" class="l-nav__logo">
                     <img src="{{ asset('images/logo/clean/primarylogo.png') }}" alt="Giftloft" class="l-nav__logo-img">
                 </a>
-                <p class="l-footer__tag">The gift-card builder studio — personalised,
-                    PIN-locked birthday pages with animated gift reveals, ready to share in minutes.</p>
+                <p class="l-footer__tag">The gift-card builder studio — PIN-locked birthday pages
+                    with animated gift reveals, shared as one link.</p>
             </div>
 
             <div class="l-footer__links">
@@ -16,14 +16,14 @@
 
                 <div class="l-footer__col">
                     <h4>Product</h4>
-                    <a href="{{ $onLanding ? '#showcase' : url('/#showcase') }}">Themes</a>
-                    <a href="{{ $onLanding ? '#builder' : url('/#builder') }}">How it works</a>
+                    <a href="{{ $onLanding ? '#how' : url('/#how') }}">How it works</a>
+                    <a href="{{ $onLanding ? '#themes' : url('/#themes') }}">Themes</a>
                     <a href="{{ $onLanding ? '#features' : url('/#features') }}">Features</a>
-                    <a href="{{ $onLanding ? '#gallery' : url('/#gallery') }}">Gallery</a>
                     <a href="{{ route('contact') }}">Contact</a>
                 </div>
                 <div class="l-footer__col">
                     <h4>Account</h4>
+                    <a href="{{ route('client.register') }}">Create Account</a>
                     <a href="{{ route('client.login') }}">Client Login</a>
                     <a href="{{ route('client.forgot-password') }}">Reset Password</a>
                 </div>

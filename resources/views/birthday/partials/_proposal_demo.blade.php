@@ -3,9 +3,10 @@
 
     Included by all four designs; inert unless the page is asked for with
     `?demo=1`. It exists so the dashboard's design cards can show the *whole*
-    flow rather than a thumbnail of one moment — the client watches the box
-    open, the letter unfold, the question arrive, the No button run away and
-    the celebration fire, then it starts again.
+    flow rather than a thumbnail of one moment — the client watches the thread
+    type itself out (or the foil come off, or the stars join), the question
+    arrive, the No button run away, the Yes open its letter, then it starts
+    again.
 
     It is not a video file. It is the real page driving itself: the same code
     path a recipient triggers with a real tap, played by a script instead of a
@@ -55,7 +56,9 @@
         var AFTER_QUESTION = 900;     // before the No button starts running
         var NUDGE_GAP = 700;
         var BEFORE_YES = 850;
-        var HOLD_CELEBRATION = 4200;  // long enough to watch it land
+        // long enough for the letter the Yes opens to arrive *and* be read —
+        // the loop used to restart while it was still writing itself out
+        var HOLD_CELEBRATION = 6200;
         var timers = [];
 
         function at(ms, fn) { timers.push(setTimeout(fn, ms)); }

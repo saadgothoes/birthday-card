@@ -4148,13 +4148,6 @@
         color: #fff;
     }
 
-    /* the still that holds the space until the real page has loaded */
-    .pc-inner {
-        position: relative;
-        width: 220px;
-        height: 168px;
-    }
-
     .prop-design-body {
         padding: 0.95rem 1.05rem 1.1rem;
     }
@@ -4206,200 +4199,213 @@
         color: #fff;
     }
 
-    /* the motion loops themselves — one keyframe set per design */
+    /* The still that holds the space until the real preview has loaded — one
+       CSS loop per design, in that design's theme-1 colours. It is a
+       *placeholder*, not a second copy of the design: it says which of the
+       four this card is at a glance, and the live page takes over on top. */
     .pc {
         position: absolute;
         inset: 0;
         z-index: 1;
     }
 
-    .pc-1 { background: linear-gradient(160deg, #f7ece2, #e8c9b0); }
-    .pc-2 { background: linear-gradient(160deg, #a35a56, #5c1420); }
-    .pc-3 { background: linear-gradient(170deg, #3a1f3d, #16102a); }
-    .pc-4 { background: linear-gradient(165deg, #cfe8f0, #f6d9e3); }
+    .pc-1 { background: linear-gradient(175deg, #f7f3ec, #e6ded1); }
+    .pc-2 { background: linear-gradient(175deg, #fbf5ea, #ead9bd); }
+    .pc-3 { background: linear-gradient(180deg, #1b2450, #05070f); }
+    .pc-4 { background: linear-gradient(175deg, #f6efe3, #e4d8c6); }
 
-    /* 1 — the lid lifts and a letter rises */
-    .pc-1 .lid {
+    .pc-inner {
         position: absolute;
-        left: 50%;
-        top: 58px;
-        width: 92px;
-        height: 20px;
-        margin-left: -46px;
-        border-radius: 5px;
-        background: linear-gradient(170deg, #c98079, #9c5852);
-        transform-origin: 6% 100%;
-        animation: pcLid 4s ease-in-out infinite;
-        z-index: 3;
+        inset: 0;
     }
 
-    .pc-1 .base {
+    /* 1 — messages land, and something is always being typed */
+    .pc-1 .b {
         position: absolute;
-        left: 50%;
-        top: 78px;
-        width: 80px;
-        height: 52px;
-        margin-left: -40px;
-        border-radius: 4px 4px 7px 7px;
-        background: linear-gradient(170deg, #b8746c, #8f4f4b);
-        z-index: 2;
+        left: 12%;
+        height: 11%;
+        border-radius: 999px;
+        background: #fff;
+        box-shadow: 0 4px 10px -8px rgba(0, 0, 0, .7);
+        opacity: 0;
+        transform: translateY(8px) scale(.94);
+        transform-origin: left bottom;
+        animation: pcBubble 3.6s cubic-bezier(.16, 1, .3, 1) infinite;
     }
 
-    /* the ribbon down the front, so the shape reads as a gift and not a brick */
-    .pc-1 .base::after,
-    .pc-1 .lid::after {
+    .pc-1 .b:nth-child(1) { top: 28%; width: 46%; animation-delay: .1s; }
+    .pc-1 .b:nth-child(2) { top: 43%; width: 60%; animation-delay: .7s; }
+    .pc-1 .b:nth-child(3) { top: 58%; width: 38%; background: #b5654a; animation-delay: 1.3s; }
+
+    @keyframes pcBubble {
+        0%, 4%     { opacity: 0; transform: translateY(8px) scale(.94); }
+        14%, 82%   { opacity: 1; transform: none; }
+        100%       { opacity: 0; transform: none; }
+    }
+
+    .pc-1 .dots {
+        position: absolute;
+        left: 12%;
+        top: 74%;
+        display: flex;
+        gap: 4px;
+    }
+
+    .pc-1 .dots i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #b5654a;
+        opacity: .35;
+        animation: pcDot 1.2s infinite;
+    }
+
+    .pc-1 .dots i:nth-child(2) { animation-delay: .16s; }
+    .pc-1 .dots i:nth-child(3) { animation-delay: .32s; }
+
+    @keyframes pcDot {
+        0%, 60%, 100% { opacity: .3; transform: translateY(0); }
+        30%           { opacity: 1; transform: translateY(-3px); }
+    }
+
+    /* 2 — a foil panel with something being scratched off it */
+    .pc-2 .foil {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 44%;
+        height: 62%;
+        transform: translate(-50%, -50%);
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f4dfa8, #c9a24a 45%, #f4dfa8 70%, #8f6f2a);
+        overflow: hidden;
+    }
+
+    .pc-2 .foil::after {
         content: '';
         position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        width: 14px;
-        margin-left: -7px;
-        background: linear-gradient(180deg, #f3dcc4, #dcb08a);
-    }
-
-    .pc-1 .note {
-        position: absolute;
-        left: 50%;
-        top: 66px;
-        width: 62px;
-        height: 44px;
-        margin-left: -31px;
-        border-radius: 3px;
-        background: #fffaf4;
-        box-shadow: 0 6px 12px -8px rgba(0, 0, 0, .6);
-        animation: pcNote 4s ease-in-out infinite;
-        z-index: 1;
-    }
-
-    @keyframes pcLid {
-        0%, 22% { transform: rotate(0); }
-        38%, 78% { transform: rotate(-108deg); }
-        94%, 100% { transform: rotate(0); }
-    }
-
-    @keyframes pcNote {
-        0%, 30% { transform: translateY(14px) scaleY(.4); opacity: 0; }
-        48%, 78% { transform: translateY(-26px) scaleY(1); opacity: 1; }
-        92%, 100% { transform: translateY(14px) scaleY(.4); opacity: 0; }
-    }
-
-    /* 2 — the locket halves swing open */
-    .pc-2 .lk {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 96px;
-        height: 88px;
-        margin: -44px 0 0 -48px;
-    }
-
-    /* each half is its own half-of-a-heart polygon, closed down the seam —
-       clipping a whole heart to a rectangle would square off the inner edge */
-    .pc-2 .lk i {
-        position: absolute;
         inset: 0;
-        background: radial-gradient(circle at 38% 32%, #f0d79b, #8a6524);
-        transform-origin: left center;
-        animation: pcLkL 4s ease-in-out infinite;
+        background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, .75) 50%, transparent 62%);
+        background-size: 260% 100%;
+        animation: pcSweep 3s ease-in-out infinite;
     }
 
-    .pc-2 .lk i:nth-of-type(1) {
-        clip-path: polygon(50% 100%, 8% 55%, 4% 28%, 20% 10%, 38% 12%, 50% 26%);
+    @keyframes pcSweep {
+        0%, 10%   { background-position: 130% 0; }
+        70%, 100% { background-position: -30% 0; }
     }
 
-    .pc-2 .lk i:nth-of-type(2) {
-        clip-path: polygon(50% 100%, 50% 26%, 62% 12%, 80% 10%, 96% 28%, 92% 55%);
-        transform-origin: right center;
-        animation-name: pcLkR;
-    }
-
-    .pc-2 .lk b {
+    /* the torn strip that keeps growing across it */
+    .pc-2 .tear {
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 44px;
-        height: 44px;
-        margin: -22px 0 0 -22px;
+        width: 0;
+        height: 13%;
+        transform: translate(-50%, -50%) rotate(-7deg);
+        border-radius: 999px;
+        background: #fffdf7;
+        box-shadow: 0 0 0 1px rgba(58, 45, 29, .12);
+        animation: pcTear 3s ease-in-out infinite;
+    }
+
+    @keyframes pcTear {
+        0%, 12%  { width: 0; opacity: 0; }
+        55%      { width: 40%; opacity: 1; }
+        88%      { width: 40%; opacity: 1; }
+        100%     { width: 40%; opacity: 0; }
+    }
+
+    /* 3 — stars, and the line that joins them */
+    .pc-3 .st {
+        position: absolute;
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
-        background: radial-gradient(circle, #fff, #f6ecd6);
-        border: 2px solid #f0d79b;
+        background: #fff;
+        opacity: .35;
+        animation: pcStar 3.4s ease-in-out infinite;
     }
 
-    @keyframes pcLkL {
-        0%, 24% { transform: rotateY(0); }
-        44%, 80% { transform: rotateY(-108deg); }
-        96%, 100% { transform: rotateY(0); }
+    .pc-3 .st:nth-child(1) { left: 50%; top: 24%; animation-delay: 0s; }
+    .pc-3 .st:nth-child(2) { left: 66%; top: 40%; animation-delay: .35s; }
+    .pc-3 .st:nth-child(3) { left: 62%; top: 64%; animation-delay: .7s; }
+    .pc-3 .st:nth-child(4) { left: 38%; top: 64%; animation-delay: 1.05s; }
+    .pc-3 .st:nth-child(5) { left: 34%; top: 40%; animation-delay: 1.4s; }
+
+    @keyframes pcStar {
+        0%, 10%   { opacity: .3; box-shadow: none; }
+        40%, 80%  { opacity: 1; box-shadow: 0 0 8px 1px rgba(255, 233, 168, .9); }
+        100%      { opacity: .3; box-shadow: none; }
     }
 
-    @keyframes pcLkR {
-        0%, 24% { transform: rotateY(0); }
-        44%, 80% { transform: rotateY(108deg); }
-        96%, 100% { transform: rotateY(0); }
-    }
-
-    /* 3 — the countdown runs, then flashes */
-    .pc-3 .num {
+    .pc-3 .arc {
         position: absolute;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        font: 700 3.4rem/1 'Inter', system-ui, sans-serif;
-        color: #fff;
-        text-shadow: 0 0 26px rgba(255, 226, 168, .8);
+        left: 34%;
+        top: 24%;
+        width: 32%;
+        height: 40%;
+        border: 1px solid rgba(255, 233, 168, .85);
+        border-radius: 50%;
+        clip-path: inset(0 0 0 0);
         opacity: 0;
+        animation: pcArc 3.4s ease-in-out infinite;
     }
 
-    .pc-3 .num:nth-child(1) { animation: pcNum 4s linear infinite; }
-    .pc-3 .num:nth-child(2) { animation: pcNum 4s linear infinite -1s; }
-    .pc-3 .num:nth-child(3) { animation: pcNum 4s linear infinite -2s; }
+    @keyframes pcArc {
+        0%, 30%  { opacity: 0; }
+        60%, 85% { opacity: .9; }
+        100%     { opacity: 0; }
+    }
 
-    .pc-3 .flash {
+    /* 4 — the top of the stack is thrown away, over and over */
+    .pc-4 .p {
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 24px;
-        height: 24px;
-        margin: -12px 0 0 -12px;
-        border-radius: 50%;
-        background: radial-gradient(circle, #ffe2a8, transparent 70%);
-        animation: pcFlash 4s ease-out infinite;
+        width: 38%;
+        height: 58%;
+        margin: -29% 0 0 -19%;
+        border-radius: 4px;
+        background: #fffdf8;
+        box-shadow: 0 10px 20px -14px rgba(0, 0, 0, .8), 0 0 0 1px rgba(59, 49, 38, .12);
     }
 
-    @keyframes pcNum {
-        0% { opacity: 0; transform: scale(.9); }
-        6%, 22% { opacity: 1; transform: scale(1); }
-        30% { opacity: 0; transform: scale(.9); }
-        100% { opacity: 0; }
-    }
-
-    @keyframes pcFlash {
-        0%, 74% { transform: scale(0); opacity: 0; }
-        82% { transform: scale(9); opacity: .95; }
-        100% { transform: scale(16); opacity: 0; }
-    }
-
-    /* 4 — the balloons pop one after another */
-    .pc-4 .bl {
+    .pc-4 .p::before {
+        content: '';
         position: absolute;
-        top: 40px;
-        width: 40px;
-        height: 50px;
-        border-radius: 50% 50% 47% 47% / 42% 42% 58% 58%;
-        animation: pcPop 4s ease-in-out infinite;
+        inset: 7% 7% 22%;
+        background: linear-gradient(145deg, #e8d5bd, #c0654e);
     }
 
-    .pc-4 .bl:nth-child(1) { left: 24%; background: #8ecae6; animation-delay: 0s; }
-    .pc-4 .bl:nth-child(2) { left: 42%; top: 24px; background: #ffb3c6; animation-delay: .18s; }
-    .pc-4 .bl:nth-child(3) { left: 60%; background: #ffd6a5; animation-delay: .36s; }
-    .pc-4 .bl:nth-child(4) { left: 42%; top: 74px; background: #caffbf; animation-delay: .54s; }
+    .pc-4 .p:nth-child(1) { transform: rotate(-4deg); }
+    .pc-4 .p:nth-child(2) { transform: rotate(3deg); }
+    .pc-4 .p:nth-child(3) { animation: pcFlick 2.8s cubic-bezier(.3, .8, .4, 1) infinite; }
 
-    @keyframes pcPop {
-        0%, 40% { transform: scale(1) translateY(0); opacity: 1; }
-        50% { transform: scale(1.4); opacity: 0; }
-        88% { transform: scale(1) translateY(0); opacity: 0; }
-        96%, 100% { opacity: 1; }
+    @keyframes pcFlick {
+        0%, 18%   { transform: rotate(1deg) translate(0, 0); opacity: 1; }
+        58%, 100% { transform: rotate(22deg) translate(115%, -12%); opacity: 0; }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .pc-1 .b,
+        .pc-1 .dots i,
+        .pc-2 .foil::after,
+        .pc-2 .tear,
+        .pc-3 .st,
+        .pc-3 .arc,
+        .pc-4 .p {
+            animation: none;
+        }
+
+        .pc-1 .b,
+        .pc-3 .st,
+        .pc-3 .arc { opacity: 1; transform: none; }
+
+        .pc-2 .tear { width: 40%; opacity: 1; }
+    }
+
 
     /* ── Step 1: the theme swatches under the chosen design ───────────── */
     .prop-theme-grid {
@@ -4729,7 +4735,7 @@
                     <div class="step-num" id="psn2">2</div>
                     <div>
                         <div class="step-label">Your Words</div>
-                        <div class="step-sub">The question, the letter, the ring</div>
+                        <div class="step-sub">The question, the words, the photos</div>
                     </div>
                 </div>
                 <div class="prop-nav-item" id="propNav3" onclick="goToPropStep(3)">
@@ -5698,26 +5704,29 @@
             $savedPropQrTheme = ($cardOccasion === 'proposal') ? ($card->qr_data['theme'] ?? null) : null;
 
             // Which text box each field gets. Everything else is a plain input.
-            $propAreas = ['letter_text', 'closing_line'];
+            $propAreas = ['chat_text', 'caption_text', 'letter_text', 'closing_line'];
+            // How many lines each multi-line field may hold, so the textarea
+            // enforces the same shape the controller validates.
+            $propMultiline = \App\Http\Controllers\Client\BirthdayCardController::PROPOSAL_MULTILINE;
             $propLabels = [
-                'heading' => ['Kicker', 'The small line above the name'],
+                'heading' => ['Kicker', 'The small line at the top'],
                 'tap_label' => ['Tap hint', 'What the page asks them to do'],
-                'letter_text' => ['The letter', 'One line per line — up to 8'],
-                'pre_label' => ['Warning line', 'The line above the countdown'],
-                'countdown_seconds' => ['Countdown', 'How many seconds it counts (1-10)'],
+                'chat_text' => ['The messages', 'One message per line — up to ' . $propMultiline['chat_text']],
+                'caption_text' => ['The captions', 'One photo per line — up to ' . $propMultiline['caption_text']],
                 'question' => ['The question', 'The one that matters'],
                 'yes_label' => ['Yes button', ''],
-                'no_label' => ['No button', 'The one that runs away'],
-                'yes_heading' => ['After the Yes', 'The celebration heading'],
-                'wedding_date' => ['Wedding date', 'Optional — shows a date card after the Yes'],
-                'altar_label' => ['Date card label', ''],
-                'fallback_line' => ['If there is no date yet', 'Shown on the card instead'],
+                'no_label' => ['No button', 'The one that runs away — and gives up at the fifth try'],
+                'yes_heading' => ['After the Yes', 'The heading on the letter the Yes opens'],
+                'letter_text' => ['The letter', 'The surprise after the Yes — one line per line, up to ' . $propMultiline['letter_text']],
                 'closing_line' => ['Closing line', 'The last thing they read'],
                 'signed' => ['Signed', ''],
             ];
             $propPhotoLabels = [
-                'ring_photo' => 'The ring',
+                'photo_1' => 'Photo 1',
+                'photo_2' => 'Photo 2',
+                'photo_3' => 'Photo 3',
                 'couple_photo' => 'The two of you',
+                'ring_photo' => 'The ring',
             ];
             @endphp
             <div id="proposalFlow">
@@ -5745,21 +5754,22 @@
                                          letter, question, the No button running away, the
                                          celebration — then starting again. `data-src` because it
                                          is only loaded once this step is on screen. --}}
-                                    <iframe data-src="{{ route('proposal.design.theme', ['design' => $n, 'theme' => 1]) }}?demo=1{{ $n === 3 ? '&countdown_seconds=3' : '' }}"
+                                    <iframe data-src="{{ route('proposal.design.theme', ['design' => $n, 'theme' => 1]) }}?demo=1"
                                         title="{{ $d['name'] }} preview" tabindex="-1" aria-hidden="true"
                                         data-design="{{ $n }}"></iframe>
                                     <div class="pc pc-{{ $n }}" aria-hidden="true">
                                         <div class="pc-inner">
                                         @if ($n === 1)
-                                            <span class="note"></span><span class="base"></span><span class="lid"></span>
+                                            <span class="b"></span><span class="b"></span><span class="b"></span>
+                                            <span class="dots"><i></i><i></i><i></i></span>
                                         @elseif ($n === 2)
-                                            <span class="lk"><b></b><i></i><i></i></span>
+                                            <span class="foil"></span><span class="tear"></span>
                                         @elseif ($n === 3)
-                                            <span class="num">3</span><span class="num">2</span><span class="num">1</span>
-                                            <span class="flash"></span>
+                                            <span class="arc"></span>
+                                            <span class="st"></span><span class="st"></span><span class="st"></span>
+                                            <span class="st"></span><span class="st"></span>
                                         @else
-                                            <span class="bl"></span><span class="bl"></span>
-                                            <span class="bl"></span><span class="bl"></span>
+                                            <span class="p"></span><span class="p"></span><span class="p"></span>
                                         @endif
                                         </div>
                                     </div>
@@ -5876,15 +5886,11 @@
                                         @endif
                                     </div>
                                     @if (in_array($key, $propAreas))
-                                        <textarea id="prop_{{ $key }}" rows="{{ $key === 'letter_text' ? 5 : 2 }}"
+                                        <textarea id="prop_{{ $key }}"
+                                            rows="{{ isset($propMultiline[$key]) ? $propMultiline[$key] : 2 }}"
                                             maxlength="{{ $propLimits[$key] }}"
-                                            @if ($key === 'letter_text') data-max-lines="{{ \App\Http\Controllers\Client\BirthdayCardController::PROPOSAL_LETTER_MAX_LINES }}" @endif
+                                            @isset($propMultiline[$key]) data-max-lines="{{ $propMultiline[$key] }}" @endisset
                                             oninput="updatePropPreview()"></textarea>
-                                    @elseif ($key === 'wedding_date')
-                                        <input type="date" id="prop_{{ $key }}" oninput="updatePropPreview()">
-                                    @elseif ($key === 'countdown_seconds')
-                                        <input type="number" id="prop_{{ $key }}" min="1" max="10" placeholder="5"
-                                            style="max-width:120px;" oninput="updatePropPreview()">
                                     @else
                                         <input type="text" id="prop_{{ $key }}"
                                             maxlength="{{ $propLimits[$key] ?? 60 }}" oninput="updatePropPreview()">
@@ -11598,7 +11604,7 @@
         if (!frame || !propDesign || !propPreviewIsVisible(frame)) return;
         // the chosen design at full size, playing its flow through on a loop —
         // the same `?demo=1` the four cards use
-        frame.src = propPageUrl('demo=1' + (propDesign === 3 ? '&countdown_seconds=3' : ''));
+        frame.src = propPageUrl('demo=1');
     }
 
     function savePropDesignAndContinue() {
@@ -11717,7 +11723,7 @@
     let propPreviewMode = 'words';
     const PROP_MODE_HINTS = {
         words: 'Held at the question so you can read your own words. The recipient sees the reveal play out first.',
-        yes: 'The celebration, with your closing line and signature.',
+        yes: 'The surprise the Yes opens — your letter, sealed with both names and the date.',
         play: 'The whole thing, start to finish, on a loop — exactly what they will see.',
     };
 
@@ -11740,12 +11746,10 @@
             const p = propParams();
             if (propPreviewMode === 'play') {
                 p.set('demo', '1');
-                // a five-second countdown makes for a slow loop to watch
-                if (propDesign === 3 && !p.get('countdown_seconds')) p.set('countdown_seconds', '3');
             } else if (propPreviewMode === 'yes') {
                 p.set('preview_stage', 'yes');
             } else {
-                p.set('preview_stage', propDesign === 3 ? 'reveal' : 'open');
+                p.set('preview_stage', 'open');
             }
             frame.src = propPageUrl(p.toString());
         };

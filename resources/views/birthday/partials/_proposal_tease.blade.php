@@ -1,18 +1,16 @@
 {{--
-    Proposal · the shared "Will you marry me?" module.
+    Proposal · the question and the two buttons.
 
-    All four proposal designs end on the same question and the same pair of
-    buttons, so the behaviour lives here once rather than four times. Each
-    design @includes this partial and calls `initTeaseButtons()` with its own
-    root element and its own celebration:
+    All four designs end on the same pair, so the behaviour lives here once.
+    A design @includes this and calls:
 
         initTeaseButtons({
             root:  document.getElementById('askBlock'),
             onYes: () => celebrate(),
         });
 
-    Markup the module expects inside `root` (a design supplies its own
-    wrapper/typography — only the data attributes matter):
+    Markup it expects inside `root` (the design brings its own typography —
+    only the data attributes matter):
 
         <p data-tease-question>Will you marry me?</p>
         <div data-tease-row>
@@ -21,51 +19,56 @@
         </div>
         <p data-tease-stage></p>          (optional running commentary)
 
-    What it does:
-      · Pointer over "No" (or a tap on it) moves the button somewhere else
-        inside the row and shrinks it a little, each time, and puffs a sad
-        emoji out of where it was.
-      · Its label changes as it runs — "No" → "Are you sure?" → … so the
-        joke reads even to someone who never catches it.
-      · "Yes" grows as "No" shrinks, and always answers.
+    What it does, and why it ends:
+
+      · Pointer over "No" (or a tap on it) springs the button somewhere else
+        inside the row, a little smaller each time, and puffs an emoji out of
+        where it was.
+      · Its label runs down a ladder — "No" → "are you sure" → … — so the joke
+        reads even to someone who never catches the button.
+      · After five dodges **it gives up**: it shrinks out of existence and the
+        Yes takes the whole row. A gag with no ending is just an obstacle, and
+        an endless chase on a page like this one starts to feel mean — so the
+        page makes the decision the moment the joke stops being funny.
 
     Accessibility: the dodge is bound to *pointer* events only. A keyboard user
-    tabbing to "No" is never teleported away from the focused control (that is
-    a trap, not a joke) — pressing it plays the same emoji puff, changes the
-    label and returns focus, and "Yes" is always one Tab away. Both buttons
-    carry a visible focus ring. Under `prefers-reduced-motion` the button still
-    moves, but instantly and without the emoji shower.
+    tabbing to "No" is never teleported off the control they are focused on —
+    that is a trap, not a joke. Pressing it plays the same puff, advances the
+    ladder and returns focus to Yes, which is always one Tab away. Both buttons
+    carry a visible focus ring. Under prefers-reduced-motion the button still
+    moves, but instantly and without the emoji.
 
-    The colours come from the design's own CSS custom properties, so the module
-    is skinned by whichever theme is on the page:
+    Skinned by the design through:
         --pt-yes-bg, --pt-yes-ink, --pt-no-bg, --pt-no-ink, --pt-ink, --pt-ring
 --}}
 <style>
     [data-tease-row] {
         position: relative;
         display: flex;
-        flex-wrap: wrap;
-        gap: clamp(0.6rem, 3vw, 1.1rem);
+        flex-wrap: nowrap;
+        gap: clamp(.55rem, 3vw, .9rem);
         align-items: center;
         justify-content: center;
-        min-height: 74px;
-        margin-top: clamp(0.9rem, 3vw, 1.3rem);
+        min-height: 66px;
+        margin-top: clamp(.9rem, 3vw, 1.25rem);
     }
 
     [data-tease-yes],
     [data-tease-no] {
         font: inherit;
-        font-weight: 700;
-        letter-spacing: .02em;
+        font-weight: 600;
+        letter-spacing: .01em;
         border: 0;
         cursor: pointer;
         border-radius: 999px;
-        padding: 0.78em 1.9em;
-        font-size: clamp(0.98rem, 3.6vw, 1.12rem);
-        transition: transform .28s cubic-bezier(.2, .9, .3, 1.2),
-                    left .28s cubic-bezier(.2, .9, .3, 1.2),
-                    top .28s cubic-bezier(.2, .9, .3, 1.2),
-                    box-shadow .25s ease, background .25s ease, opacity .25s ease;
+        padding: .8em 1.85em;
+        font-size: clamp(.95rem, 3.6vw, 1.06rem);
+        white-space: nowrap;
+        transition: transform .34s cubic-bezier(.16, 1, .3, 1),
+                    left .34s cubic-bezier(.16, 1, .3, 1),
+                    top .34s cubic-bezier(.16, 1, .3, 1),
+                    width .34s cubic-bezier(.16, 1, .3, 1),
+                    box-shadow .25s ease, background .25s ease, opacity .3s ease;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
     }
@@ -73,38 +76,54 @@
     [data-tease-yes] {
         background: var(--pt-yes-bg, #a35a56);
         color: var(--pt-yes-ink, #fff);
-        box-shadow: 0 10px 26px -12px rgba(0, 0, 0, .55);
+        box-shadow: 0 12px 28px -14px rgba(0, 0, 0, .7);
     }
 
     [data-tease-yes]:hover {
-        transform: translateY(-2px) scale(1.04);
+        transform: translateY(-2px) scale(1.03);
+    }
+
+    [data-tease-yes]:active {
+        transform: translateY(0) scale(.98);
+    }
+
+    /* the Yes takes the row once the No has given up */
+    [data-tease-yes].pt-sole {
+        width: min(100%, 320px);
+        transform: none;
     }
 
     [data-tease-no] {
-        background: var(--pt-no-bg, rgba(255, 255, 255, .78));
+        background: var(--pt-no-bg, rgba(255, 255, 255, .72));
         color: var(--pt-no-ink, #4a2f2a);
         box-shadow: 0 6px 18px -12px rgba(0, 0, 0, .5);
     }
 
-    /* once it starts running it is taken out of the flow, so the Yes button
-       does not slide sideways every time the No button shrinks */
+    /* once it starts running it comes out of the flow, so the Yes does not
+       slide sideways every time the No shrinks */
     [data-tease-no].pt-loose {
         position: absolute;
         margin: 0;
         z-index: 3;
     }
 
+    [data-tease-no].pt-gone {
+        opacity: 0;
+        transform: scale(.2) !important;
+        pointer-events: none;
+    }
+
     [data-tease-yes]:focus-visible,
     [data-tease-no]:focus-visible {
-        outline: 3px solid var(--pt-ring, #ffffff);
+        outline: 3px solid var(--pt-ring, #fff);
         outline-offset: 3px;
     }
 
     [data-tease-stage] {
-        margin: 0.85rem 0 0;
-        min-height: 1.25em;
-        font-size: clamp(0.78rem, 3vw, 0.9rem);
-        opacity: .82;
+        margin: .8rem 0 0;
+        min-height: 1.3em;
+        font-size: clamp(.76rem, 3vw, .88rem);
+        opacity: .8;
         color: var(--pt-ink, inherit);
         transition: opacity .3s ease;
     }
@@ -113,7 +132,7 @@
         position: fixed;
         z-index: 999;
         pointer-events: none;
-        font-size: 1.5rem;
+        font-size: 1.45rem;
         animation: ptPuff 1.05s cubic-bezier(.2, .7, .3, 1) forwards;
     }
 
@@ -127,7 +146,7 @@
 
         [data-tease-yes],
         [data-tease-no] {
-            transition: background .2s ease, box-shadow .2s ease;
+            transition: background .2s ease, box-shadow .2s ease, opacity .2s ease;
         }
 
         .pt-puff {
@@ -137,11 +156,11 @@
 </style>
 <script>
     /**
-     * Wire one question block. Returns a small handle so a design can reset the
-     * module when its own "ask again" runs.
+     * Wire one question block. Returns a handle so a design can put the module
+     * back to the start — which is what the looping demo does every pass.
      *
-     * config: root (Element), onYes (Function), and optionally emojis, labels
-     * and stages — arrays of strings a design can override for its own tone.
+     * config: root (Element), onYes (Function), and optionally emojis, labels,
+     * stages (arrays a design can override for its own tone) and giveUpAt.
      */
     window.initTeaseButtons = function initTeaseButtons(config) {
         var root = config && config.root;
@@ -155,89 +174,117 @@
         if (!row || !yes || !no) return null;
 
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var emojis = config.emojis || ['😢', '🥺', '💔', '😭', '🙈'];
-        var labels = config.labels || ['No', 'Are you sure?', 'Really sure?', 'Think again!',
-            'Last chance…', 'You can\'t catch me', 'Just say yes 🥹'];
-        var stages = config.stages || ['', 'Hmm.', 'That button is not cooperating.',
-            'It is getting away from you.', 'One of these two is the right answer.',
-            'The other one is right there.', 'It has given up hiding. So should you.'];
+        var emojis = config.emojis || ['🥺', '😭', '💔', '🙈', '😔'];
+        var labels = config.labels || ['No', 'are you sure', 'think about it',
+            'last chance', 'you cannot catch me', 'ok fine'];
+        var stages = config.stages || ['', 'hm.', 'it moved again.',
+            'that button does not want to be pressed.',
+            'one of these two is the right answer.',
+            'and then there was one.'];
+        var giveUpAt = config.giveUpAt || 5;
 
         var dodges = 0;
+        var done = false;
+
+        function buzz(ms) {
+            if (reduced) return;
+            try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { /* not everywhere */ }
+        }
 
         function puff(x, y) {
             if (reduced) return;
             var el = document.createElement('span');
             el.className = 'pt-puff';
-            el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            el.textContent = emojis[(Math.random() * emojis.length) | 0];
             el.style.left = x + 'px';
             el.style.top = y + 'px';
             document.body.appendChild(el);
             setTimeout(function () { el.remove(); }, 1100);
         }
 
+        function say(n) {
+            no.textContent = labels[Math.min(n, labels.length - 1)];
+            if (stage) stage.textContent = stages[Math.min(n, stages.length - 1)];
+        }
+
+        /** The ending: the No stops being a button and the Yes takes the row. */
+        function giveUp() {
+            done = true;
+            var box = no.getBoundingClientRect();
+            puff(box.left + box.width / 2, box.top + box.height / 2);
+            no.classList.add('pt-gone');
+            no.setAttribute('tabindex', '-1');
+            no.setAttribute('aria-hidden', 'true');
+            yes.classList.add('pt-sole');
+            if (stage) stage.textContent = stages[stages.length - 1];
+            buzz([14, 60, 26]);
+        }
+
         /** Move "No" to a fresh spot inside the row, never off screen. */
         function dodge() {
+            if (done) return;
+
             var rowBox = row.getBoundingClientRect();
             var noBox = no.getBoundingClientRect();
-
             puff(noBox.left + noBox.width / 2, noBox.top + noBox.height / 2);
+            buzz(12);
 
             if (!no.classList.contains('pt-loose')) {
                 // freeze the row's height first, so taking the button out of
                 // the flow does not make the block jump
-                row.style.minHeight = Math.max(rowBox.height, 74) + 'px';
+                row.style.minHeight = Math.max(rowBox.height, 66) + 'px';
                 no.classList.add('pt-loose');
             }
 
             dodges++;
-            var scale = Math.max(0.45, 1 - dodges * 0.09);
+            if (dodges >= giveUpAt) { say(dodges); giveUp(); return; }
+
+            var scale = Math.max(.5, 1 - dodges * .1);
             var maxX = Math.max(0, rowBox.width - noBox.width);
             var maxY = Math.max(0, rowBox.height - noBox.height);
 
-            // keep it clear of the Yes button, so the two never overlap
+            // keep clear of the Yes, so the two never sit on top of each other
             var yesBox = yes.getBoundingClientRect();
             var left, top, tries = 0;
             do {
                 left = Math.random() * maxX;
                 top = Math.random() * maxY;
                 tries++;
-            } while (tries < 12 && Math.abs((rowBox.left + left) - yesBox.left) < yesBox.width &&
+            } while (tries < 14 && Math.abs((rowBox.left + left) - yesBox.left) < yesBox.width &&
                      Math.abs((rowBox.top + top) - yesBox.top) < yesBox.height);
 
             no.style.left = left + 'px';
             no.style.top = top + 'px';
             no.style.transform = 'scale(' + scale + ')';
-            no.textContent = labels[Math.min(dodges, labels.length - 1)];
-            if (stage) stage.textContent = stages[Math.min(dodges, stages.length - 1)];
-
-            if (dodges >= labels.length - 1) {
-                // it has run out of places to hide — leave it be, but harmless
-                no.style.opacity = '0.75';
-            }
+            say(dodges);
         }
 
-        // Pointer only: a keyboard user is never moved off the control they
-        // are focused on.
+        // Pointer only: a keyboard user is never moved off the focused control.
         no.addEventListener('pointerenter', function (e) {
             if (e.pointerType === 'mouse') dodge();
         });
+
         no.addEventListener('click', function (e) {
             e.preventDefault();
             dodge();
             no.blur();
         });
+
+        // Keyboard: same joke, same ending, but the button stays where it is.
         no.addEventListener('keydown', function (e) {
             if (e.key !== 'Enter' && e.key !== ' ') return;
             e.preventDefault();
+            if (done) { yes.focus(); return; }
             var box = no.getBoundingClientRect();
             puff(box.left + box.width / 2, box.top + box.height / 2);
             dodges++;
-            no.textContent = labels[Math.min(dodges, labels.length - 1)];
-            if (stage) stage.textContent = stages[Math.min(dodges, stages.length - 1)];
+            say(dodges);
+            if (dodges >= giveUpAt) giveUp();
             yes.focus();
         });
 
         yes.addEventListener('click', function () {
+            buzz([10, 40, 18]);
             if (typeof config.onYes === 'function') config.onYes();
         });
 
@@ -247,11 +294,14 @@
         return {
             reset: function () {
                 dodges = 0;
-                no.classList.remove('pt-loose');
+                done = false;
+                no.classList.remove('pt-loose', 'pt-gone');
                 no.removeAttribute('style');
-                no.textContent = labels[0];
+                no.removeAttribute('aria-hidden');
+                no.removeAttribute('tabindex');
+                yes.classList.remove('pt-sole');
                 row.style.minHeight = '';
-                if (stage) stage.textContent = stages[0];
+                say(0);
             }
         };
     };

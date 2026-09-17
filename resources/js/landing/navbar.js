@@ -15,4 +15,22 @@ export function initNavbar() {
 
     gsap.set(nav, { y: -20, opacity: 0 });
     gsap.to(nav, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.1 });
+
+    // Below 860px the links live in a drawer instead of disappearing.
+    const burger = document.getElementById('navBurger');
+    const drawer = document.getElementById('navDrawer');
+    if (!burger || !drawer) return;
+
+    const close = () => {
+        nav.classList.remove('is-open');
+        burger.setAttribute('aria-expanded', 'false');
+    };
+
+    burger.addEventListener('click', () => {
+        const open = nav.classList.toggle('is-open');
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    drawer.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+    window.addEventListener('resize', () => { if (window.innerWidth > 860) close(); });
 }
