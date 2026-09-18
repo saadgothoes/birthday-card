@@ -4511,6 +4511,8 @@
             display: block;
         }
     </style>
+    @include('partials.no-input-zoom')
+
 </head>
 
 @php

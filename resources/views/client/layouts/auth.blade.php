@@ -372,6 +372,8 @@
     </style>
 
     @stack('styles')
+    @include('partials.no-input-zoom')
+
 </head>
 
 <body>
