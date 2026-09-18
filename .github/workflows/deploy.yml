@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
 
+# Ek waqt mein sirf ek deploy chale. Agar pichla abhi chal raha ho to naya
+# uska intezar karega — do deploy ek saath server par nahi tikrayenge.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -15,14 +21,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build assets
         run: npm run build
 
-      - name: Deploy to server
+      # Pehle code aur PHP packages. Build files abhi nahi bhejni, kyunki
+      # git pull unhe hata sakta hai.
+      - name: Pull code and install PHP packages
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -33,13 +42,12 @@ jobs:
           script: |
             cd ~/birthday_card_app
             git pull origin main
-            php composer.phar install --no-dev --optimize-autoloader
+            COMPOSER_MEMORY_LIMIT=-1 php composer.phar install \
+              --no-dev --optimize-autoloader --no-interaction
             php artisan migrate --force
-            php artisan config:cache
-            php artisan view:cache
-            mkdir -p tmp
-            touch tmp/restart.txt
 
+      # Ab taaza build files. Ye git pull ke BAAD ja rahi hain, is liye
+      # inhe koi cheez overwrite nahi karegi.
       - name: Upload build files
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -50,3 +58,24 @@ jobs:
           source: "public/build/*"
           target: "/home/clinic/birthday_card_app/public/build"
           strip_components: 2
+
+      # Sab kuch apni jagah aa gaya — ab purani cache hatao aur app restart karo.
+      # clear pehle, cache baad mein: warna Laravel purani copy hi pakre rehta hai.
+      - name: Clear caches and restart app
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            cd ~/birthday_card_app
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            mkdir -p tmp
+            touch tmp/restart.txt
